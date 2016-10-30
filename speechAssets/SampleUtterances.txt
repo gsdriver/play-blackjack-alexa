@@ -1,0 +1,5 @@
+BlackjackIntent do {Action}
+BlackjackIntent to {Action}
+BettingIntent bet {Amount}
+BettingIntent to bet {Amount}
+BettingIntent play for {Amount}

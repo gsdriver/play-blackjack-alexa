@@ -1,0 +1,31 @@
+{
+  "intents": [
+    {
+      "intent": "BlackjackIntent",
+      "slots": [
+      {
+        "name": "Action",
+        "type": "LIST_OF_ACTIONS"
+      }
+     ]
+    },
+    {
+      "intent": "BettingIntent",
+      "slots": [
+        {
+          "name": "Amount",
+          "type": "AMAZON.Number"
+        }
+      ]
+    },
+   {
+      "intent": "AMAZON.HelpIntent"
+    },
+    {
+      "intent": "AMAZON.StopIntent"
+    },
+    {
+      "intent": "AMAZON.CancelIntent"
+    }
+  ]
+}
