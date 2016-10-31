@@ -65,7 +65,7 @@ Blackjack.prototype.intentHandlers = {
         else
         {
             // Let's play this action
-            playgame.PlayBlackjackAction(session.user.userId, actionSlot.value, 0, function(speechError, speech, gameState) {
+            playgame.PlayBlackjackAction(session.user.userId, GetBlackjackAction(actionSlot), 0, function(speechError, speech, gameState) {
                 if (gameState)
                 {
                     session.attributes = gameState;
@@ -99,6 +99,19 @@ Blackjack.prototype.intentHandlers = {
                 SendAlexaResponse(speechError, speech, response);
             });
         }
+    },
+    // Rules intent
+    "RulesIntent" : function (intent, session, response) {
+        // Just read the rules
+        playgame.ReadRules(session.user.userId, function(speechError, speech, gameState)
+        {
+            if (gameState)
+            {
+                session.attributes = gameState;
+            }
+
+            SendAlexaResponse(speechError, speech, response);
+        });
     },
     // Stop intent
     "AMAZON.StopIntent": function (intent, session, response) {
@@ -151,6 +164,29 @@ function SendAlexaResponse(speechError, speech, response)
         };
         response.tellWithCard(speechOutput, cardTitle, "Hit or stand");
     }
+}
+
+/*
+ * Maps whatever the user said to the appropriate action
+ */
+function GetBlackjackAction(actionSlot)
+{
+    var mapping = ["hit", "hit", "take a hit", "hit", "hit me", "hit", "take one", "hit",
+            "stand", "stand", "stay", "stand", "done", "stand",
+            "surrender", "surrender", "give up", "surrender",
+            "double", "double", "double down", "double down",
+            "split", "split",
+            "insurance", "insurance", "take insurance", "insurance", "insure me", "insurance",
+            "no insurance", "noinsurance", "never take insurance", "noinsurance",
+            "don't take insurance", "noinsurance",
+            "shuffle", "shuffle", "shuffle deck", "shuffle",
+            "reset", "resetbankroll", "reset bankroll", "resetbankroll"];
+    var index, action;
+
+    // Look it up in lowercase
+    index = outcomeMapping.indexOf(actionSlot.value.toLowerCase());
+    action = (index > -1) ? mapping[index + 1] : actionSlot.value;
+    return action;
 }
 
 exports.handler = function (event, context) 

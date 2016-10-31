@@ -18,7 +18,10 @@
         }
       ]
     },
-   {
+    {
+      "intent": "RulesIntent"
+    },
+    {
       "intent": "AMAZON.HelpIntent"
     },
     {

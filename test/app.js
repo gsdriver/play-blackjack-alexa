@@ -32,10 +32,11 @@ function PrintResults(speechError, speech, gameState)
 
     if (gameState)
     {
-        console.log(JSON.stringify(gameState));
+        console.log(); //JSON.stringify(gameState));
     }
 }
 
 const userID = "d0fb4421-3686-4a7a-866b-c69e1a3318f5";
 
-playgame.PlayBlackjackAction(userID, "stand", 100, PrintResults);
+//playgame.ReadRules(userID, PrintResults);
+playgame.PlayBlackjackAction(userID, (process.argv.length > 2) ? process.argv[2] : "stand", 100, PrintResults);
