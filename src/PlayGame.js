@@ -26,7 +26,7 @@
 
 var http = require('http');
 var requestify = require('requestify');
-var config = require('../src/config');
+var config = require('./config');
 
 const cardRanks = ["none", "ace", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "jack", "queen", "king"];
 
@@ -58,7 +58,7 @@ module.exports = {
             }
             else {
                 // OK, let's post this action and get a new game state
-                PostUserAction(gameState.userID, action, amount, function(error, newGameState) {
+                PostUserAction(gameState.userID, action, (amount ? amount : gameState.lastBet), function(error, newGameState) {
                     if (error)
                     {
                         speechError = error;
