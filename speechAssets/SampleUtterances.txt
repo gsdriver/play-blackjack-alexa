@@ -6,5 +6,10 @@ BettingIntent play for {Amount}
 RulesIntent read rules
 RulesIntent what are the rules
 RulesIntent tell me the rules
-RulesIntent tell rules
-RulesIntent rules
+SuggestIntent what should I do
+SuggestIntent give suggestion
+SuggestIntent to give suggestion
+SuggestIntent suggest action
+SuggestIntent suggest play
+SuggestIntent to suggest action
+SuggestIntent to suggest play

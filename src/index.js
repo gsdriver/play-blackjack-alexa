@@ -105,6 +105,13 @@ Blackjack.prototype.intentHandlers = {
             SendAlexaResponse(speechError, speech, response);
         });
     },
+    // Suggestion intent
+    "SuggestIntent" : function (intent, session, response) {
+        // Get a suggestion
+        playgame.PlayBlackjackAction(session.user.userId, "suggest", 0, function(speechError, speech, gameState) {
+            SendAlexaResponse(speechError, speech, response);
+        });
+    },
     // Stop intent
     "AMAZON.StopIntent": function (intent, session, response) {
         var speechOutput = "Goodbye";

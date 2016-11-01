@@ -37,41 +37,72 @@ module.exports = {
         var speechError;
         var speech = "Sorry, internal error. What else can I help with?";
 
-        // Get the game state so we can take action (the latest should be stored tied to this user ID)
-        GetGameState(userID, function(error, gameState) {
-            if (error)
+        // Special case if this is suggest
+        if (action == "suggest")
+        {
+            PostUserAction(userID, action, 0, function(error, suggestion)
             {
-                speechError = "There was an error: " + error;
-                callback(speechError, null, null);
-                return;
-            }
+                var mapping = ["insurance", "You should take Insurance",
+                               "noinsurance", "You shouldn't take Insurance",
+                               "hit", "You should hit",
+                               "stand", "You should stand",
+                               "split", "You should split",
+                               "double", "You should Double Down",
+                               "surrender", "You should surrender"];
+                var index;
+                var speechError = (suggestion.error) ? suggestion.error : error;
+                var suggestText = suggestion.suggestion;
 
-            // Is this a valid option?
-            if (!gameState.possibleActions || (gameState.possibleActions.indexOf(action) < 0))
-            {
-                // Probably need a way to read out the game state better
-                speechError = "I'm sorry, " + action + " is not a valid action at this time. ";
-                speechError += ReadHand(gameState);
-                speechError += " " + ListValidActions(gameState);
-                speechError += "What else can I help with?";
-                callback(speechError, null, gameState);
-            }
-            else {
-                // OK, let's post this action and get a new game state
-                PostUserAction(gameState.userID, action, (amount ? amount : gameState.lastBet), function(error, newGameState) {
-                    if (error)
+                if (suggestText)
+                {
+                    index = mapping.indexOf(suggestText);
+                    if (index > -1)
                     {
-                        speechError = error;
+                        suggestText = mapping[index + 1];
                     }
-                    else
-                    {
-                        speech = TellResult(action, gameState, newGameState);
-                    }
+                }
 
-                    callback(speechError, speech, newGameState);
-                });
-            }
-        });
+                callback(speechError, suggestText, null);
+            });
+        }
+        else
+        {
+            // Get the game state so we can take action (the latest should be stored tied to this user ID)
+            GetGameState(userID, function(error, gameState) {
+                if (error)
+                {
+                    speechError = "There was an error: " + error;
+                    callback(speechError, null, null);
+                    return;
+                }
+
+                // Is this a valid option?
+                if (!gameState.possibleActions || (gameState.possibleActions.indexOf(action) < 0))
+                {
+                    // Probably need a way to read out the game state better
+                    speechError = "I'm sorry, " + action + " is not a valid action at this time. ";
+                    speechError += ReadHand(gameState);
+                    speechError += " " + ListValidActions(gameState);
+                    speechError += "What else can I help with?";
+                    callback(speechError, null, gameState);
+                }
+                else {
+                    // OK, let's post this action and get a new game state
+                    PostUserAction(gameState.userID, action, (amount ? amount : gameState.lastBet), function(error, newGameState) {
+                        if (error)
+                        {
+                            speechError = error;
+                        }
+                        else
+                        {
+                            speech = TellResult(action, gameState, newGameState);
+                        }
+
+                        callback(speechError, speech, newGameState);
+                    });
+                }
+            });
+        }
     },
     // Reads back the rules in play
     ReadRules: function (userID, callback)

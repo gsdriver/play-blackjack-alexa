@@ -117,4 +117,5 @@ if (process.argv.length > 2)
 }
 
 BlackjackIntent(jackAction, thisSession, null);
+//playgame.PlayBlackjackAction(userID, "suggest", 0, PrintResults);
 

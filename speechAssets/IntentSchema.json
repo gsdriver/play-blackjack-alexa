@@ -22,6 +22,9 @@
       "intent": "RulesIntent"
     },
     {
+      "intent": "SuggestIntent"
+    },
+    {
       "intent": "AMAZON.HelpIntent"
     },
     {
