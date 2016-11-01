@@ -78,27 +78,19 @@ Blackjack.prototype.intentHandlers = {
     // Betting intent
     "BettingIntent" : function (intent, session, response) {
         var amountSlot = intent.slots.Amount;
+        var amount = (!amountSlot || !amountSlot.value) ? 0 : amountSlot.value;
         var error;
 
-        // Make sure we have an amount first
-        if (!amountSlot || !amountSlot.value)
+        // Take the bet
+        playgame.PlayBlackjackAction(session.user.userId, "bet", amount, function(speechError, speech, gameState)
         {
-            error = "I'm sorry, you need to provide an amount to bet. What else can I help you with?";
-            SendAlexaResponse(error, null, response);
-        }
-        else
-        {
-            // Take the bet
-            playgame.PlayBlackjackAction(session.user.userId, "bet", amountSlot.value, function(speechError, speech, gameState)
+            if (gameState)
             {
-                if (gameState)
-                {
-                    session.attributes = gameState;
-                }
+                session.attributes = gameState;
+            }
 
-                SendAlexaResponse(speechError, speech, response);
-            });
-        }
+            SendAlexaResponse(speechError, speech, response);
+        });
     },
     // Rules intent
     "RulesIntent" : function (intent, session, response) {
@@ -174,18 +166,18 @@ function GetBlackjackAction(actionSlot)
     var mapping = ["hit", "hit", "take a hit", "hit", "hit me", "hit", "take one", "hit",
             "stand", "stand", "stay", "stand", "done", "stand",
             "surrender", "surrender", "give up", "surrender",
-            "double", "double", "double down", "double down",
+            "double", "double", "double down", "double",
             "split", "split",
             "insurance", "insurance", "take insurance", "insurance", "insure me", "insurance",
             "no insurance", "noinsurance", "never take insurance", "noinsurance",
             "don't take insurance", "noinsurance",
             "shuffle", "shuffle", "shuffle deck", "shuffle",
             "reset", "resetbankroll", "reset bankroll", "resetbankroll",
-            "deal", "bet"];
+            "bet", "bet", "deal", "bet"];
     var index, action;
 
     // Look it up in lowercase
-    index = outcomeMapping.indexOf(actionSlot.value.toLowerCase());
+    index = mapping.indexOf(actionSlot.value.toLowerCase());
     action = (index > -1) ? mapping[index + 1] : actionSlot.value;
     return action;
 }
