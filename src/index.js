@@ -112,6 +112,31 @@ Blackjack.prototype.intentHandlers = {
             SendAlexaResponse(speechError, speech, response);
         });
     },
+    // Change rules intent
+    "ChangeRulesIntent" : function (intent, session, response) {
+        // Which rule should we change?
+        var changeSlot = intent.slots.Change;
+        var optionSlot = intent.slots.ChangeOption;
+
+        if (!changeSlot)
+        {
+            error = "I'm sorry, I didn't catch a rule to change. Please provide a rule to change like Surrender or Hit Soft 17. What else can I help with?";
+            SendAlexaResponse(error, null, response);
+        }
+        else if (!changeSlot.value) {
+            speechError = "I'm sorry, I don't understand how to change " + changeSlot.value + ". Please provide a rule to change like Surrender or Hit Soft 17. What else can I help with?";
+            SendAlexaResponse(error, null, response);
+        }
+        else if (!optionSlot || !optionSlot.value)
+        {
+            error = "I'm sorry, I didn't catch how to change " + changeSlot.value;
+        }
+        else
+        {
+            // Build the appropriate rules object
+            var rules = BuildRulesObject(changeSlot.value, optionSlot.value);
+        }
+    },
     // Stop intent
     "AMAZON.StopIntent": function (intent, session, response) {
         var speechOutput = "Goodbye";
@@ -187,6 +212,19 @@ function GetBlackjackAction(actionSlot)
     index = mapping.indexOf(actionSlot.value.toLowerCase());
     action = (index > -1) ? mapping[index + 1] : actionSlot.value;
     return action;
+}
+
+/*
+ * Determines which rules to change
+ */
+function BuildRulesObject(option, value)
+{
+    var valueMapping = {"on": true, "off": false, "enable": true, "disable": false,
+                "3 to 2": 0.5, "three to two": 0.5, "6 to 5": 0.2, "six to five": 0.2, "even": 0, "even money": 0,
+                "one deck": 1, "two decks": 2, "four decks": 4, "six decks": 6, "eight decks": 8,
+                "two deck": 2, "four deck": 4, "six deck": 6, "eight deck": 8,
+                "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "eight": 8};
+    var ruleMapping = {};
 }
 
 exports.handler = function (event, context) 

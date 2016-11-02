@@ -224,9 +224,9 @@ function GetSpeechError(response)
 function ActionToText(action)
 {
     var index;
-    var mapping = ["resetbankroll", "Bet",
-                   "shuffle", "Bet",
-                   "bet", "Bet",
+    var mapping = ["resetbankroll", "Deal",
+                   "shuffle", "Deal",
+                   "bet", "Deal",
                    "insurance", "Take Insurance",
                    "noinsurance", "Don't take Insurance",
                    "hit", "Hit",
@@ -575,7 +575,7 @@ function RulesToText(rules)
     // Double rules
     var doubleMapping = ["any", "any cards",
                           "10or11", "10 or 11 only",
-                          "9or10o11", "9-11 only",
+                          "9or10o11", "9 thru 11 only",
                           "none", "not allowed"];
     var iDouble = doubleMapping.indexOf(rules.double);
     if (iDouble > -1)
@@ -592,8 +592,8 @@ function RulesToText(rules)
 
     // Surrender rules
     var surrenderMapping = ["none", "Surrender not offered. ",
-                          "early", "Early surrender allowed. ",
-                          "late", "Late surrender allowed. "];
+                          "early", "Surrender allowed. ",
+                          "late", "Surrender allowed. "];
     var iSurrender = surrenderMapping.indexOf(rules.surrender);
     if (iSurrender > -1) {
         text += surrenderMapping[iSurrender + 1];

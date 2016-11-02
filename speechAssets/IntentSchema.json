@@ -22,6 +22,19 @@
       "intent": "RulesIntent"
     },
     {
+      "intent": "ChangeRulesIntent",
+      "slots": [
+        {
+          "name": "Change",
+          "type": "LIST_OF_RULE_OPTIONS"
+        },
+        {
+          "name": "ChangeOption",
+          "type": "LIST_OF_RULE_VALUES"
+        }
+      ]
+    }
+    {
       "intent": "SuggestIntent"
     },
     {
