@@ -317,7 +317,6 @@ function TellResult(action, gameState, newGameState)
 function ReadDealerAction(gameState)
 {
     var result, i;
-    var dealerTotal = HandTotal(gameState.dealerHand.cards);
 
     result = "The dealer had a " + cardRanks[gameState.dealerHand.cards[0].rank] + " down.";
     if (gameState.dealerHand.cards.length > 2)
@@ -335,13 +334,13 @@ function ReadDealerAction(gameState)
         result += ".";
     }
 
-    if (dealerTotal.total > 21)
+    if (gameState.dealerHand.total > 21)
     {
         result += " The dealer busted.";
     }
     else
     {
-        result += " The dealer had a total of " + dealerTotal.total + ".";
+        result += " The dealer had a total of " + gameState.dealerHand.total + ".";
     }
 
     return result;
@@ -380,18 +379,17 @@ function ReadGameResult(gameState)
  */
 function ReadHit(gameState)
 {
-    var cards = gameState.playerHands[gameState.currentPlayerHand].cards;
+    var currentHand = gameState.playerHands[gameState.currentPlayerHand];
     var result;
-    var handTotal = HandTotal(cards);
 
-    result = "You got a " + cardRanks[cards[cards.length - 1].rank];
-    if (handTotal.total > 21)
+    result = "You got a " + cardRanks[currentHand.cards[currentHand.cards.length - 1].rank];
+    if (currentHand.total > 21)
     {
         result += " and busted. ";
     }
     else
     {
-        result += " for a total of " + handTotal.total + ".";
+        result += " for a total of " + (currentHand.soft ? "soft " : "") + currentHand.total + ".";
         result += " The dealer is showing a " + cardRanks[gameState.dealerHand.cards[1].rank];
         result += ".";
     }
@@ -410,18 +408,17 @@ function ReadHit(gameState)
  */
 function ReadDouble(gameState)
 {
-    var cards = gameState.playerHands[gameState.currentPlayerHand].cards;
+    var currentHand = gameState.playerHands[gameState.currentPlayerHand];
     var result;
-    var handTotal = HandTotal(cards);
 
-    result = "You got a " + cardRanks[cards[cards.length - 1].rank];
-    if (handTotal.total > 21)
+    result = "You got a " + cardRanks[currentHand.cards[currentHand.cards.length - 1].rank];
+    if (currentHand.total > 21)
     {
         result += " and busted.";
     }
     else
     {
-        result += " for a total of " + handTotal.total + ". ";
+        result += " for a total of " + (currentHand.soft ? "soft " : "") + currentHand.total + ". ";
     }
 
     if (gameState.activePlayer != "player")
@@ -515,13 +512,13 @@ function ReadHand(gameState)
 {
     var result = "";
     var i;
-    var handTotal = HandTotal(gameState.playerHands[gameState.currentPlayerHand].cards);
+    var currentHand = gameState.playerHands[gameState.currentPlayerHand];
 
     // If they have more than one hand, then say the hand number
     result += ReadHandNumber(gameState, gameState.currentPlayerHand);
 
     // Read the full hand
-    if (handTotal.total > 21)
+    if (currentHand.total > 21)
     {
         result += "You busted with ";
     }
@@ -531,16 +528,16 @@ function ReadHand(gameState)
         result += (gameState.activePlayer == "none") ? "You had " : "You have ";
     }
 
-    for (i = 0; i < gameState.playerHands[gameState.currentPlayerHand].cards.length; i++)
+    for (i = 0; i < currentHand.cards.length; i++)
     {
-        result += cardRanks[gameState.playerHands[gameState.currentPlayerHand].cards[i].rank];
-        if (i < gameState.playerHands[gameState.currentPlayerHand].cards.length - 1)
+        result += cardRanks[currentHand.cards[i].rank];
+        if (i < currentHand.cards.length - 1)
         {
             result += " and ";
         }
     }
 
-    result += " for a total of " + handTotal.speech;
+    result += " for a total of " + (currentHand.soft ? "soft " : "") + currentHand.total;
     result += ". The dealer ";
     result += (gameState.activePlayer == "none") ? "had a " : "has a ";
     result += cardRanks[gameState.dealerHand.cards[1].rank];
@@ -562,42 +559,6 @@ function ReadHandNumber(gameState, handNumber)
         result = mapping[handNumber];
     }
 
-    return result;
-}
-
-function HandTotal(cards)
-{
-    var result = {speech: "", total: 0, soft: false};
-    var hasAces = false;
-
-    for (var i = 0; i < cards.length; i++)
-    {
-        if (cards[i].rank > 10)
-        {
-            result.total += 10;
-        }
-        else
-        {
-            result.total += cards[i].rank;
-        }
-
-        // Note if there's an ace
-        if (cards[i].rank == 1)
-        {
-            hasAces = true;
-        }
-    }
-
-    // If there are aces, add 10 to the total (unless it would go over 21)
-    // Note that in this case the hand is soft
-    if ((result.total <= 11) && hasAces)
-    {
-        result.speech = "soft ";
-        result.total += 10;
-        result.soft = true;
-    }
-
-    result.speech += result.total;
     return result;
 }
 
