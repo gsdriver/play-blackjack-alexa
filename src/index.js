@@ -92,6 +92,13 @@ Blackjack.prototype.intentHandlers = {
             SendAlexaResponse(speechError, speech, response);
         });
     },
+    // Suggestion intent
+    "SuggestIntent" : function (intent, session, response) {
+        // Get a suggestion
+        playgame.PlayBlackjackAction(session.user.userId, "suggest", 0, function(speechError, speech, gameState) {
+            SendAlexaResponse(speechError, speech, response);
+        });
+    },
     // Rules intent
     "RulesIntent" : function (intent, session, response) {
         // Just read the rules
@@ -102,13 +109,6 @@ Blackjack.prototype.intentHandlers = {
                 session.attributes = gameState;
             }
 
-            SendAlexaResponse(speechError, speech, response);
-        });
-    },
-    // Suggestion intent
-    "SuggestIntent" : function (intent, session, response) {
-        // Get a suggestion
-        playgame.PlayBlackjackAction(session.user.userId, "suggest", 0, function(speechError, speech, gameState) {
             SendAlexaResponse(speechError, speech, response);
         });
     },
@@ -176,7 +176,7 @@ function GetBlackjackAction(actionSlot)
             "double", "double", "double down", "double",
             "split", "split",
             "insurance", "insurance", "take insurance", "insurance", "insure me", "insurance",
-            "no insurance", "noinsurance", "never take insurance", "noinsurance",
+            "noinsurance", "noinsurance", "no insurance", "noinsurance", "never take insurance", "noinsurance",
             "don't take insurance", "noinsurance",
             "shuffle", "shuffle", "shuffle deck", "shuffle",
             "reset", "resetbankroll", "reset bankroll", "resetbankroll",

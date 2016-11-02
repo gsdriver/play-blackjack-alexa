@@ -98,7 +98,26 @@ module.exports = {
                             speech = TellResult(action, gameState, newGameState);
                         }
 
-                        callback(speechError, speech, newGameState);
+                        // If this is shuffle, we'll do the shuffle for them
+                        if (!error && (newGameState.possibleActions.indexOf("shuffle") > -1))
+                        {
+                            // Simplify things and just shuffle for them
+                            PostUserAction(gameState.userID, "shuffle", 0, function(nextError, nextGameState) {
+                                callback(null, speech, nextGameState);
+                            });
+                        }
+                        // If this is resetbankroll, we'll do that for them too
+                        else if (!error && (newGameState.possibleActions.indexOf("resetbankroll") > -1))
+                        {
+                            // Simplify things and just shuffle for them
+                            PostUserAction(gameState.userID, "resetbankroll", 0, function(nextError, nextGameState) {
+                                callback(null, speech, nextGameState);
+                            });
+                        }
+                        else
+                        {
+                            callback(speechError, speech, newGameState);
+                        }
                     });
                 }
             });
@@ -175,15 +194,38 @@ function PostUserAction(userID, action, amount, callback)
         callback(null, JSON.parse(response.body));
     })
     .fail(function(response) {
-        callback(response.getCode(), null);
+        callback(GetSpeechError(response), null);
     });;
+}
+
+function GetSpeechError(response)
+{
+    var errorMapping = ["bettoosmall", "Your bet is below the minimum of five dollars",
+                        "bettoolarge", "Your bet is below the maximum of one thousand dollars",
+                        "betoverbankroll", "Your bet is more than your available bankroll"];
+    var errorText = "Internal error";
+    var error;
+    var index;
+
+    error = response.getBody();
+    if (error && error.error)
+    {
+        index = errorMapping.indexOf(error.error);
+        errorText = (index > -1) ? errorMapping[index + 1] : error.error;
+    }
+    else
+    {
+        errorText = "Error code " + response.getCode();
+    }
+
+    return errorText;
 }
 
 function ActionToText(action)
 {
     var index;
-    var mapping = ["resetbankroll", "Reset Bankroll",
-                   "shuffle", "Shuffle",
+    var mapping = ["resetbankroll", "Bet",
+                   "shuffle", "Bet",
                    "bet", "Bet",
                    "insurance", "Take Insurance",
                    "noinsurance", "Don't take Insurance",
@@ -254,6 +296,7 @@ function TellResult(action, gameState, newGameState)
         case "noinsurance":
             // Say whether the dealer had blackjack, and what the next thing is to do
             result += ReadInsurance(newGameState);
+            break;
         case "split":
             // OK, now you have multiple hands - makes reading the game state more interesting
             result += ReadSplit(newGameState);
@@ -455,7 +498,7 @@ function ReadInsurance(gameState)
         result += "The dealer had a blackjack. ";
         result += ReadGameResult(gameState);
     }
-    else if (game.dealerHand.outcome == "nodealerblackjack")
+    else if (gameState.dealerHand.outcome == "nodealerblackjack")
     {
         // No blackjack - so what do you want to do now?
         result += "The dealer didn't have a blackjack. ";

@@ -30,7 +30,7 @@ function GetBlackjackAction(actionSlot)
             "double", "double", "double down", "double",
             "split", "split",
             "insurance", "insurance", "take insurance", "insurance", "insure me", "insurance",
-            "no insurance", "noinsurance", "never take insurance", "noinsurance",
+            "noinsurance", "noinsurance", "no insurance", "noinsurance", "never take insurance", "noinsurance",
             "don't take insurance", "noinsurance",
             "shuffle", "shuffle", "shuffle deck", "shuffle",
             "reset", "resetbankroll", "reset bankroll", "resetbankroll",
@@ -63,6 +63,7 @@ function BlackjackIntent(intent, session, response) {
             if (gameState)
             {
                 session.attributes = gameState;
+//console.log(JSON.stringify(gameState));
             }
 
             PrintResults(speechError, speech, response);
@@ -70,20 +71,22 @@ function BlackjackIntent(intent, session, response) {
     }
 }
 
+function SuggestIntent(intent, session, response) {
+    // Get a suggestion
+    playgame.PlayBlackjackAction(session.user.userId, "suggest", 0, function(speechError, speech, gameState) {
+        PrintResults(speechError, speech, response);
+    });
+}
+
 function PrintResults(speechError, speech, gameState)
 {
     if (speech)
     {
-        console.log("I say " + speech);
+        console.log(speech);
     }
     if (speechError)
     {
         console.log("Error " + speechError);
-    }
-
-    if (gameState)
-    {
-        console.log(); //JSON.stringify(gameState));
     }
 }
 
@@ -110,12 +113,24 @@ var jackAction =  {
                          }
                        }
                      };
+var suggestAction = {
+                          "name": "SuggestIntent",
+                          "slots": {}
+                        };
 
-if (process.argv.length > 2)
+if ((process.argv.length > 2) && (process.argv[2] == "suggest"))
 {
-    jackAction.slots.Action.value = process.argv[2];
+    SuggestIntent(suggestAction, thisSession, null);
+}
+else
+{
+    if (process.argv.length > 2)
+    {
+        jackAction.slots.Action.value = process.argv[2];
+    }
+
+    BlackjackIntent(jackAction, thisSession, null);
 }
 
-BlackjackIntent(jackAction, thisSession, null);
 //playgame.PlayBlackjackAction(userID, "suggest", 0, PrintResults);
 
