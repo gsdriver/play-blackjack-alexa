@@ -117,24 +117,43 @@ Blackjack.prototype.intentHandlers = {
         // Which rule should we change?
         var changeSlot = intent.slots.Change;
         var optionSlot = intent.slots.ChangeOption;
+        var speechError;
 
         if (!changeSlot)
         {
-            error = "I'm sorry, I didn't catch a rule to change. Please provide a rule to change like Surrender or Hit Soft 17. What else can I help with?";
-            SendAlexaResponse(error, null, response);
+            speechError = "I'm sorry, I didn't catch a rule to change. Please provide a rule to change like Surrender or Hit Soft 17. What else can I help with?";
+            SendAlexaResponse(speechError, null, response);
         }
         else if (!changeSlot.value) {
             speechError = "I'm sorry, I don't understand how to change " + changeSlot.value + ". Please provide a rule to change like Surrender or Hit Soft 17. What else can I help with?";
-            SendAlexaResponse(error, null, response);
+            SendAlexaResponse(speechError, null, response);
         }
         else if (!optionSlot || !optionSlot.value)
         {
-            error = "I'm sorry, I didn't catch how to change " + changeSlot.value;
+            speechError = "I'm sorry, I didn't catch how to change " + changeSlot.value;
         }
         else
         {
-            // Build the appropriate rules object
+            // Build the appropriate rules object and set it
             var rules = BuildRulesObject(changeSlot.value, optionSlot.value);
+
+            if (!rules)
+            {
+                speechError = "I'm sorry, I was unable to change " + changeSlot.value + " to " + optionSlot.value;
+                SendAlexaResponse(speechError, null, response);
+            }
+            else
+            {
+                playgame.ChangeRules(session.user.userId, rules, function(speechError, speech, gameState)
+                {
+                    if (gameState)
+                    {
+                        session.attributes = gameState;
+                    }
+
+                    SendAlexaResponse(speechError, speech, response);
+                });
+            }
         }
     },
     // Stop intent
@@ -223,8 +242,27 @@ function BuildRulesObject(option, value)
                 "3 to 2": 0.5, "three to two": 0.5, "6 to 5": 0.2, "six to five": 0.2, "even": 0, "even money": 0,
                 "one deck": 1, "two decks": 2, "four decks": 4, "six decks": 6, "eight decks": 8,
                 "two deck": 2, "four deck": 4, "six deck": 6, "eight deck": 8,
-                "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "eight": 8};
-    var ruleMapping = {};
+                "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "eight": 8,
+                 "1": 1, "2": 2, "3": 3, "4": 4, "6": 6, "8": 8};
+    var ruleMapping = {"hit soft seventeen": "hitSoft17", "soft seventeen": "hitSoft17", "surrender": "surrender",
+                "double": "double", "double down": "double", "double after split": "doubleaftersplit", "resplit aces": "resplitAces",
+                "blackjack pays": "blackjackBonus", "blackjack bonus": "blackjackBonus", "number of decks": "numberOfDecks",
+                "decks": "numberOfDecks", "minimum bet": "minBet", "table minimum": "minBet", "maximum bet": "maxBet",
+                "table maximum": "maxBet", "number of splits": "maxSplitHands", "number of split hands": "maxSplitHands",
+                "split hands": "maxSplitHands"};
+    var ruleValue = valueMapping[value.toLowerCase()];
+    var ruleOption = ruleMapping[option.toLowerCase()];
+    var rules = {};
+
+    if ((ruleValue == undefined) || (ruleOption == undefined))
+    {
+        return null;
+    }
+
+    // OK, now we can set the rule object appropriately
+    rules[ruleOption] = ruleValue;
+    console.log(JSON.stringify(rules));
+    return rules;
 }
 
 exports.handler = function (event, context) 

@@ -32,7 +32,7 @@ const cardRanks = ["none", "ace", "two", "three", "four", "five", "six", "seven"
 
 module.exports = {
     //Plays a given action, returning either an error or a response string
-    PlayBlackjackAction: function (userID, action, amount, callback)
+    PlayBlackjackAction: function (userID, action, value, callback)
     {
         var speechError;
         var speech = "Sorry, internal error. What else can I help with?";
@@ -88,7 +88,7 @@ module.exports = {
                 }
                 else {
                     // OK, let's post this action and get a new game state
-                    PostUserAction(gameState.userID, action, (amount ? amount : gameState.lastBet), function(error, newGameState) {
+                    PostUserAction(gameState.userID, action, (value ? value : gameState.lastBet), function(error, newGameState) {
                         if (error)
                         {
                             speechError = error;
@@ -143,6 +143,38 @@ module.exports = {
             speech = RulesToText(gameState.houseRules);
             callback(speechError, speech, gameState);
         });
+    },
+    // Changes the rules in play
+    ChangeRules : function (userID, rules, callback)
+    {
+        var speechError;
+        var speech = "Sorry, internal error. What else can I help with?";
+
+        // OK, let's post the rule change and get a new game state
+        PostUserAction(userID, "setrules", rules, function(error, newGameState) {
+            if (error)
+            {
+                speechError = error;
+            }
+            else
+            {
+                // Read the new rules
+                speech = RulesToText(newGameState.houseRules);
+            }
+
+            // If this is shuffle, we'll do the shuffle for them
+            if (!error && (newGameState.possibleActions.indexOf("shuffle") > -1))
+            {
+                // Simplify things and just shuffle for them
+                PostUserAction(userID, "shuffle", 0, function(nextError, nextGameState) {
+                    callback(null, speech, nextGameState);
+                });
+            }
+            else
+            {
+                callback(speechError, speech, newGameState);
+            }
+        });
     }
 };
 
@@ -177,13 +209,17 @@ function GetGameState(userID, callback)
     });
 }
 
-function PostUserAction(userID, action, amount, callback)
+function PostUserAction(userID, action, value, callback)
 {
     var payload = {userID: userID, action: action};
 
     if (action == "bet")
     {
-        payload.value = amount;
+        payload.value = value;
+    }
+    else if (action == "setrules")
+    {
+        for (var attrname in value) { payload[attrname] = value[attrname]; }
     }
     requestify.post(config.serviceEndpoint, payload)
     .then(function(response) {

@@ -22,3 +22,4 @@ SuggestIntent suggest action
 SuggestIntent suggest play
 SuggestIntent to suggest action
 SuggestIntent to suggest play
+ChangeRulesIntent change {Change} to {ChangeOption}
