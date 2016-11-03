@@ -1,225 +1,74 @@
-var playgame = require('../src/PlayGame');
+var mainApp = require('../src/index');
 
-   /*
-var endpoint = "http://localhost:3000";
-
-requestify.post(endpoint, {userID: "d4360c70-814c-446b-a712-511c3231b144", action: "bet", value:"100"})
-.then(function(response) {
-    // Get the response body (JSON parsed or jQuery object for XMLs)
-    response.getBody();
-
-    // Get the raw response body
-    console.log(JSON.stringify(response.body));
-})
-.fail(function(response) {
-    console.log("ERROR " + response.getCode());
-    console.log(JSON.stringify(response));
-});
-
-http://blackjacktutor-env.us-west-2.elasticbeanstalk.com/get?userID=amzn1.ask.account.AFLJ3RYNI3X6MQMX4KVH52CZKDSI6PMWCQWRBHSPJJPR2MKGDNJHW36XF2ET6I2BFUDRKH3SR2ACZ5VCRLXLGJFBTQGY4RNYZA763JED57USTK6F7IRYT6KR3XYO2ZTKK55OM6ID2WQXQKKXJCYMWXQ74YXREHVTQ3VUD5QHYBJTKHDDH5R4ALQAGIQKPFL52A3HQ377WNCCHYI
-*/
-
-function BuildRulesObject(option, value)
+function BuildEvent(argv)
 {
-    var valueMapping = {"on": true, "off": false, "enable": true, "disable": false,
-                "3 to 2": 0.5, "three to two": 0.5, "6 to 5": 0.2, "six to five": 0.2, "even": 0, "even money": 0,
-                "one deck": 1, "two decks": 2, "four decks": 4, "six decks": 6, "eight decks": 8,
-                "two deck": 2, "four deck": 4, "six deck": 6, "eight deck": 8,
-                "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "eight": 8,
-                "1": 1, "2": 2, "3": 3, "4": 4, "6": 6, "8": 8};
-    var ruleMapping = {"hit soft seventeen": "hitSoft17", "soft seventeen": "hitSoft17", "surrender": "surrender",
-                "double": "double", "double down": "double", "double after split": "doubleaftersplit", "resplit aces": "resplitAces",
-                "blackjack pays": "blackjackBonus", "blackjack bonus": "blackjackBonus", "number of decks": "numberOfDecks",
-                "decks": "numberOfDecks", "minimum bet": "minBet", "table minimum": "minBet", "maximum bet": "maxBet",
-                "table maximum": "maxBet", "number of splits": "maxSplitHands", "number of split hands": "maxSplitHands",
-                "split hands": "maxSplitHands"};
-    var ruleValue = valueMapping[value.toLowerCase()];
-    var ruleOption = ruleMapping[option.toLowerCase()];
-    var rules = {};
+    // Templates that can fill in the intent
+    var blackjackIntent = {"name": "BlackjackIntent", "slots": {"Action": {"name": "Action", "value": ""}}};
+    var suggestIntent = {"name": "SuggestIntent", "slots": {}};
+    var changeRulesIntent = {"name": "ChangeRulesIntent", "slots": {"ChangeOption": {"name": "ChangeOption", "value": ""}, "Change": {"name": "Change", "value": ""}}};
+    var readRulesIntent = {"name": "RulesIntent", "slots": {}};
+    var betIntent = {"name": "BetIntent", "slots": {"Amount": {"name": "Amount", "value": ""}}};
 
-    if ((ruleValue == undefined) || (ruleOption == undefined))
+    var lambda = {
+       "session": {
+         "sessionId": "SessionId.c88ec34d-28b0-46f6-a4c7-120d8fba8fa7",
+         "application": {
+           "applicationId": "amzn1.ask.skill.74ea63e3-3295-463f-8ea5-cd80f4b6cfc9"
+         },
+         "attributes": {},
+         "user": {
+           "userId": "amzn1.ask.account.AFLJ3RYNI3X6MQMX4KVH52CZKDSI6PMWCQWRBHSPJJPR2MKGDNJHW36XF2ET6I2BFUDRKH3SR2ACZ5VCRLXLGJFBTQGY4RNYZA763JED57USTK6F7IRYT6KR3XYO2ZTKK55OM6ID2WQXQKKXJCYMWXQ74YXREHVTQ3VUD5QHYBJTKHDDH5R4ALQAGIQKPFL52A3HQ377WNCCHYI"
+         },
+         "new": true
+       },
+       "request": {
+         "type": "IntentRequest",
+         "requestId": "EdwRequestId.26405959-e350-4dc0-8980-14cdc9a4e921",
+         "locale": "en-US",
+         "timestamp": "2016-11-03T21:31:08Z",
+         "intent": {}
+       },
+       "version": "1.0"
+     };
+
+    // If there is no argument, then we'll just ask for the rules
+    if ((argv.length <= 2) || (argv[2] == "rules"))
     {
-        return null;
+        lambda.request.intent = readRulesIntent;
     }
-
-    // OK, now we can set the rule object appropriately
-    rules[ruleOption] = ruleValue;
-    console.log(JSON.stringify(rules));
-    return rules;
-}
-
-/*
- * Maps whatever the user said to the appropriate action
- */
-function GetBlackjackAction(actionSlot)
-{
-    var mapping = ["hit", "hit", "take a hit", "hit", "hit me", "hit", "take one", "hit",
-            "stand", "stand", "stay", "stand", "done", "stand",
-            "surrender", "surrender", "give up", "surrender",
-            "double", "double", "double down", "double",
-            "split", "split",
-            "insurance", "insurance", "take insurance", "insurance", "insure me", "insurance",
-            "noinsurance", "noinsurance", "no insurance", "noinsurance", "never take insurance", "noinsurance",
-            "don't take insurance", "noinsurance",
-            "shuffle", "shuffle", "shuffle deck", "shuffle",
-            "reset", "resetbankroll", "reset bankroll", "resetbankroll",
-            "bet", "bet", "deal", "bet"];
-    var index, action;
-
-    // Look it up in lowercase
-    index = mapping.indexOf(actionSlot.value.toLowerCase());
-    action = (index > -1) ? mapping[index + 1] : actionSlot.value;
-    return action;
-}
-
-function BlackjackIntent(intent, session, response) {
-    // First make sure we have an action
-    var actionSlot = intent.slots.Action;
-    var error;
-
-    if (!actionSlot) {
-        error = "I'm sorry, I didn't catch that action. Please say what you want to do on this hand like hit or stand. What else can I help with?";
-        PrintResults(error, null, response);
+    else if (argv[2] == "suggest")
+    {
+        lambda.request.intent = suggestIntent;
     }
-    else if (!actionSlot.value) {
-        speechError = "I'm sorry, I don't understand how to " + actionSlot.value + ". Please provide an action like hit or stand. What else can I help with?";
-        PrintResults(error, null, response);
+    else if (argv[2] == "bet")
+    {
+        betIntent.slots.Amount.value = (argv.length > 3) ? argv[3] : 100;
+        lambda.request.intent = betIntent;
+    }
+    else if (argv[2] == "change")
+    {
+        changeRulesIntent.slots.Change.value = (argv.length > 3) ? argv[3] : "hit soft 17";
+        changeRulesIntent.slots.ChangeOption.value = (argv.length > 4) ? argv[4] : "on";
+        lambda.request.intent = changeRulesIntent;
     }
     else
     {
-        // Let's play this action
-        playgame.PlayBlackjackAction(session.user.userId, GetBlackjackAction(actionSlot), 0, function(speechError, speech, gameState) {
-            if (gameState)
-            {
-                session.attributes = gameState;
-//console.log(JSON.stringify(gameState));
-            }
-
-            PrintResults(speechError, speech, response);
-        });
+        blackjackIntent.slots.Action.value = argv[2];
+        lambda.request.intent = blackjackIntent;
     }
+
+    return lambda;
 }
 
-function ChangeRulesIntent(intent, session, response) {
-    // Which rule should we change?
-    var changeSlot = intent.slots.Change;
-    var optionSlot = intent.slots.ChangeOption;
-    var speechError;
-
-    if (!changeSlot)
-    {
-        speechError = "I'm sorry, I didn't catch a rule to change. Please provide a rule to change like Surrender or Hit Soft 17. What else can I help with?";
-        PrintResults(speechError, null, response);
-    }
-    else if (!changeSlot.value) {
-        speechError = "I'm sorry, I don't understand how to change " + changeSlot.value + ". Please provide a rule to change like Surrender or Hit Soft 17. What else can I help with?";
-        PrintResults(speechError, null, response);
-    }
-    else if (!optionSlot || !optionSlot.value)
-    {
-        speechError = "I'm sorry, I didn't catch how to change " + changeSlot.value;
-    }
-    else
-    {
-        // Build the appropriate rules object and set it
-        var rules = BuildRulesObject(changeSlot.value, optionSlot.value);
-
-        if (!rules)
-        {
-            speechError = "I'm sorry, I was unable to change " + changeSlot.value + " to " + optionSlot.value;
-            PrintResults(speechError, null, response);
-        }
-        else
-        {
-            playgame.ChangeRules(session.user.userId, rules, function(speechError, speech, gameState)
-            {
-                if (gameState)
-                {
-                    session.attributes = gameState;
-                }
-
-                PrintResults(speechError, speech, response);
-            });
-        }
-    }
- }
-
-function SuggestIntent(intent, session, response) {
-    // Get a suggestion
-    playgame.PlayBlackjackAction(session.user.userId, "suggest", 0, function(speechError, speech, gameState) {
-        PrintResults(speechError, speech, response);
-    });
+// Simple response - just print out what I'm given
+function myResponse(appId) {
+    this._appId = appId;
 }
 
-function PrintResults(speechError, speech, gameState)
-{
-    if (speech)
-    {
-        console.log(speech);
-    }
-    if (speechError)
-    {
-        console.log("Error " + speechError);
-    }
+myResponse.succeed = function(result) {
+    console.log(result.response.outputSpeech.text);
 }
 
-const userID = "9c7fc59c-29c6-49ca-9c20-9c9324849460";
-
-//playgame.ReadRules(userID, PrintResults);
-var thisSession = {
-                      "sessionId": "SessionId.d9a53cc2-638f-4f08-bb62-4a3cf970fcc2",
-                      "application": {
-                        "applicationId": "amzn1.ask.skill.74ea63e3-3295-463f-8ea5-cd80f4b6cfc9"
-                      },
-                      "attributes": {},
-                      "user": {
-                        "userId": userID //"amzn1.ask.account.AFLJ3RYNI3X6MQMX4KVH52CZKDSI6PMWCQWRBHSPJJPR2MKGDNJHW36XF2ET6I2BFUDRKH3SR2ACZ5VCRLXLGJFBTQGY4RNYZA763JED57USTK6F7IRYT6KR3XYO2ZTKK55OM6ID2WQXQKKXJCYMWXQ74YXREHVTQ3VUD5QHYBJTKHDDH5R4ALQAGIQKPFL52A3HQ377WNCCHYI"
-                      },
-                      "new": true
-                    };
-var jackAction =  {
-                       "name": "BlackjackIntent",
-                       "slots": {
-                         "Action": {
-                           "name": "Action",
-                           "value": "stand"
-                         }
-                       }
-                     };
-var suggestAction = {
-                          "name": "SuggestIntent",
-                          "slots": {}
-                        };
-var changeRules = {
-                        "name": "ChangeRulesIntent",
-      "slots": {
-        "ChangeOption": {
-          "name": "ChangeOption",
-          "value": "6"
-        },
-        "Change": {
-          "name": "Change",
-          "value": "number of decks"
-        }
-      }
-                        };
-
-ChangeRulesIntent(changeRules, thisSession, null);
-return;
-
-if ((process.argv.length > 2) && (process.argv[2] == "suggest"))
-{
-    SuggestIntent(suggestAction, thisSession, null);
-}
-else
-{
-    if (process.argv.length > 2)
-    {
-        jackAction.slots.Action.value = process.argv[2];
-    }
-
-    BlackjackIntent(jackAction, thisSession, null);
-}
-
-//playgame.PlayBlackjackAction(userID, "suggest", 0, PrintResults);
+// Build the event object and call the app
+mainApp.handler(BuildEvent(process.argv), myResponse);
 

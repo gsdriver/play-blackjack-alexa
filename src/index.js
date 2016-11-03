@@ -262,7 +262,6 @@ function BuildRulesObject(option, value)
 
     // OK, now we can set the rule object appropriately
     rules[ruleOption] = ruleValue;
-    console.log(JSON.stringify(rules));
     return rules;
 }
 
