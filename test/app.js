@@ -1,136 +1,74 @@
-var playgame = require('../src/PlayGame');
+var mainApp = require('../src/index');
 
-   /*
-var endpoint = "http://localhost:3000";
-
-requestify.post(endpoint, {userID: "d4360c70-814c-446b-a712-511c3231b144", action: "bet", value:"100"})
-.then(function(response) {
-    // Get the response body (JSON parsed or jQuery object for XMLs)
-    response.getBody();
-
-    // Get the raw response body
-    console.log(JSON.stringify(response.body));
-})
-.fail(function(response) {
-    console.log("ERROR " + response.getCode());
-    console.log(JSON.stringify(response));
-});
-
-http://blackjacktutor-env.us-west-2.elasticbeanstalk.com/get?userID=amzn1.ask.account.AFLJ3RYNI3X6MQMX4KVH52CZKDSI6PMWCQWRBHSPJJPR2MKGDNJHW36XF2ET6I2BFUDRKH3SR2ACZ5VCRLXLGJFBTQGY4RNYZA763JED57USTK6F7IRYT6KR3XYO2ZTKK55OM6ID2WQXQKKXJCYMWXQ74YXREHVTQ3VUD5QHYBJTKHDDH5R4ALQAGIQKPFL52A3HQ377WNCCHYI
-*/
-
-/*
- * Maps whatever the user said to the appropriate action
- */
-function GetBlackjackAction(actionSlot)
+function BuildEvent(argv)
 {
-    var mapping = ["hit", "hit", "take a hit", "hit", "hit me", "hit", "take one", "hit",
-            "stand", "stand", "stay", "stand", "done", "stand",
-            "surrender", "surrender", "give up", "surrender",
-            "double", "double", "double down", "double",
-            "split", "split",
-            "insurance", "insurance", "take insurance", "insurance", "insure me", "insurance",
-            "noinsurance", "noinsurance", "no insurance", "noinsurance", "never take insurance", "noinsurance",
-            "don't take insurance", "noinsurance",
-            "shuffle", "shuffle", "shuffle deck", "shuffle",
-            "reset", "resetbankroll", "reset bankroll", "resetbankroll",
-            "bet", "bet", "deal", "bet"];
-    var index, action;
+    // Templates that can fill in the intent
+    var blackjackIntent = {"name": "BlackjackIntent", "slots": {"Action": {"name": "Action", "value": ""}}};
+    var suggestIntent = {"name": "SuggestIntent", "slots": {}};
+    var changeRulesIntent = {"name": "ChangeRulesIntent", "slots": {"ChangeOption": {"name": "ChangeOption", "value": ""}, "Change": {"name": "Change", "value": ""}}};
+    var readRulesIntent = {"name": "RulesIntent", "slots": {}};
+    var betIntent = {"name": "BetIntent", "slots": {"Amount": {"name": "Amount", "value": ""}}};
 
-    // Look it up in lowercase
-    index = mapping.indexOf(actionSlot.value.toLowerCase());
-    action = (index > -1) ? mapping[index + 1] : actionSlot.value;
-    return action;
-}
+    var lambda = {
+       "session": {
+         "sessionId": "SessionId.c88ec34d-28b0-46f6-a4c7-120d8fba8fa7",
+         "application": {
+           "applicationId": "amzn1.ask.skill.74ea63e3-3295-463f-8ea5-cd80f4b6cfc9"
+         },
+         "attributes": {},
+         "user": {
+           "userId": "amzn1.ask.account.AFLJ3RYNI3X6MQMX4KVH52CZKDSI6PMWCQWRBHSPJJPR2MKGDNJHW36XF2ET6I2BFUDRKH3SR2ACZ5VCRLXLGJFBTQGY4RNYZA763JED57USTK6F7IRYT6KR3XYO2ZTKK55OM6ID2WQXQKKXJCYMWXQ74YXREHVTQ3VUD5QHYBJTKHDDH5R4ALQAGIQKPFL52A3HQ377WNCCHYI"
+         },
+         "new": true
+       },
+       "request": {
+         "type": "IntentRequest",
+         "requestId": "EdwRequestId.26405959-e350-4dc0-8980-14cdc9a4e921",
+         "locale": "en-US",
+         "timestamp": "2016-11-03T21:31:08Z",
+         "intent": {}
+       },
+       "version": "1.0"
+     };
 
-function BlackjackIntent(intent, session, response) {
-    // First make sure we have an action
-    var actionSlot = intent.slots.Action;
-    var error;
-
-    if (!actionSlot) {
-        error = "I'm sorry, I didn't catch that action. Please say what you want to do on this hand like hit or stand. What else can I help with?";
-        PrintResults(error, null, response);
+    // If there is no argument, then we'll just ask for the rules
+    if ((argv.length <= 2) || (argv[2] == "rules"))
+    {
+        lambda.request.intent = readRulesIntent;
     }
-    else if (!actionSlot.value) {
-        speechError = "I'm sorry, I don't understand how to " + actionSlot.value + ". Please provide an action like hit or stand. What else can I help with?";
-        PrintResults(error, null, response);
+    else if (argv[2] == "suggest")
+    {
+        lambda.request.intent = suggestIntent;
+    }
+    else if (argv[2] == "bet")
+    {
+        betIntent.slots.Amount.value = (argv.length > 3) ? argv[3] : 100;
+        lambda.request.intent = betIntent;
+    }
+    else if (argv[2] == "change")
+    {
+        changeRulesIntent.slots.Change.value = (argv.length > 3) ? argv[3] : "hit soft 17";
+        changeRulesIntent.slots.ChangeOption.value = (argv.length > 4) ? argv[4] : "on";
+        lambda.request.intent = changeRulesIntent;
     }
     else
     {
-        // Let's play this action
-        playgame.PlayBlackjackAction(session.user.userId, GetBlackjackAction(actionSlot), 0, function(speechError, speech, gameState) {
-            if (gameState)
-            {
-                session.attributes = gameState;
-//console.log(JSON.stringify(gameState));
-            }
-
-            PrintResults(speechError, speech, response);
-        });
-    }
-}
-
-function SuggestIntent(intent, session, response) {
-    // Get a suggestion
-    playgame.PlayBlackjackAction(session.user.userId, "suggest", 0, function(speechError, speech, gameState) {
-        PrintResults(speechError, speech, response);
-    });
-}
-
-function PrintResults(speechError, speech, gameState)
-{
-    if (speech)
-    {
-        console.log(speech);
-    }
-    if (speechError)
-    {
-        console.log("Error " + speechError);
-    }
-}
-
-const userID = "d0fb4421-3686-4a7a-866b-c69e1a3318f5";
-
-//playgame.ReadRules(userID, PrintResults);
-var thisSession = {
-                      "sessionId": "SessionId.d9a53cc2-638f-4f08-bb62-4a3cf970fcc2",
-                      "application": {
-                        "applicationId": "amzn1.ask.skill.74ea63e3-3295-463f-8ea5-cd80f4b6cfc9"
-                      },
-                      "attributes": {},
-                      "user": {
-                        "userId": "amzn1.ask.account.AFLJ3RYNI3X6MQMX4KVH52CZKDSI6PMWCQWRBHSPJJPR2MKGDNJHW36XF2ET6I2BFUDRKH3SR2ACZ5VCRLXLGJFBTQGY4RNYZA763JED57USTK6F7IRYT6KR3XYO2ZTKK55OM6ID2WQXQKKXJCYMWXQ74YXREHVTQ3VUD5QHYBJTKHDDH5R4ALQAGIQKPFL52A3HQ377WNCCHYI"
-                      },
-                      "new": true
-                    };
-var jackAction =  {
-                       "name": "BlackjackIntent",
-                       "slots": {
-                         "Action": {
-                           "name": "Action",
-                           "value": "stand"
-                         }
-                       }
-                     };
-var suggestAction = {
-                          "name": "SuggestIntent",
-                          "slots": {}
-                        };
-
-if ((process.argv.length > 2) && (process.argv[2] == "suggest"))
-{
-    SuggestIntent(suggestAction, thisSession, null);
-}
-else
-{
-    if (process.argv.length > 2)
-    {
-        jackAction.slots.Action.value = process.argv[2];
+        blackjackIntent.slots.Action.value = argv[2];
+        lambda.request.intent = blackjackIntent;
     }
 
-    BlackjackIntent(jackAction, thisSession, null);
+    return lambda;
 }
 
-//playgame.PlayBlackjackAction(userID, "suggest", 0, PrintResults);
+// Simple response - just print out what I'm given
+function myResponse(appId) {
+    this._appId = appId;
+}
+
+myResponse.succeed = function(result) {
+    console.log(result.response.outputSpeech.text);
+}
+
+// Build the event object and call the app
+mainApp.handler(BuildEvent(process.argv), myResponse);
 

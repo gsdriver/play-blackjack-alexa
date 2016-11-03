@@ -3,7 +3,16 @@ BlackjackIntent to {Action}
 BettingIntent bet {Amount}
 BettingIntent to bet {Amount}
 BettingIntent play for {Amount}
+BettingIntent bet {Amount} dollars
+BettingIntent to bet {Amount} dollars
+BettingIntent play for {Amount} dollars
+BettingIntent do bet
+BettingIntent to deal
+BettingIntent to bet
 RulesIntent read rules
+RulesIntent read the rules
+RulesIntent to read rules
+RulesIntent to read the rules
 RulesIntent what are the rules
 RulesIntent tell me the rules
 SuggestIntent what should I do
@@ -13,3 +22,4 @@ SuggestIntent suggest action
 SuggestIntent suggest play
 SuggestIntent to suggest action
 SuggestIntent to suggest play
+ChangeRulesIntent change {Change} to {ChangeOption}

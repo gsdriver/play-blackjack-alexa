@@ -32,7 +32,7 @@ const cardRanks = ["none", "ace", "two", "three", "four", "five", "six", "seven"
 
 module.exports = {
     //Plays a given action, returning either an error or a response string
-    PlayBlackjackAction: function (userID, action, amount, callback)
+    PlayBlackjackAction: function (userID, action, value, callback)
     {
         var speechError;
         var speech = "Sorry, internal error. What else can I help with?";
@@ -84,11 +84,11 @@ module.exports = {
                     speechError += ReadHand(gameState);
                     speechError += " " + ListValidActions(gameState);
                     speechError += "What else can I help with?";
-                    callback(speechError, null, gameState);
+                    SendUserCallback(gameState, speechError, null, callback);
                 }
                 else {
                     // OK, let's post this action and get a new game state
-                    PostUserAction(gameState.userID, action, (amount ? amount : gameState.lastBet), function(error, newGameState) {
+                    PostUserAction(gameState.userID, action, (value ? value : gameState.lastBet), function(error, newGameState) {
                         if (error)
                         {
                             speechError = error;
@@ -98,26 +98,7 @@ module.exports = {
                             speech = TellResult(action, gameState, newGameState);
                         }
 
-                        // If this is shuffle, we'll do the shuffle for them
-                        if (!error && (newGameState.possibleActions.indexOf("shuffle") > -1))
-                        {
-                            // Simplify things and just shuffle for them
-                            PostUserAction(gameState.userID, "shuffle", 0, function(nextError, nextGameState) {
-                                callback(null, speech, nextGameState);
-                            });
-                        }
-                        // If this is resetbankroll, we'll do that for them too
-                        else if (!error && (newGameState.possibleActions.indexOf("resetbankroll") > -1))
-                        {
-                            // Simplify things and just shuffle for them
-                            PostUserAction(gameState.userID, "resetbankroll", 0, function(nextError, nextGameState) {
-                                callback(null, speech, nextGameState);
-                            });
-                        }
-                        else
-                        {
-                            callback(speechError, speech, newGameState);
-                        }
+                        SendUserCallback(gameState, speechError, speech, callback);
                     });
                 }
             });
@@ -143,8 +124,62 @@ module.exports = {
             speech = RulesToText(gameState.houseRules);
             callback(speechError, speech, gameState);
         });
+    },
+    // Changes the rules in play
+    ChangeRules : function (userID, rules, callback)
+    {
+        var speechError;
+        var speech = "Sorry, internal error. What else can I help with?";
+
+        // OK, let's post the rule change and get a new game state
+        PostUserAction(userID, "setrules", rules, function(error, newGameState) {
+            if (error)
+            {
+                speechError = error;
+            }
+            else
+            {
+                // Read the new rules
+                speech = RulesToText(newGameState.houseRules);
+            }
+
+            // If this is shuffle, we'll do the shuffle for them
+            SendUserCallback(newGameState, error, speech, callback);
+        });
     }
 };
+
+/*
+ * It's possible the game gets to a state where you have to reset the bankroll
+ * or shuffle the deck.  Let's do that automatically for the user
+ */
+function SendUserCallback(gameState, error, speech, callback)
+{
+    // If this is shuffle, we'll do the shuffle for them
+    if (gameState && gameState.possibleActions)
+    {
+        if (gameState.possibleActions.indexOf("shuffle") > -1)
+        {
+            // Simplify things and just shuffle for them
+            PostUserAction(gameState.userID, "shuffle", 0, function(nextError, nextGameState) {
+                callback(error, speech, nextGameState);
+            });
+            return;
+        }
+        // If this is resetbankroll, we'll do that for them too
+        else if (gameState.possibleActions.indexOf("resetbankroll") > -1)
+        {
+            // Simplify things and just shuffle for them
+            PostUserAction(gameState.userID, "resetbankroll", 0, function(nextError, nextGameState) {
+                callback(error, speech, nextGameState);
+            });
+            return;
+        }
+    }
+
+    // Nope, just do a regular callback
+    callback(error, speech, gameState);
+}
 
 /*
  * Internal functions
@@ -177,13 +212,17 @@ function GetGameState(userID, callback)
     });
 }
 
-function PostUserAction(userID, action, amount, callback)
+function PostUserAction(userID, action, value, callback)
 {
     var payload = {userID: userID, action: action};
 
     if (action == "bet")
     {
-        payload.value = amount;
+        payload.value = value;
+    }
+    else if (action == "setrules")
+    {
+        for (var attrname in value) { payload[attrname] = value[attrname]; }
     }
     requestify.post(config.serviceEndpoint, payload)
     .then(function(response) {
@@ -224,9 +263,9 @@ function GetSpeechError(response)
 function ActionToText(action)
 {
     var index;
-    var mapping = ["resetbankroll", "Bet",
-                   "shuffle", "Bet",
-                   "bet", "Bet",
+    var mapping = ["resetbankroll", "Deal",
+                   "shuffle", "Deal",
+                   "bet", "Deal",
                    "insurance", "Take Insurance",
                    "noinsurance", "Don't take Insurance",
                    "hit", "Hit",
@@ -512,7 +551,14 @@ function ReadHand(gameState)
 {
     var result = "";
     var i;
-    var currentHand = gameState.playerHands[gameState.currentPlayerHand];
+    var currentHand;
+
+    // It's possible there is no hand
+    if (gameState.playerHands.length == 0)
+    {
+        return "";
+    }
+    currentHand = gameState.playerHands[gameState.currentPlayerHand];
 
     // If they have more than one hand, then say the hand number
     result += ReadHandNumber(gameState, gameState.currentPlayerHand);
@@ -566,8 +612,8 @@ function RulesToText(rules)
 {
     var text = "";
 
-    // Start with bet information
-    text += "Bet: $" + rules.minBet + " - " + rules.maxBet + ". ";
+    // Say the decks and betting range
+    text += rules.numberOfDecks + " deck game, bet from " + rules.minBet + " to " + rules.maxBet + " dollars. ";
 
     // Hit or stand on soft 17
     text += "Dealer " + (rules.hitSoft17 ? "hits" : "stands") + " on soft 17. ";
@@ -575,7 +621,7 @@ function RulesToText(rules)
     // Double rules
     var doubleMapping = ["any", "any cards",
                           "10or11", "10 or 11 only",
-                          "9or10o11", "9-11 only",
+                          "9or10o11", "9 thru 11 only",
                           "none", "not allowed"];
     var iDouble = doubleMapping.indexOf(rules.double);
     if (iDouble > -1)
@@ -592,8 +638,8 @@ function RulesToText(rules)
 
     // Surrender rules
     var surrenderMapping = ["none", "Surrender not offered. ",
-                          "early", "Early surrender allowed. ",
-                          "late", "Late surrender allowed. "];
+                          "early", "Surrender allowed. ",
+                          "late", "Surrender allowed. "];
     var iSurrender = surrenderMapping.indexOf(rules.surrender);
     if (iSurrender > -1) {
         text += surrenderMapping[iSurrender + 1];
