@@ -84,7 +84,7 @@ module.exports = {
                     speechError += ReadHand(gameState);
                     speechError += " " + ListValidActions(gameState);
                     speechError += "What else can I help with?";
-                    callback(speechError, null, gameState);
+                    SendUserCallback(gameState, speechError, null, callback);
                 }
                 else {
                     // OK, let's post this action and get a new game state
@@ -98,26 +98,7 @@ module.exports = {
                             speech = TellResult(action, gameState, newGameState);
                         }
 
-                        // If this is shuffle, we'll do the shuffle for them
-                        if (!error && (newGameState.possibleActions.indexOf("shuffle") > -1))
-                        {
-                            // Simplify things and just shuffle for them
-                            PostUserAction(gameState.userID, "shuffle", 0, function(nextError, nextGameState) {
-                                callback(null, speech, nextGameState);
-                            });
-                        }
-                        // If this is resetbankroll, we'll do that for them too
-                        else if (!error && (newGameState.possibleActions.indexOf("resetbankroll") > -1))
-                        {
-                            // Simplify things and just shuffle for them
-                            PostUserAction(gameState.userID, "resetbankroll", 0, function(nextError, nextGameState) {
-                                callback(null, speech, nextGameState);
-                            });
-                        }
-                        else
-                        {
-                            callback(speechError, speech, newGameState);
-                        }
+                        SendUserCallback(gameState, speechError, speech, callback);
                     });
                 }
             });
@@ -163,20 +144,42 @@ module.exports = {
             }
 
             // If this is shuffle, we'll do the shuffle for them
-            if (!error && (newGameState.possibleActions.indexOf("shuffle") > -1))
-            {
-                // Simplify things and just shuffle for them
-                PostUserAction(userID, "shuffle", 0, function(nextError, nextGameState) {
-                    callback(null, speech, nextGameState);
-                });
-            }
-            else
-            {
-                callback(speechError, speech, newGameState);
-            }
+            SendUserCallback(newGameState, error, speech, callback);
         });
     }
 };
+
+/*
+ * It's possible the game gets to a state where you have to reset the bankroll
+ * or shuffle the deck.  Let's do that automatically for the user
+ */
+function SendUserCallback(gameState, error, speech, callback)
+{
+    // If this is shuffle, we'll do the shuffle for them
+    if (gameState && gameState.possibleActions)
+    {
+        if (gameState.possibleActions.indexOf("shuffle") > -1)
+        {
+            // Simplify things and just shuffle for them
+            PostUserAction(gameState.userID, "shuffle", 0, function(nextError, nextGameState) {
+                callback(error, speech, nextGameState);
+            });
+            return;
+        }
+        // If this is resetbankroll, we'll do that for them too
+        else if (gameState.possibleActions.indexOf("resetbankroll") > -1)
+        {
+            // Simplify things and just shuffle for them
+            PostUserAction(gameState.userID, "resetbankroll", 0, function(nextError, nextGameState) {
+                callback(error, speech, nextGameState);
+            });
+            return;
+        }
+    }
+
+    // Nope, just do a regular callback
+    callback(error, speech, gameState);
+}
 
 /*
  * Internal functions
@@ -548,7 +551,14 @@ function ReadHand(gameState)
 {
     var result = "";
     var i;
-    var currentHand = gameState.playerHands[gameState.currentPlayerHand];
+    var currentHand;
+
+    // It's possible there is no hand
+    if (gameState.playerHands.length == 0)
+    {
+        return "";
+    }
+    currentHand = gameState.playerHands[gameState.currentPlayerHand];
 
     // If they have more than one hand, then say the hand number
     result += ReadHandNumber(gameState, gameState.currentPlayerHand);
@@ -602,8 +612,8 @@ function RulesToText(rules)
 {
     var text = "";
 
-    // Start with bet information
-    text += "Bet: $" + rules.minBet + " - " + rules.maxBet + ". ";
+    // Say the decks and betting range
+    text += rules.numberOfDecks + " deck game, bet from " + rules.minBet + " to " + rules.maxBet + " dollars. ";
 
     // Hit or stand on soft 17
     text += "Dealer " + (rules.hitSoft17 ? "hits" : "stands") + " on soft 17. ";

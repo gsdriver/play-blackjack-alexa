@@ -205,7 +205,7 @@ function SendAlexaResponse(speechError, speech, response)
             speech: speech,
             type: AlexaSkill.speechOutputType.PLAIN_TEXT
         };
-        response.tellWithCard(speechOutput, cardTitle, "Hit or stand");
+        response.tellWithCard(speechOutput, cardTitle, speechOutput);
     }
 }
 
@@ -244,7 +244,8 @@ function BuildRulesObject(option, value)
                 "two deck": 2, "four deck": 4, "six deck": 6, "eight deck": 8,
                 "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "eight": 8,
                  "1": 1, "2": 2, "3": 3, "4": 4, "6": 6, "8": 8};
-    var ruleMapping = {"hit soft seventeen": "hitSoft17", "soft seventeen": "hitSoft17", "surrender": "surrender",
+    var ruleMapping = {"hit soft seventeen": "hitSoft17", "soft seventeen": "hitSoft17",
+                "hit soft 17": "hitSoft17", "soft 17": "hitSoft17", "surrender": "surrender",
                 "double": "double", "double down": "double", "double after split": "doubleaftersplit", "resplit aces": "resplitAces",
                 "blackjack pays": "blackjackBonus", "blackjack bonus": "blackjackBonus", "number of decks": "numberOfDecks",
                 "decks": "numberOfDecks", "minimum bet": "minBet", "table minimum": "minBet", "maximum bet": "maxBet",
