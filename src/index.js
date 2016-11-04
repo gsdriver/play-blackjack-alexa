@@ -27,7 +27,7 @@
 var AlexaSkill = require('./AlexaSkill');
 var playgame = require('./PlayGame');
 
-var APP_ID = undefined; //"amzn1.ask.skill.74ea63e3-3295-463f-8ea5-cd80f4b6cfc9";
+var APP_ID = "amzn1.ask.skill.74ea63e3-3295-463f-8ea5-cd80f4b6cfc9";
 
 var Blackjack = function () {
     AlexaSkill.call(this, APP_ID);
@@ -205,7 +205,11 @@ function SendAlexaResponse(speechError, speech, response)
             speech: speech,
             type: AlexaSkill.speechOutputType.PLAIN_TEXT
         };
-        response.tellWithCard(speechOutput, cardTitle, speechOutput);
+        repromptOutput = {
+            speech: "What is your next action?",
+            type: AlexaSkill.speechOutputType.PLAIN_TEXT
+        };
+        response.askWithCard(speechOutput, repromptOutput, cardTitle, speechOutput);
     }
 }
 

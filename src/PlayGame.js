@@ -34,7 +34,7 @@ module.exports = {
     //Plays a given action, returning either an error or a response string
     PlayBlackjackAction: function (userID, action, value, callback)
     {
-        var speechError;
+        var speechError = null;
         var speech = "Sorry, internal error. What else can I help with?";
 
         // Special case if this is suggest
@@ -98,7 +98,7 @@ module.exports = {
                             speech = TellResult(action, gameState, newGameState);
                         }
 
-                        SendUserCallback(gameState, speechError, speech, callback);
+                        SendUserCallback(newGameState, speechError, speech, callback);
                     });
                 }
             });
@@ -108,7 +108,7 @@ module.exports = {
     ReadRules: function (userID, callback)
     {
         // Get the game state, which will have the rules
-        var speechError;
+        var speechError = null;
         var speech = "Sorry, internal error. What else can I help with?";
 
         // Get the game state so we can take action (the latest should be stored tied to this user ID)
@@ -128,7 +128,7 @@ module.exports = {
     // Changes the rules in play
     ChangeRules : function (userID, rules, callback)
     {
-        var speechError;
+        var speechError = null;
         var speech = "Sorry, internal error. What else can I help with?";
 
         // OK, let's post the rule change and get a new game state

@@ -7,7 +7,7 @@ function BuildEvent(argv)
     var suggestIntent = {"name": "SuggestIntent", "slots": {}};
     var changeRulesIntent = {"name": "ChangeRulesIntent", "slots": {"ChangeOption": {"name": "ChangeOption", "value": ""}, "Change": {"name": "Change", "value": ""}}};
     var readRulesIntent = {"name": "RulesIntent", "slots": {}};
-    var betIntent = {"name": "BetIntent", "slots": {"Amount": {"name": "Amount", "value": ""}}};
+    var betIntent = {"name": "BettingIntent", "slots": {"Amount": {"name": "Amount", "value": ""}}};
 
     var lambda = {
        "session": {
