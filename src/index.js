@@ -44,7 +44,13 @@ Blackjack.prototype.eventHandlers.onLaunch = function (launchRequest, session, r
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
     var repromptText = "For instructions on what you can say, please say help me.";
-    response.ask(speechText, repromptText);
+
+    // If they opened the session, flush the previous state if any
+    playgame.FlushGame(session.user.userId, function(error, result)
+    {
+        // I don't care if this succeeds or not
+        response.ask(speechText, repromptText);
+    });
 };
 
 Blackjack.prototype.intentHandlers = {

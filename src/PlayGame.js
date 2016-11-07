@@ -42,24 +42,29 @@ module.exports = {
         {
             PostUserAction(userID, action, 0, function(error, suggestion)
             {
-                var mapping = ["insurance", "You should take Insurance",
-                               "noinsurance", "You shouldn't take Insurance",
-                               "hit", "You should hit",
-                               "stand", "You should stand",
-                               "split", "You should split",
-                               "double", "You should Double Down",
-                               "surrender", "You should surrender",
-                               "notplayerturn", "The game is over"];
-                var index;
+                var youShould = ["You should ", "The book says you should ", "The book would tell you to ", "According to Basic Strategy you should ",
+                        "The book would suggest that you ", "I think you should ", "Basic Strategy would suggest you "];
+                var actionMapping = {"insurance": "take insurance", "noinsurance": "not take insurance", "hit": "hit",
+                                "stand": "stand", "split": "split", "double": "double", "surrender": "surrender"};
+
                 var speechError = (suggestion.error) ? suggestion.error : error;
                 var suggestText = suggestion.suggestion;
 
                 if (suggestText)
                 {
-                    index = mapping.indexOf(suggestText);
-                    if (index > -1)
+                    // Special case if it wasn't your turn
+                    if (suggestText == "notplayerturn")
                     {
-                        suggestText = mapping[index + 1];
+                        suggestText = "I can't give a suggestion when the game is over.";
+                    }
+                    else
+                    {
+                        if (actionMapping[suggestText])
+                        {
+                            var prefix = youShould[Math.floor(Math.random() * youShould.length)];
+
+                            suggestText = prefix + actionMapping[suggestText];
+                        }
                     }
                 }
 
@@ -124,6 +129,14 @@ module.exports = {
             // Convert the rules to text
             speech = RulesToText(gameState.houseRules);
             callback(speechError, speech, gameState);
+        });
+    },
+    // Flushes the current user from our store, which resets everything to the beginning state
+    FlushGame: function (userID, callback)
+    {
+        FlushGameState(userID, function(error, result) {
+            // Just call back
+            callback(error, result);
         });
     },
     // Reads back the current hand and game state
@@ -218,6 +231,26 @@ function GetGameState(userID, callback)
             res.on('end', function() {
                 callback(null, JSON.parse(fulltext));
             });
+        }
+        else
+        {
+            // Sorry, there was an error calling the HTTP endpoint
+            callback("Unable to call endpoint", null);
+        }
+    }).on('error', function (e) {
+        callback("Communications error: " + e.message, null);
+    });
+}
+
+function FlushGameState(userID, callback)
+{
+    var queryString = 'flushcache?userID=' + userID;
+
+    http.get(config.serviceEndpoint + queryString, function (res) {
+        if (res.statusCode == 200)
+        {
+            // Great, I don't really care what the response is
+            callback(null, "OK");
         }
         else
         {
