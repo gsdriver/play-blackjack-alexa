@@ -48,7 +48,8 @@ module.exports = {
                                "stand", "You should stand",
                                "split", "You should split",
                                "double", "You should Double Down",
-                               "surrender", "You should surrender"];
+                               "surrender", "You should surrender",
+                               "notplayerturn", "The game is over"];
                 var index;
                 var speechError = (suggestion.error) ? suggestion.error : error;
                 var suggestText = suggestion.suggestion;
@@ -129,7 +130,16 @@ module.exports = {
     ReadCurrentHand: function (userID, callback)
     {
         GetGameState(userID, function(error, gameState) {
-            callback((error) ? ("There was an error: " + error) : null, (gameState) ? (ReadHand(gameState) + " " + ListValidActions(gameState)) : null, null);
+            if (error)
+            {
+                callback(error, null, null);
+            }
+            else
+            {
+                var speech = ReadHand(gameState) + " " + ListValidActions(gameState);
+                speech += " You have " + gameState.bankroll + " dollars.";
+                callback(null, speech, gameState);
+            }
         });
     },
     // Changes the rules in play
@@ -247,7 +257,7 @@ function PostUserAction(userID, action, value, callback)
 function GetSpeechError(response)
 {
     var errorMapping = ["bettoosmall", "Your bet is below the minimum of five dollars",
-                        "bettoolarge", "Your bet is below the maximum of one thousand dollars",
+                        "bettoolarge", "Your bet is above the maximum of one thousand dollars",
                         "betoverbankroll", "Your bet is more than your available bankroll"];
     var errorText = "Internal error";
     var error;
@@ -398,6 +408,10 @@ function ReadDealerAction(gameState)
     {
         result += " The dealer busted.";
     }
+    else if ((gameState.dealerHand.total == 21) && (gameState.dealerHand.cards.length == 2))
+    {
+        result += " The dealer has Blackjack.";
+    }
     else
     {
         result += " The dealer had a total of " + gameState.dealerHand.total + ".";
@@ -519,7 +533,15 @@ function ReadSplit(gameState)
 {
     var result;
 
-    result = "You split a pair of " + cardRanks[gameState.playerHands[gameState.currentPlayerHand].cards[0].rank];
+    result = "You split ";
+    if (gameState.playerHands[gameState.currentPlayerHand].cards[0].rank >= 10)
+    {
+        result += "tens";
+    }
+    else
+    {
+        result += "a pair of " + cardRanks[gameState.playerHands[gameState.currentPlayerHand].cards[0].rank] + "s";
+    }
     result += ". ";
 
     // Now read the current hand
@@ -656,15 +678,18 @@ function RulesToText(rules)
     text += "Dealer " + (rules.hitSoft17 ? "hits" : "stands") + " on soft 17. ";
 
     // Double rules
-    var doubleMapping = ["any", "any cards",
-                          "10or11", "10 or 11 only",
-                          "9or10o11", "9 thru 11 only",
+    var doubleMapping = ["any", "on any cards",
+                          "10or11", "on 10 or 11 only",
+                          "9or10o11", "on 9 thru 11 only",
                           "none", "not allowed"];
     var iDouble = doubleMapping.indexOf(rules.double);
     if (iDouble > -1)
     {
-        text += "Double on " + doubleMapping[iDouble + 1] + ". ";
-        text += "Double after split " + (rules.doubleaftersplit ? "allowed. " : "not allowed. ");
+        text += "Double down " + doubleMapping[iDouble + 1] + ". ";
+        if (rules.double != "none")
+        {
+            text += "Double after split " + (rules.doubleaftersplit ? "allowed. " : "not allowed. ");
+        }
     }
 
     // Splitting (only metion if you can resplit aces 'cuz that's uncommon)

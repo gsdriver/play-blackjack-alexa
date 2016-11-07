@@ -1,18 +1,81 @@
 BlackjackIntent do {Action}
-BlackjackIntent to {Action}
-BlackjackIntent play {Action}
+BlackjackIntent {Action}
+BlackjackIntent take a {Action}
+BlackjackIntent take an {Action}
+BlackjackIntent {Action} me
+BlackjackIntent {Action} this hand
+BlackjackIntent {Action} on this hand
+BlackjackIntent do {Action} this hand
+BlackjackIntent do {Action} on this hand
+BlackjackIntent take a {Action} this hand
+BlackjackIntent take an {Action} this hand
+BlackjackIntent take a {Action} on this hand
+BlackjackIntent take an {Action} on this hand
+BlackjackIntent {Action} this round
+BlackjackIntent {Action} on this round
+BlackjackIntent do {Action} this round
+BlackjackIntent do {Action} on this round
+BlackjackIntent take a {Action} this round
+BlackjackIntent take an {Action} this round
+BlackjackIntent take a {Action} on this round
+BlackjackIntent take an {Action} on this round
+BlackjackIntent {Action} this time
+BlackjackIntent {Action} on this time
+BlackjackIntent do {Action} this time
+BlackjackIntent do {Action} on this time
+BlackjackIntent take a {Action} this time
+BlackjackIntent take an {Action} this time
+BlackjackIntent take a {Action} on this time
+BlackjackIntent take an {Action} on this time
 BettingIntent bet {Amount}
-BettingIntent to bet {Amount}
+BettingIntent play {Amount}
+BettingIntent bet for {Amount}
+BettingIntent play for {Amount}
 BettingIntent bet {Amount} dollars
-BettingIntent to bet {Amount} dollars
+BettingIntent play {Amount} dollars
+BettingIntent bet for {Amount} dollars
 BettingIntent play for {Amount} dollars
+BettingIntent bet {Amount} dollar
+BettingIntent play {Amount} dollar
+BettingIntent bet for {Amount} dollar
+BettingIntent play for {Amount} dollar
 BettingIntent do bet
+BettingIntent do deal
+BettingIntent deal
+BettingIntent bet
 RulesIntent read rules
 RulesIntent read the rules
 RulesIntent what are the rules
 RulesIntent tell me the rules
+RulesIntent the rules
+RulesIntent rules
+RulesIntent read game rules
+RulesIntent read the game rules
+RulesIntent what are the game rules
+RulesIntent tell me the game rules
+RulesIntent the game rules
+RulesIntent game rules
+RulesIntent read rules of the game
+RulesIntent read the rules of the game
+RulesIntent what are the rules of the game
+RulesIntent tell me the rules of the game
+RulesIntent the rules of the game
+RulesIntent rules of the game
 SuggestIntent what should I do
 SuggestIntent give suggestion
+SuggestIntent give me suggestion
+SuggestIntent give me a suggestion
+SuggestIntent for suggestion
+SuggestIntent for a suggestion
 SuggestIntent suggest action
 SuggestIntent suggest play
+SuggestIntent suggest move
+SuggestIntent suggest a move
+SuggestIntent suggest an action
+SuggestIntent suggest a play
 ChangeRulesIntent change {Change} to {ChangeOption}
+ChangeRulesIntent make {Change} to {ChangeOption}
+ChangeRulesIntent turn {Change} to {ChangeOption}
+ChangeRulesIntent change {Change} {ChangeOption}
+ChangeRulesIntent make {Change} {ChangeOption}
+ChangeRulesIntent turn {Change} {ChangeOption}
