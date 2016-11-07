@@ -1,8 +1,8 @@
 BlackjackIntent do {Action}
 BlackjackIntent to {Action}
+BlackjackIntent play {Action}
 BettingIntent bet {Amount}
 BettingIntent to bet {Amount}
-BettingIntent play for {Amount}
 BettingIntent bet {Amount} dollars
 BettingIntent to bet {Amount} dollars
 BettingIntent play for {Amount} dollars

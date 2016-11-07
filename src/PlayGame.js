@@ -125,6 +125,13 @@ module.exports = {
             callback(speechError, speech, gameState);
         });
     },
+    // Reads back the current hand and game state
+    ReadCurrentHand: function (userID, callback)
+    {
+        GetGameState(userID, function(error, gameState) {
+            callback((error) ? ("There was an error: " + error) : null, (gameState) ? (ReadHand(gameState) + " " + ListValidActions(gameState)) : null, null);
+        });
+    },
     // Changes the rules in play
     ChangeRules : function (userID, rules, callback)
     {
@@ -285,18 +292,26 @@ function ListValidActions(gameState)
 
     if (gameState.possibleActions)
     {
-        result = "You can say ";
-        for (i = 0; i < gameState.possibleActions.length; i++)
+        // Special case - if there is insurance and noinsurance in the list, then ask a yes/no question
+        if (gameState.possibleActions.indexOf("insurance") > -1)
         {
-            result += ActionToText(gameState.possibleActions[i]);
-            if (i < gameState.possibleActions.length - 1)
-            {
-                // There's more to come
-                result += ", or ";
-            }
+            result = "Do you want to take insurance?  Say yes or no.";
         }
+        else
+        {
+            result = "You can say ";
+            for (i = 0; i < gameState.possibleActions.length; i++)
+            {
+                result += ActionToText(gameState.possibleActions[i]);
+                if (i < gameState.possibleActions.length - 1)
+                {
+                    // There's more to come
+                    result += ", or ";
+                }
+            }
 
-        result += ". ";
+            result += ". ";
+        }
     }
 
     return result;
@@ -589,11 +604,27 @@ function ReadHand(gameState)
         }
     }
 
-    result += " for a total of " + (currentHand.soft ? "soft " : "") + currentHand.total;
+    // If this is a blackjack (two-card 21 with only one hand), then say it
+    if ((gameState.playerHands.length == 1) && (currentHand.cards.length == 2) && (currentHand.total == 21))
+    {
+        result += " for a blackjack";
+    }
+    else
+    {
+        result += " for a total of " + (currentHand.soft ? "soft " : "") + currentHand.total;
+    }
+    
     result += ". The dealer ";
-    result += (gameState.activePlayer == "none") ? "had a " : "has a ";
-    result += cardRanks[gameState.dealerHand.cards[1].rank];
-    result += " showing.";
+    if (gameState.activePlayer == "none")
+    {
+        // Game over, so read the whole dealer hand
+        result += "had a " + cardRanks[gameState.dealerHand.cards[1].rank] + " showing. ";
+        result += ReadDealerAction(gameState);
+    }
+    else
+    {
+        result += "has a " + cardRanks[gameState.dealerHand.cards[1].rank] + " showing.";
+    }
 
     return result;
 }

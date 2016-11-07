@@ -8,6 +8,9 @@ function BuildEvent(argv)
     var changeRulesIntent = {"name": "ChangeRulesIntent", "slots": {"ChangeOption": {"name": "ChangeOption", "value": ""}, "Change": {"name": "Change", "value": ""}}};
     var readRulesIntent = {"name": "RulesIntent", "slots": {}};
     var betIntent = {"name": "BettingIntent", "slots": {"Amount": {"name": "Amount", "value": ""}}};
+    var yesIntent = {"name": "AMAZON.YesIntent", "slots": {}};
+    var noIntent = {"name": "AMAZON.NoIntent", "slots": {}};
+    var repeatIntent = {"name": "AMAZON.RepeatIntent", "slots": {}};
 
     var lambda = {
        "session": {
@@ -50,6 +53,18 @@ function BuildEvent(argv)
         changeRulesIntent.slots.Change.value = (argv.length > 3) ? argv[3] : "hit soft 17";
         changeRulesIntent.slots.ChangeOption.value = (argv.length > 4) ? argv[4] : "on";
         lambda.request.intent = changeRulesIntent;
+    }
+    else if (argv[2] == "yes")
+    {
+        lambda.request.intent = yesIntent;
+    }
+    else if (argv[2] == "no")
+    {
+        lambda.request.intent = noIntent;
+    }
+    else if (argv[2] == "repeat")
+    {
+        lambda.request.intent = repeatIntent;
     }
     else
     {

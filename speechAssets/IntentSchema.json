@@ -33,7 +33,7 @@
           "type": "LIST_OF_RULE_VALUES"
         }
       ]
-    }
+    },
     {
       "intent": "SuggestIntent"
     },
@@ -45,6 +45,15 @@
     },
     {
       "intent": "AMAZON.CancelIntent"
+    },
+    {
+      "intent": "AMAZON.RepeatIntent"
+    },
+    {
+      "intent": "AMAZON.YesIntent"
+    },
+    {
+      "intent": "AMAZON.NoIntent"
     }
   ]
 }

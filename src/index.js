@@ -166,6 +166,43 @@ Blackjack.prototype.intentHandlers = {
         var speechOutput = "Goodbye";
         response.tell(speechOutput);
     },
+    // Yes intent - wihch we'll assume means take insurance
+    "AMAZON.YesIntent": function (intent, session, response) {
+        playgame.PlayBlackjackAction(session.user.userId, "insurance", 0, function(speechError, speech, gameState)
+        {
+            if (gameState)
+            {
+                session.attributes = gameState;
+            }
+
+            SendAlexaResponse(speechError, speech, response);
+        });
+    },
+    // No intent - which we'll assume means don't take insurance
+    "AMAZON.NoIntent": function (intent, session, response) {
+        playgame.PlayBlackjackAction(session.user.userId, "noinsurance", 0, function(speechError, speech, gameState)
+        {
+            if (gameState)
+            {
+                session.attributes = gameState;
+            }
+
+            SendAlexaResponse(speechError, speech, response);
+        });
+    },
+    // Repeat intent - read the hand
+    "AMAZON.RepeatIntent": function (intent, session, response) {
+        // Re-read the hand and possible actions
+        playgame.ReadCurrentHand(session.user.userId, function(speechError, speech, gameState)
+        {
+            if (gameState)
+            {
+                session.attributes = gameState;
+            }
+
+            SendAlexaResponse(speechError, speech, response);
+        });
+    },
     // Help intent - provide help
     "AMAZON.HelpIntent": function (intent, session, response) {
         var speechText = "You can ask questions such as, what should I do with a 14 against dealer 10, or, you can say exit... Now, what can I help you with?";
@@ -216,23 +253,18 @@ function SendAlexaResponse(speechError, speech, response)
  */
 function GetBlackjackAction(actionSlot)
 {
-    var mapping = ["hit", "hit", "take a hit", "hit", "hit me", "hit", "take one", "hit",
-            "stand", "stand", "stay", "stand", "done", "stand",
-            "surrender", "surrender", "give up", "surrender",
-            "double", "double", "double down", "double",
-            "split", "split",
-            "insurance", "insurance", "take insurance", "insurance", "insure me", "insurance",
-            "noinsurance", "noinsurance", "no insurance", "noinsurance", "never take insurance", "noinsurance",
-            "don't take insurance", "noinsurance",
-            "shuffle", "shuffle", "shuffle deck", "shuffle",
-            "reset", "resetbankroll", "reset bankroll", "resetbankroll",
-            "bet", "bet", "deal", "bet"];
-    var index, action;
+    var actionMapping = {"hit": "hit", "take a hit": "hit", "hit me": "hit", "take one": "hit",
+            "stand": "stand", "stay": "stand", "done": "stand",
+            "surrender": "surrender", "give up": "surrender",
+            "double": "double", "double down": "double",
+            "split": "split",
+            "shuffle": "shuffle", "shuffle deck": "shuffle",
+            "reset": "resetbankroll", "reset bankroll": "resetbankroll",
+            "bet": "bet", "deal": "bet"};
+    var action = actionMapping[actionSlot.value.toLowerCase()];
 
     // Look it up in lowercase
-    index = mapping.indexOf(actionSlot.value.toLowerCase());
-    action = (index > -1) ? mapping[index + 1] : actionSlot.value;
-    return action;
+    return (action == undefined) ? null : action;
 }
 
 /*
