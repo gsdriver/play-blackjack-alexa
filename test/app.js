@@ -13,7 +13,7 @@ function BuildEvent(argv)
        "session": {
          "sessionId": "SessionId.c88ec34d-28b0-46f6-a4c7-120d8fba8fa7",
          "application": {
-           "applicationId": "amzn1.ask.skill.74ea63e3-3295-463f-8ea5-cd80f4b6cfc9"
+           "applicationId": "amzn1.ask.skill.94d09885-df32-4bf9-88c4-4670dbc14140"
          },
          "attributes": {},
          "user": {
