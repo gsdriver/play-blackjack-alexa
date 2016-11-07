@@ -346,7 +346,7 @@ function TellResult(action, gameState, newGameState)
             break;
         case "hit":
             // Tell them the new card, the total, and the dealer up card
-            result += ReadHit(newGameState);
+            result += ReadHit(gameState, newGameState);
             break;
         case "stand":
             // OK, let's read what the dealer had, what they drew, and what happened
@@ -354,7 +354,7 @@ function TellResult(action, gameState, newGameState)
             break;
         case "double":
             // Tell them the new card, and what the dealer did
-            result += ReadDouble(newGameState);
+            result += ReadDouble(gameState, newGameState);
             break;
         case "insurance":
         case "noinsurance":
@@ -451,10 +451,25 @@ function ReadGameResult(gameState)
 /*
  * We will read the new card, the total, and the dealer up card
  */
-function ReadHit(gameState)
+function ReadHit(oldGameState, gameState)
 {
     var currentHand = gameState.playerHands[gameState.currentPlayerHand];
     var result;
+
+    // It's possible they hit (and busted) on a split hand - if so, read that off and let them know
+    if (gameState.currentPlayerHand != oldGameState.currentPlayerHand)
+    {
+        var oldHand = gameState.playerHands[oldGameState.currentPlayerHand];
+        if (oldHand.total > 21)
+        {
+            result = "You got a " + cardRanks[oldHand.cards[oldHand.cards.length - 1].rank];
+            result += " and busted. ";
+
+            // Now read the other hand in full
+            result += ReadHand(gameState);
+            return result;
+        }
+    }
 
     result = "You got a " + cardRanks[currentHand.cards[currentHand.cards.length - 1].rank];
     if (currentHand.total > 21)
@@ -480,10 +495,25 @@ function ReadHit(gameState)
 /*
  * We read the card that the player got, then the dealer's hand, action, and final outcome
  */
-function ReadDouble(gameState)
+function ReadDouble(oldGameState, gameState)
 {
     var currentHand = gameState.playerHands[gameState.currentPlayerHand];
     var result;
+
+    // It's possible they hit (and busted) on a split hand - if so, read that off and let them know
+    if (gameState.currentPlayerHand != oldGameState.currentPlayerHand)
+    {
+        var oldHand = gameState.playerHands[oldGameState.currentPlayerHand];
+        if (oldHand.total > 21)
+        {
+            result = "You got a " + cardRanks[oldHand.cards[oldHand.cards.length - 1].rank];
+            result += " and busted. ";
+
+            // Now read the other hand in full
+            result += ReadHand(gameState);
+            return result;
+        }
+    }
 
     result = "You got a " + cardRanks[currentHand.cards[currentHand.cards.length - 1].rank];
     if (currentHand.total > 21)
