@@ -345,6 +345,12 @@ function TellResult(action, gameState, newGameState)
             break;
     }
 
+    if ((gameState.activePlayer == "player") && (newGameState.activePlayer != "player"))
+    {
+        // OK, game over - so let's give the new total
+        result += " You have " + newGameState.bankroll + " dollars.";
+    }
+
     // And what can they do next?
     result += " " + ListValidActions(newGameState);
     return result;

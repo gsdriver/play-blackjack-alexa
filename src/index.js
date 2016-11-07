@@ -209,7 +209,7 @@ function SendAlexaResponse(speechError, speech, response)
             speech: "What is your next action?",
             type: AlexaSkill.speechOutputType.PLAIN_TEXT
         };
-        response.askWithCard(speechOutput, repromptOutput, cardTitle, speechOutput);
+        response.askWithCard(speechOutput, repromptOutput, cardTitle, speech);
     }
 }
 
