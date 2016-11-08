@@ -39,7 +39,7 @@ Blackjack.prototype.constructor = Blackjack;
 
 Blackjack.prototype.eventHandlers.onLaunch = function (launchRequest, session, response) 
 {
-    var speechText = "Welcome to the Blackjack player. You can start a blackjack game by saying start game ... Now, what can I help you with.";
+    var speechText = "Welcome to the Blackjack player. You can start a blackjack game by saying Deal or Bet ... Now, what can I help you with.";
     
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
@@ -211,8 +211,8 @@ Blackjack.prototype.intentHandlers = {
     },
     // Help intent - provide help
     "AMAZON.HelpIntent": function (intent, session, response) {
-        var speechText = "You can ask questions such as, what should I do with a 14 against dealer 10, or, you can say exit... Now, what can I help you with?";
-        var repromptText = "You can say things like, what should I do with a 14 against dealer 10, or you can say exit... Now, what can I help you with?";
+        var speechText = "You can play a game by saying Deal, or you can hear the table rules by saying Read Rules, or you can change the rules by saying Change or, you can say exit... Now, what can I help you with?";
+        var repromptText = "You can play a game by saying Deal, or you can say exit... Now, what can I help you with?";
         var speechOutput = {
             speech: speechText,
             type: AlexaSkill.speechOutputType.PLAIN_TEXT
