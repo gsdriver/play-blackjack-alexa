@@ -1,0 +1,30 @@
+{
+  "name": "play-blackjack-alexa",
+  "version": "1.0.0",
+  "description": "Blackjack Game Alexa Skill",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "requestify": "^0.2.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test\\app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gsdriver/play-blackjack-alexa.git"
+  },
+  "keywords": [
+    "blackjack",
+    "alexa"
+  ],
+  "author": "Garrett Vargas <gsdriver@live.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gsdriver/play-blackjack-alexa/issues"
+  },
+  "homepage": "https://github.com/gsdriver/play-blackjack-alexa#readme"
+}
