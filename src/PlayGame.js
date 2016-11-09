@@ -34,9 +34,6 @@ module.exports = {
     //Plays a given action, returning either an error or a response string
     PlayBlackjackAction: function (userID, action, value, callback)
     {
-        var speechError = null;
-        var speech = "Sorry, internal error. What else can I help with?";
-
         // Special case if this is suggest
         if (action == "suggest")
         {
@@ -68,12 +65,14 @@ module.exports = {
                     }
                 }
 
-                callback(speechError, suggestText, null);
+                callback(speechError, suggestText, null, null, null);
             });
         }
         else
         {
             // Get the game state so we can take action (the latest should be stored tied to this user ID)
+            var speechError = null, speechQuestion = null, repromptQuestion = null;
+
             GetGameState(userID, function(error, gameState) {
                 if (error)
                 {
@@ -89,8 +88,7 @@ module.exports = {
                     speechError = "I'm sorry, " + action + " is not a valid action at this time. ";
                     speechError += ReadHand(gameState);
                     speechError += " " + ListValidActions(gameState);
-                    speechError += "What else can I help with?";
-                    SendUserCallback(gameState, speechError, null, callback);
+                    SendUserCallback(gameState, speechError, null, null, null, callback);
                 }
                 else {
                     // OK, let's post this action and get a new game state
@@ -101,10 +99,11 @@ module.exports = {
                         }
                         else
                         {
-                            speech = TellResult(action, gameState, newGameState);
+                            repromptQuestion = ListValidActions(newGameState);
+                            speechQuestion = TellResult(action, gameState, newGameState) + " " + repromptQuestion;
                         }
 
-                        SendUserCallback(newGameState, speechError, speech, callback);
+                        SendUserCallback(newGameState, speechError, null, speechQuestion, repromptQuestion, callback);
                     });
                 }
             });
@@ -122,13 +121,13 @@ module.exports = {
             if (error)
             {
                 speechError = "There was an error: " + error;
-                callback(speechError, null, null);
+                callback(speechError, null, null, null, null);
                 return;
             }
 
             // Convert the rules to text
             speech = RulesToText(gameState.houseRules);
-            callback(speechError, speech, gameState);
+            callback(speechError, speech, null, null, gameState);
         });
     },
     // Flushes the current user from our store, which resets everything to the beginning state
@@ -149,9 +148,10 @@ module.exports = {
             }
             else
             {
-                var speech = ReadHand(gameState) + " " + ListValidActions(gameState);
-                speech += " You have " + gameState.bankroll + " dollars.";
-                callback(null, speech, gameState);
+                var speech = "You have " + gameState.bankroll + " dollars. " + ReadHand(gameState) + " ";
+                var repromptQuestion = ListValidActions(gameState);
+
+                callback(null, null, speech + repromptQuestion, repromptQuestion, gameState);
             }
         });
     },
@@ -174,7 +174,7 @@ module.exports = {
             }
 
             // If this is shuffle, we'll do the shuffle for them
-            SendUserCallback(newGameState, error, speech, callback);
+            SendUserCallback(newGameState, error, speech, null, null, callback);
         });
     }
 };
@@ -183,7 +183,7 @@ module.exports = {
  * It's possible the game gets to a state where you have to reset the bankroll
  * or shuffle the deck.  Let's do that automatically for the user
  */
-function SendUserCallback(gameState, error, speech, callback)
+function SendUserCallback(gameState, error, speechResponse, speechQuestion, repromptQuestion, callback)
 {
     // If this is shuffle, we'll do the shuffle for them
     if (gameState && gameState.possibleActions)
@@ -192,7 +192,7 @@ function SendUserCallback(gameState, error, speech, callback)
         {
             // Simplify things and just shuffle for them
             PostUserAction(gameState.userID, "shuffle", 0, function(nextError, nextGameState) {
-                callback(error, speech, nextGameState);
+                callback(error, speechResponse, speechQuestion, repromptQuestion, nextGameState);
             });
             return;
         }
@@ -201,14 +201,14 @@ function SendUserCallback(gameState, error, speech, callback)
         {
             // Simplify things and just shuffle for them
             PostUserAction(gameState.userID, "resetbankroll", 0, function(nextError, nextGameState) {
-                callback(error, speech, nextGameState);
+                callback(error, speechResponse, speechQuestion, repromptQuestion, nextGameState);
             });
             return;
         }
     }
 
     // Nope, just do a regular callback
-    callback(error, speech, gameState);
+    callback(error, speechResponse, speechQuestion, repromptQuestion, gameState);
 }
 
 /*
@@ -328,6 +328,9 @@ function ActionToText(action)
     return (index > -1) ? mapping[index + 1] : "";
 }
 
+/*
+ * Lists what the user can do next - provided in the form of a question
+ */
 function ListValidActions(gameState)
 {
     var i;
@@ -342,7 +345,7 @@ function ListValidActions(gameState)
         }
         else
         {
-            result = "You can say ";
+            result = "Would you like to ";
             for (i = 0; i < gameState.possibleActions.length; i++)
             {
                 result += ActionToText(gameState.possibleActions[i]);
@@ -353,7 +356,7 @@ function ListValidActions(gameState)
                 }
             }
 
-            result += ". ";
+            result += "?";
         }
     }
 
@@ -409,8 +412,6 @@ function TellResult(action, gameState, newGameState)
         result += " You have " + newGameState.bankroll + " dollars.";
     }
 
-    // And what can they do next?
-    result += " " + ListValidActions(newGameState);
     return result;
 }
 

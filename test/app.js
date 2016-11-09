@@ -109,6 +109,7 @@ function myResponse(appId) {
 
 myResponse.succeed = function(result) {
     console.log(result.response.outputSpeech.text);
+    console.log("The session " + ((!result.response.shouldEndSession) ? "stays open." : "closes."));
 }
 
 // Build the event object and call the app

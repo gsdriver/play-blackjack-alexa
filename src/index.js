@@ -39,7 +39,7 @@ Blackjack.prototype.constructor = Blackjack;
 
 Blackjack.prototype.eventHandlers.onLaunch = function (launchRequest, session, response) 
 {
-    var speechText = "Welcome to the Blackjack player. You can start a blackjack game by saying Deal or Bet ... Now, what can I help you with.";
+    var speechText = "Welcome to the Blackjack player. You can start a blackjack game by saying Deal or Bet ... Now, what can I help you with?";
     
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
@@ -62,22 +62,22 @@ Blackjack.prototype.intentHandlers = {
 
         if (!actionSlot) {
             error = "I'm sorry, I didn't catch that action. Please say what you want to do on this hand like hit or stand. What else can I help with?";
-            SendAlexaResponse(error, null, response);
+            SendAlexaResponse(error, null, null, null, response);
         }
         else if (!actionSlot.value) {
             speechError = "I'm sorry, I don't understand how to " + actionSlot.value + ". Please provide an action like hit or stand. What else can I help with?";
-            SendAlexaResponse(error, null, response);
+            SendAlexaResponse(error, null, null, null, response);
         }
         else
         {
             // Let's play this action
-            playgame.PlayBlackjackAction(session.user.userId, GetBlackjackAction(actionSlot), 0, function(speechError, speech, gameState) {
+            playgame.PlayBlackjackAction(session.user.userId, GetBlackjackAction(actionSlot), 0, function(speechError, speechResponse, speechQuestion, repromptQuestion, gameState) {
                 if (gameState)
                 {
                     session.attributes = gameState;
                 }
 
-                SendAlexaResponse(speechError, speech, response);
+                SendAlexaResponse(speechError, speechResponse, speechQuestion, repromptQuestion, response);
             });
         }
     },
@@ -88,34 +88,34 @@ Blackjack.prototype.intentHandlers = {
         var error;
 
         // Take the bet
-        playgame.PlayBlackjackAction(session.user.userId, "bet", amount, function(speechError, speech, gameState)
+        playgame.PlayBlackjackAction(session.user.userId, "bet", amount, function(speechError, speechResponse, speechQuestion, repromptQuestion, gameState)
         {
             if (gameState)
             {
                 session.attributes = gameState;
             }
 
-            SendAlexaResponse(speechError, speech, response);
+            SendAlexaResponse(speechError, speechResponse, speechQuestion, repromptQuestion, response);
         });
     },
     // Suggestion intent
     "SuggestIntent" : function (intent, session, response) {
         // Get a suggestion
-        playgame.PlayBlackjackAction(session.user.userId, "suggest", 0, function(speechError, speech, gameState) {
-            SendAlexaResponse(speechError, speech, response);
+        playgame.PlayBlackjackAction(session.user.userId, "suggest", 0, function(speechError, speechResponse, speechQuestion, repromptQuestion, gameState) {
+            SendAlexaResponse(speechError, speechResponse, speechQuestion, repromptQuestion, response);
         });
     },
     // Rules intent
     "RulesIntent" : function (intent, session, response) {
         // Just read the rules
-        playgame.ReadRules(session.user.userId, function(speechError, speech, gameState)
+        playgame.ReadRules(session.user.userId, function(speechError, speechResponse, speechQuestion, repromptQuestion, gameState)
         {
             if (gameState)
             {
                 session.attributes = gameState;
             }
 
-            SendAlexaResponse(speechError, speech, response);
+            SendAlexaResponse(speechError, speechResponse, speechQuestion, repromptQuestion, response);
         });
     },
     // Change rules intent
@@ -128,11 +128,11 @@ Blackjack.prototype.intentHandlers = {
         if (!changeSlot)
         {
             speechError = "I'm sorry, I didn't catch a rule to change. Please provide a rule to change like Surrender or Hit Soft 17. What else can I help with?";
-            SendAlexaResponse(speechError, null, response);
+            SendAlexaResponse(speechError, null, null, null, response);
         }
         else if (!changeSlot.value) {
             speechError = "I'm sorry, I don't understand how to change " + changeSlot.value + ". Please provide a rule to change like Surrender or Hit Soft 17. What else can I help with?";
-            SendAlexaResponse(speechError, null, response);
+            SendAlexaResponse(speechError, null, null, null, response);
         }
         else if (!optionSlot || !optionSlot.value)
         {
@@ -146,18 +146,18 @@ Blackjack.prototype.intentHandlers = {
             if (!rules)
             {
                 speechError = "I'm sorry, I was unable to change " + changeSlot.value + " to " + optionSlot.value;
-                SendAlexaResponse(speechError, null, response);
+                SendAlexaResponse(speechError, null, null, null, response);
             }
             else
             {
-                playgame.ChangeRules(session.user.userId, rules, function(speechError, speech, gameState)
+                playgame.ChangeRules(session.user.userId, rules, function(speechError, speechResponse, speechQuestion, repromptQuestion, gameState)
                 {
                     if (gameState)
                     {
                         session.attributes = gameState;
                     }
 
-                    SendAlexaResponse(speechError, speech, response);
+                    SendAlexaResponse(speechError, speechResponse, speechQuestion, repromptQuestion, response);
                 });
             }
         }
@@ -174,39 +174,39 @@ Blackjack.prototype.intentHandlers = {
     },
     // Yes intent - wihch we'll assume means take insurance
     "AMAZON.YesIntent": function (intent, session, response) {
-        playgame.PlayBlackjackAction(session.user.userId, "insurance", 0, function(speechError, speech, gameState)
+        playgame.PlayBlackjackAction(session.user.userId, "insurance", 0, function(speechError, speechResponse, speechQuestion, repromptQuestion, gameState)
         {
             if (gameState)
             {
                 session.attributes = gameState;
             }
 
-            SendAlexaResponse(speechError, speech, response);
+            SendAlexaResponse(speechError, speechResponse, speechQuestion, repromptQuestion, response);
         });
     },
     // No intent - which we'll assume means don't take insurance
     "AMAZON.NoIntent": function (intent, session, response) {
-        playgame.PlayBlackjackAction(session.user.userId, "noinsurance", 0, function(speechError, speech, gameState)
+        playgame.PlayBlackjackAction(session.user.userId, "noinsurance", 0, function(speechError, speechResponse, speechQuestion, repromptQuestion, gameState)
         {
             if (gameState)
             {
                 session.attributes = gameState;
             }
 
-            SendAlexaResponse(speechError, speech, response);
+            SendAlexaResponse(speechError, speechResponse, speechQuestion, repromptQuestion, response);
         });
     },
     // Repeat intent - read the hand
     "AMAZON.RepeatIntent": function (intent, session, response) {
         // Re-read the hand and possible actions
-        playgame.ReadCurrentHand(session.user.userId, function(speechError, speech, gameState)
+        playgame.ReadCurrentHand(session.user.userId, function(speechError, speechResponse, speechQuestion, repromptQuestion, gameState)
         {
             if (gameState)
             {
                 session.attributes = gameState;
             }
 
-            SendAlexaResponse(speechError, speech, response);
+            SendAlexaResponse(speechError, speechResponse, speechQuestion, repromptQuestion, response);
         });
     },
     // Help intent - provide help
@@ -225,7 +225,14 @@ Blackjack.prototype.intentHandlers = {
     }
 };
 
-function SendAlexaResponse(speechError, speech, response)
+/*
+ * Sends a response to Alexa - you would expect one of speechError,
+ * speechResponse, or speechQuestion to be set.  repromptQuestion
+ * will be set if speechQuestion is set and will be a shorter form
+ * of the speechQuestion (just asking what they want to do rather than
+ * giving a full game status)
+ */
+function SendAlexaResponse(speechError, speechResponse, speechQuestion, repromptQuestion, response)
 {
     var speechOutput;
     var repromptOutput;
@@ -243,15 +250,24 @@ function SendAlexaResponse(speechError, speech, response)
         };
         response.ask(speechOutput, repromptOutput);
     }
-    else {
+    else if (speechResponse) {
         speechOutput = {
-            speech: speech,
+            speech: speechResponse,
             type: AlexaSkill.speechOutputType.PLAIN_TEXT
         };
-        response.tellWithCard(speechOutput, cardTitle, speech);
+        response.tellWithCard(speechOutput, cardTitle, speechResponse);
     }
-
-    console.log(speechOutput.speech);
+    else {
+        speechOutput = {
+            speech: speechQuestion,
+            type: AlexaSkill.speechOutputType.PLAIN_TEXT
+        };
+        repromptOutput = {
+            speech: repromptQuestion,
+            type: AlexaSkill.speechOutputType.PLAIN_TEXT
+        };
+        response.askWithCard(speechOutput, repromptOutput, cardTitle, speechQuestion);
+    }
 }
 
 /*
