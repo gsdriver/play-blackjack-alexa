@@ -339,9 +339,17 @@ function ListValidActions(gameState)
     if (gameState.possibleActions)
     {
         // Special case - if there is insurance and noinsurance in the list, then ask a yes/no question
-        if (gameState.possibleActions.indexOf("insurance") > -1)
+        if (gameState.possibleActions.indexOf("noinsurance") > -1)
         {
-            result = "Do you want to take insurance?  Say yes or no.";
+            // It's possible you can't take insurance because you don't have enough money
+            if (gameState.possibleActions.indexOf("insurance") > -1)
+            {
+                result = "Do you want to take insurance?  Say yes or no.";
+            }
+            else
+            {
+                result = "You don't have enough money to take insurance - do you want to take insurance or hear your hand and bankroll?  Say no or repeat.";
+            }
         }
         else
         {

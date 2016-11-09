@@ -27,7 +27,7 @@
 var AlexaSkill = require('./AlexaSkill');
 var playgame = require('./PlayGame');
 
-var APP_ID = "amzn1.ask.skill.94d09885-df32-4bf9-88c4-4670dbc14140";
+var APP_ID = "amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce";
 
 var Blackjack = function () {
     AlexaSkill.call(this, APP_ID);
