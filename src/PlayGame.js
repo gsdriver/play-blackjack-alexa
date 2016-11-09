@@ -71,7 +71,7 @@ module.exports = {
         else
         {
             // Get the game state so we can take action (the latest should be stored tied to this user ID)
-            var speechError = null, speechQuestion = null, repromptQuestion = null;
+            var speechError = null, speechResponse = null, speechQuestion = null, repromptQuestion = null;
 
             GetGameState(userID, function(error, gameState) {
                 if (error)
@@ -99,11 +99,18 @@ module.exports = {
                         }
                         else
                         {
-                            repromptQuestion = ListValidActions(newGameState);
-                            speechQuestion = TellResult(action, gameState, newGameState) + " " + repromptQuestion;
+                            if (newGameState.activePlayer == "player")
+                            {
+                                repromptQuestion = ListValidActions(newGameState);
+                                speechQuestion = TellResult(action, gameState, newGameState) + " " + repromptQuestion;
+                            }
+                            else
+                            {
+                                speechResponse = TellResult(action, gameState, newGameState);
+                            }
                         }
 
-                        SendUserCallback(newGameState, speechError, null, speechQuestion, repromptQuestion, callback);
+                        SendUserCallback(newGameState, speechError, speechResponse, speechQuestion, repromptQuestion, callback);
                     });
                 }
             });
@@ -148,10 +155,19 @@ module.exports = {
             }
             else
             {
-                var speech = "You have " + gameState.bankroll + " dollars. " + ReadHand(gameState) + " ";
-                var repromptQuestion = ListValidActions(gameState);
+                var speechResponse = null, speechQuestion = null, repromptQuestion = null;
 
-                callback(null, null, speech + repromptQuestion, repromptQuestion, gameState);
+                if (gameState.activePlayer == "player")
+                {
+                    repromptQuestion = ListValidActions(gameState);
+                    speechQuestion = "You have " + gameState.bankroll + " dollars. " + ReadHand(gameState) + " " + repromptQuestion;
+                }
+                else
+                {
+                    speechResponse = "You have " + gameState.bankroll + " dollars. " + ReadHand(gameState);
+                }
+
+                callback(null, speechResponse, speechQuestion, repromptQuestion, gameState);
             }
         });
     },
