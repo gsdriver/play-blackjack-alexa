@@ -391,6 +391,24 @@ function TellResult(action, gameState, newGameState)
 {
     var result = "";
 
+    // It's possible they did something other than stand on the previous hand if this is a split
+    // If so, read that off first (but try to avoid it if they just stood on the prior hand)
+    if ((gameState.activePlayer == "player") && (newGameState.currentPlayerHand != gameState.currentPlayerHand))
+    {
+        var oldHand = newGameState.playerHands[gameState.currentPlayerHand];
+
+        // I don't want to re-read this hand if they just stood, so let's make sure they busted
+        // or split Aces (which only draws on card) or did a double before we read this hand.
+        if ((oldHand.total > 21) || (oldHand.bet > newGameState.playerHands[newGameState.currentPlayerHand].bet))
+        {
+            result = "You got a " + cardRanks[oldHand.cards[oldHand.cards.length - 1].rank];
+            result += (oldHand.total > 21) ? " and busted. " : (" for a total of " + oldHand.total + ". ");
+
+            // And now preface with the next hand before we tell them what happened
+            result += ReadHandNumber(newGameState, newGameState.currentPlayerHand);
+        }
+    }
+
     // So what happened?
     switch (action)
     {
@@ -406,7 +424,7 @@ function TellResult(action, gameState, newGameState)
             break;
         case "hit":
             // Tell them the new card, the total, and the dealer up card
-            result += ReadHit(gameState, newGameState);
+            result += ReadHit(newGameState);
             break;
         case "stand":
             // OK, let's read what the dealer had, what they drew, and what happened
@@ -414,7 +432,7 @@ function TellResult(action, gameState, newGameState)
             break;
         case "double":
             // Tell them the new card, and what the dealer did
-            result += ReadDouble(gameState, newGameState);
+            result += ReadDouble(newGameState);
             break;
         case "insurance":
         case "noinsurance":
@@ -509,25 +527,10 @@ function ReadGameResult(gameState)
 /*
  * We will read the new card, the total, and the dealer up card
  */
-function ReadHit(oldGameState, gameState)
+function ReadHit(gameState)
 {
     var currentHand = gameState.playerHands[gameState.currentPlayerHand];
     var result;
-
-    // It's possible they hit (and busted) on a split hand - if so, read that off and let them know
-    if (gameState.currentPlayerHand != oldGameState.currentPlayerHand)
-    {
-        var oldHand = gameState.playerHands[oldGameState.currentPlayerHand];
-        if (oldHand.total > 21)
-        {
-            result = "You got a " + cardRanks[oldHand.cards[oldHand.cards.length - 1].rank];
-            result += " and busted. ";
-
-            // Now read the other hand in full
-            result += ReadHand(gameState);
-            return result;
-        }
-    }
 
     result = "You got a " + cardRanks[currentHand.cards[currentHand.cards.length - 1].rank];
     if (currentHand.total > 21)
@@ -553,25 +556,10 @@ function ReadHit(oldGameState, gameState)
 /*
  * We read the card that the player got, then the dealer's hand, action, and final outcome
  */
-function ReadDouble(oldGameState, gameState)
+function ReadDouble(gameState)
 {
     var currentHand = gameState.playerHands[gameState.currentPlayerHand];
     var result;
-
-    // It's possible they hit (and busted) on a split hand - if so, read that off and let them know
-    if (gameState.currentPlayerHand != oldGameState.currentPlayerHand)
-    {
-        var oldHand = gameState.playerHands[oldGameState.currentPlayerHand];
-        if (oldHand.total > 21)
-        {
-            result = "You got a " + cardRanks[oldHand.cards[oldHand.cards.length - 1].rank];
-            result += " and busted. ";
-
-            // Now read the other hand in full
-            result += ReadHand(gameState);
-            return result;
-        }
-    }
 
     result = "You got a " + cardRanks[currentHand.cards[currentHand.cards.length - 1].rank];
     if (currentHand.total > 21)
