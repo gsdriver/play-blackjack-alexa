@@ -106,7 +106,9 @@ module.exports = {
                             }
                             else
                             {
-                                speechResponse = TellResult(action, gameState, newGameState);
+                                // Prompt the user to either say deal or bet an amount
+                                repromptQuestion = "Say Deal to play again betting " + newGameState.lastBet + " dollars or Bet and the amount you would like to bet.";
+                                speechQuestion = TellResult(action, gameState, newGameState) + " " + repromptQuestion;
                             }
                         }
 
