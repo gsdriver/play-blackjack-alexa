@@ -27,8 +27,11 @@
 var http = require('http');
 var requestify = require('requestify');
 var config = require('./config');
+var stubbedGame = require('./StubbedGame');
 
 const cardRanks = ["none", "ace", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "jack", "queen", "king"];
+
+const testUser = "stubbed";
 
 module.exports = {
     //Plays a given action, returning either an error or a response string
@@ -234,6 +237,11 @@ function SendUserCallback(gameState, error, speechResponse, speechQuestion, repr
  */
 function GetGameState(userID, callback)
 {
+    if (userID == testUser)
+    {
+      return stubbedGame.GetGameState(callback);
+    }
+
     var queryString = 'get?userID=' + userID;
 
     http.get(config.serviceEndpoint + queryString, function (res) {
@@ -262,6 +270,11 @@ function GetGameState(userID, callback)
 
 function FlushGameState(userID, callback)
 {
+    if (userID == testUser)
+    {
+      return stubbedGame.FlushGameState(callback);
+    }
+
     var queryString = 'flushcache?userID=' + userID;
 
     http.get(config.serviceEndpoint + queryString, function (res) {
@@ -282,6 +295,11 @@ function FlushGameState(userID, callback)
 
 function PostUserAction(userID, action, value, callback)
 {
+    if (userID == testUser)
+    {
+      return stubbedGame.PostUserAction(action, value, callback);
+    }
+
     var payload = {userID: userID, action: action};
 
     if (action == "bet")
