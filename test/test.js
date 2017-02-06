@@ -18,16 +18,22 @@ conversation(opts)
 
 opts.name = 'Take insurance';
 conversation(opts)
+  .userSays('FlushIntent')
+    .plainResponse
+      .shouldEqual('Flushed')
   .userSays('BettingIntent', {Amount: 10})
     .plainResponse
-      .shouldEqual("Do you want to take insurance?  Say yes or no.")
+      .shouldEqual("You have jack and nine for a total of 19. The dealer has a ace showing. Do you want to take insurance?  Say yes or no.")
   .userSays('AMAZON.YesIntent')
     .plainResponse
-      .shouldEqual("The dealer had a blackjack. ")
+      .shouldEqual("The dealer had a blackjack.   You have 5000 dollars. Say Deal to play again betting 100 dollars or Bet and the amount you would like to bet.")
   .end();
 
 opts.name = 'Surrender';
 conversation(opts)
+  .userSays('FlushIntent')
+    .plainResponse
+      .shouldEqual('Flushed')
   .userSays('BettingIntent', {Amount: 20})
     .plainResponse
       .shouldEqual('You have king and six for a total of 16. The dealer has a queen showing. Would you like to Hit, or Stand, or Surrender, or Double Down?')
@@ -38,6 +44,9 @@ conversation(opts)
 
 opts.name = 'Hit to Tie';
 conversation(opts)
+  .userSays('FlushIntent')
+    .plainResponse
+      .shouldEqual('Flushed')
   .userSays('BettingIntent', {Amount: 30})
     .plainResponse
       .shouldEqual('You have two and ace for a total of soft 13. The dealer has a queen showing. Would you like to Hit, or Stand, or Surrender, or Double Down?')

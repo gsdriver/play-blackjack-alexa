@@ -125,7 +125,7 @@ module.exports = {
     {
         lastGameFlow = null;
         lastGameFlowIndex = 0;
-        callback(null, "OK");
+        callback(null, "Flushed");
     },
     PostUserAction : function (action, value, callback)
     {

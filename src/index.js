@@ -54,6 +54,12 @@ Blackjack.prototype.eventHandlers.onLaunch = function (launchRequest, session, r
 };
 
 Blackjack.prototype.intentHandlers = {
+    // For testing purposes - flushes the game
+    "FlushIntent": function (intent, session, response) {
+        playgame.FlushGame(session.user.userId, function(error, result) {
+            SendAlexaResponse(error, result, null, null, response);
+        });
+    },
     // Basic Strategy Intent
     "BlackjackIntent": function (intent, session, response) {
         // First make sure we have an action
