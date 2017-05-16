@@ -5,45 +5,49 @@
 'use strict';
 
 const playgame = require('../PlayGame');
+const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
   handleIntent: function() {
     // Which rule should we change?
     const changeSlot = this.event.request.intent.slots.Change;
     const optionSlot = this.event.request.intent.slots.ChangeOption;
-    let error;
+    let ruleError;
 
     if (!changeSlot) {
-      error = 'I\'m sorry, I didn\'t catch a rule to change. Please provide a rule to change like Surrender or Hit Soft 17. What else can I help with?';
-      this.emit(':ask', error, 'What else can I help with?');
+      ruleError = 'I\'m sorry, I didn\'t catch a rule to change. Check the Alexa companion app for rules you can change. What else can I help with?';
     } else if (!changeSlot.value) {
-      error = 'I\'m sorry, I don\'t understand how to change ' + changeSlot.value + '. Please provide a rule to change like Surrender or Hit Soft 17. What else can I help with?';
-      this.emit(':ask', error, 'What else can I help with?');
+      ruleError = 'I\'m sorry, I don\'t understand how to change ' + changeSlot.value + '. Check the Alexa companion app for rules you can change. What else can I help with?';
     } else if (!optionSlot || !optionSlot.value) {
-      error = 'I\'m sorry, I didn\'t catch how to change ' + changeSlot.value;
-      this.emit(':ask', error, 'What else can I help with?');
+      ruleError = 'I\'m sorry, I didn\'t catch how to change ' + changeSlot.value + '. Check the Alexa companion app for rules you can change. What else can I help with?';
     } else {
       // Build the appropriate rules object and set it
       const rules = buildRulesObject(changeSlot.value, optionSlot.value);
       if (!rules) {
-        error = 'I\'m sorry, I was unable to change ' + changeSlot.value + ' to ' + optionSlot.value;
-        this.emit(':ask', error, 'What else can I help with?');
+        ruleError = 'I\'m sorry, I was unable to change ' + changeSlot.value + ' to ' + optionSlot.value + '. Check the Alexa companion app for available rules you can change. What else can I help with?';
       } else {
         playgame.changeRules(this.event.session.user.userId, rules,
           (error, response, speech, reprompt, gameState) => {
-          if (gameState) {
-            this.attributes['gameState'] = gameState;
-          }
-
-          if (error) {
-            this.emit(':ask', error, 'What else can I help with?');
-          } else if (response) {
-            this.emit(':tell', response);
-          } else {
-            this.emit(':ask', speech, reprompt);
-          }
+          bjUtils.emitResponse(this.emit, error, response, speech, reprompt);
         });
       }
+    }
+
+    // If there was a rule error, then let's get the rules and display those
+    if (ruleError) {
+      let cardText = '';
+
+      // Prepare card text with a full set of rules that can be changed
+      playgame.readRules(this.event.session.user.userId,
+        (error, response, speech, reprompt, gameState) => {
+        if (response) {
+          cardText += 'The current rules are ';
+          cardText += response + '/n/n';
+        }
+
+        cardText += bjUtils.getChangeCardText();
+        this.emit(':askWithCard', ruleError, 'What else can I help with?', 'Play Blackjack', cardText);
+      });
     }
   },
 };

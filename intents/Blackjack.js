@@ -1,6 +1,7 @@
 'use strict';
 
 const playgame = require('../PlayGame');
+const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
   handleIntent: function() {
@@ -19,17 +20,7 @@ module.exports = {
       playgame.playBlackjackAction(this.event.session.user.userId,
           getBlackjackAction(actionSlot), 0,
           (error, response, speech, reprompt, gameState) => {
-        if (gameState) {
-          this.attributes['gameState'] = gameState;
-        }
-
-        if (error) {
-          this.emit(':ask', error, 'What else can I help with?');
-        } else if (response) {
-          this.emit(':tell', response);
-        } else {
-          this.emit(':ask', speech, reprompt);
-        }
+        bjUtils.emitResponse(this.emit, error, response, speech, reprompt);
       });
     }
   },
