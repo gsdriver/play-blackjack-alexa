@@ -12,7 +12,8 @@ const No = require('./intents/No');
 const Repeat = require('./intents/Repeat');
 const Help = require('./intents/Help');
 
-// var APP_ID = "amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce";
+//const APP_ID = "amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce";
+const APP_ID = "amzn1.ask.skill.cb6939d9-2dac-4a8c-af5e-eb94563053f3";
 
 // Handlers for our skill
 const handlers = {
@@ -40,6 +41,7 @@ const handlers = {
 exports.handler = function(event, context, callback) {
   const alexa = Alexa.handler(event, context);
 
+  alexa.APP_ID = APP_ID;
   alexa.registerHandlers(handlers);
   alexa.execute();
 };
