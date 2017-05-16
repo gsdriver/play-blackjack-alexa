@@ -128,6 +128,33 @@ module.exports = {
       }
     });
   },
+  // Gets contextual help based on the current state of the game
+  getContextualHelp: function(userID, callback) {
+    getGameState(userID, (error, gameState) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        let result = '';
+
+        if (gameState.possibleActions) {
+          // Special case - if there is insurance and noinsurance in the list, then pose as a yes/no
+          if (gameState.possibleActions.indexOf('noinsurance') > -1) {
+            // It's possible you can't take insurance because you don't have enough money
+            if (gameState.possibleActions.indexOf('insurance') > -1) {
+              result = 'You can say yes to take insurance or no to decline insurance.';
+            } else {
+              result = 'You don\'t have enough money to take insurance - say no to decline insurance.';
+            }
+          } else {
+            result = 'You can say ' + utils.or(gameState.possibleActions) + '.';
+          }
+        }
+
+        result += ' For more options, please check the Alexa companion application.<break time=\'300ms\'/> What can I help you with?';
+        callback(null, result);
+      }
+    });
+  },
   // Changes the rules in play
   changeRules: function(userID, rules, callback) {
     let speech = 'Sorry, internal error. What else can I help with?';
@@ -271,7 +298,7 @@ function listValidActions(gameState) {
       if (gameState.possibleActions.indexOf('insurance') > -1) {
         result = 'Do you want to take insurance?  Say yes or no.';
       } else {
-        result = 'You don\'t have enough money to take insurance - do you want to take insurance or hear your hand and bankroll?  Say no or repeat.';
+        result = 'You don\'t have enough money to take insurance - say no to decline insurance.';
       }
     } else {
       result = 'Would you like to ' + utils.or(gameState.possibleActions) + '?';

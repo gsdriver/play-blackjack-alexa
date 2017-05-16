@@ -11,6 +11,7 @@ function BuildEvent(argv)
     var yesIntent = {"name": "AMAZON.YesIntent", "slots": {}};
     var noIntent = {"name": "AMAZON.NoIntent", "slots": {}};
     var repeatIntent = {"name": "AMAZON.RepeatIntent", "slots": {}};
+    var helpIntent = {"name": "AMAZON.HelpIntent", "slots": {}};
 
     var lambda = {
        "session": {
@@ -64,6 +65,10 @@ function BuildEvent(argv)
     else if (argv[2] == "suggest")
     {
         lambda.request.intent = suggestIntent;
+    }
+    else if (argv[2] == "help")
+    {
+        lambda.request.intent = helpIntent;;
     }
     else if (argv[2] == "bet")
     {
