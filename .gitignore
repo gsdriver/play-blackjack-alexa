@@ -1,5 +1,8 @@
 node_modules
+build
 PlayBlackjack.zip
+play-blackjack-alexa.zip
 PlayGame.zip
+config.bat
 src/test.json
 .idea

@@ -1,4 +1,4 @@
-var mainApp = require('../src/index');
+var mainApp = require('../index');
 
 function BuildEvent(argv)
 {
@@ -102,16 +102,33 @@ function BuildEvent(argv)
     return lambda;
 }
 
+
 // Simple response - just print out what I'm given
 function myResponse(appId) {
-    this._appId = appId;
+  this._appId = appId;
 }
 
 myResponse.succeed = function(result) {
+  if (result.response.outputSpeech.ssml) {
+    console.log('AS SSML: ' + result.response.outputSpeech.ssml);
+  } else {
     console.log(result.response.outputSpeech.text);
-    console.log("The session " + ((!result.response.shouldEndSession) ? "stays open." : "closes."));
+  }
+  if (result.response.card && result.response.card.content) {
+    console.log('Card Content: ' + result.response.card.content);
+  }
+  console.log('The session ' + ((!result.response.shouldEndSession) ? 'stays open.' : 'closes.'));
+  if (result.sessionAttributes) {
+    console.log('Attributes: ' + JSON.stringify(result.sessionAttributes));
+  }
+}
+
+myResponse.fail = function(e) {
+  console.log(e);
 }
 
 // Build the event object and call the app
-mainApp.handler(BuildEvent(process.argv), myResponse);
-
+var event = BuildEvent(process.argv);
+if (event) {
+    mainApp.handler(event, myResponse);
+}
