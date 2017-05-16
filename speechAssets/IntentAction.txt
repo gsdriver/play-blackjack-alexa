@@ -8,11 +8,11 @@ BettingIntent:
 
 RulesIntent:
   - Reads the rules of the game
-  - Card sent to companion app with full set of rules
+  - Card sent to companion app with full set of rules in play
 
 ChangeRulesIntent: 
   - Changes the rules of the game
-  - Card sent to companion app with full set of rules
+  - Card sent to companion app with full set of rules and available options to change (if there was an error)
 
 SuggestIntent: 
   - Provides a suggestion for the given hand
@@ -24,7 +24,7 @@ AMAZON.HelpIntent:
 
 AMAZON.RepeatIntent:
   - Repeats the current hand
-  - Full status sent to companion app
+  - No card sent to companion app
 
 AMAZON.YesIntent:
   - Takes insurance
