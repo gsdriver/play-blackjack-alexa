@@ -17,6 +17,17 @@ const Reset = require('./intents/Reset');
 // const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
 const APP_ID = 'amzn1.ask.skill.cb6939d9-2dac-4a8c-af5e-eb94563053f3';
 
+const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
+  'AMAZON.YesIntent': Reset.handleYesReset,
+  'AMAZON.NoIntent': Reset.handleNoReset,
+  'SessionEndedRequest': Exit.handleIntent,
+  'AMAZON.StopIntent': Exit.handleIntent,
+  'AMAZON.CancelIntent': Exit.handleIntent,
+  'Unhandled': function() {
+    this.emit(':ask', 'Sorry, I didn\'t get that. Try saying Yes or No.', 'Try saying Yes or No.');
+  },
+});
+
 const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'BettingIntent': Betting.handleIntent,
   'ResetIntent': Reset.handleIntent,
@@ -86,6 +97,7 @@ exports.handler = function(event, context, callback) {
   const alexa = Alexa.handler(event, context);
 
   alexa.APP_ID = APP_ID;
-  alexa.registerHandlers(handlers, newGameHandlers, insuranceHandlers, inGameHandlers);
+  alexa.registerHandlers(handlers, resetHandlers, newGameHandlers,
+    insuranceHandlers, inGameHandlers);
   alexa.execute();
 };
