@@ -30,10 +30,10 @@ module.exports = {
   // version of the gameState variable)
   isDefaultGameState: function(gameState) {
     return ((gameState.activePlayer == 'none') && (gameState.bankroll == 5000) && (gameState.lastBet == 100)
-      && (gameState.rules.hitSoft17 == false) && (gameState.rules.surrender == 'late')
-      && (gameState.rules.double == 'any' && (gameState.doubleaftersplit == true)
-      && (gameState.rules.resplitAces == false) && (gameState.blackjackBonus == 0.5)
-      && (gameState.rules.numberOfDecks == 1)));
+      && (gameState.houseRules.hitSoft17 == false) && (gameState.houseRules.surrender == 'late')
+      && (gameState.houseRules.double == 'any' && (gameState.houseRules.doubleaftersplit == true)
+      && (gameState.houseRules.resplitAces == false) && (gameState.houseRules.blackjackBonus == 0.5)
+      && (gameState.houseRules.numberOfDecks == 1)));
   },
   getChangeCardText: function() {
     let cardText = '';
