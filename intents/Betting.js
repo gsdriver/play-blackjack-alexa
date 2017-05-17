@@ -21,9 +21,11 @@ module.exports = {
       bjUtils.emitResponse(this.emit, 'Unable to place a bet for ' + amountSlot.value, null, null, null);
     } else {
       // Take the bet
-      playgame.playBlackjackAction(this.event.session.user.userId, 'bet', amount,
+      const action = {action: 'bet', amount: amount, firsthand: this.attributes['firsthand']};
+
+      playgame.playBlackjackAction(this.event.session.user.userId, action,
         (error, response, speech, reprompt, gameState) => {
-        this.handler.state = bjUtils.getState(gameState);
+        this.attributes['firsthand'] = undefined;
         bjUtils.emitResponse(this.emit, error, response, speech, reprompt);
       });
     }

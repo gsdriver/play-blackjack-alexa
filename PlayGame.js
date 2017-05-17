@@ -12,10 +12,10 @@ const cardRanks = ['none', 'ace', 'two', 'three', 'four', 'five', 'six', 'seven'
 
 module.exports = {
   // Plays a given action, returning either an error or a response string
-  playBlackjackAction: function(userID, action, value, callback) {
+  playBlackjackAction: function(userID, action, callback) {
     // Special case if this is suggest
-    if (action == 'suggest') {
-      postUserAction(userID, action, 0, (error, suggestion) => {
+    if (action.action == 'suggest') {
+      postUserAction(userID, action.action, 0, (error, suggestion) => {
         const youShould = ['You should ', 'The book says you should ', 'The book would tell you to ', 'According to Basic Strategy you should ',
                 'The book would suggest that you ', 'I think you should ', 'Basic Strategy would suggest you '];
         const actionMapping = {'insurance': 'take insurance', 'noinsurance': 'not take insurance', 'hit': 'hit',
@@ -37,7 +37,7 @@ module.exports = {
         }
 
         getGameState(userID, (err, gameState) => {
-          const reprompt = (gameState) ? listValidActions(gameState) : 'What can I help you with?';
+          const reprompt = (gameState) ? listValidActions(gameState, 'full') : 'What can I help you with?';
           suggestText += ('. ' + reprompt);
           callback(speechError, null, suggestText, reprompt, null);
         });
@@ -45,7 +45,7 @@ module.exports = {
     } else {
       // Get the game state so we can take action (the latest should be stored tied to this user ID)
       let speechError = null;
-      let speechQuestion = null;
+      let speechQuestion = '';
       let repromptQuestion = null;
 
       getGameState(userID, (error, gameState) => {
@@ -56,27 +56,29 @@ module.exports = {
         }
 
         // Is this a valid option?
-        if (!gameState.possibleActions || (gameState.possibleActions.indexOf(action) < 0)) {
+        if (!gameState.possibleActions || (gameState.possibleActions.indexOf(action.action) < 0)) {
           // Probably need a way to read out the game state better
-          speechError = 'I\'m sorry, ' + action + ' is not a valid action at this time. ';
+          speechError = 'I\'m sorry, ' + action.action + ' is not a valid action at this time. ';
           speechError += readHand(gameState);
-          speechError += ' ' + listValidActions(gameState);
+          speechError += ' ' + listValidActions(gameState, 'full');
           sendUserCallback(gameState, speechError, null, null, null, callback);
         } else {
           // OK, let's post this action and get a new game state
-          postUserAction(gameState.userID, action,
-            (value ? value : gameState.lastBet), (error, newGameState) => {
+          const betAmount = (action.amount ? action.amount : gameState.lastBet);
+
+          postUserAction(gameState.userID, action.action, betAmount, (error, newGameState) => {
             if (error) {
               speechError = error;
             } else {
-              // Pose this as a question whether it's the player or dealer's turn
-              repromptQuestion = listValidActions(newGameState);
-              speechQuestion = tellResult(action, gameState, newGameState);
-              if (newGameState.activePlayer == 'player') {
-                speechQuestion += ' What would you like to do?';
-              } else {
-                speechQuestion += ' Would you like to play again?';
+              // If this was the first hand, or they specified a value, tell them how much they bet
+              if ((action.action === 'bet') && (action.firsthand || (action.amount > 0))) {
+                speechQuestion += ('You bet ' + betAmount + ' dollars. ');
               }
+
+              // Pose this as a question whether it's the player or dealer's turn
+              repromptQuestion = listValidActions(newGameState, 'full');
+              speechQuestion += (tellResult(action.action, gameState, newGameState)
+                + ' ' + listValidActions(newGameState, 'summary'));
             }
 
             sendUserCallback(newGameState, speechError, null,
@@ -97,7 +99,7 @@ module.exports = {
       }
 
       // Convert the rules to text
-      const reprompt = listValidActions(gameState);
+      const reprompt = listValidActions(gameState, 'full');
       const speech = rulesToText(gameState.houseRules) + reprompt;
 
       callback(null, null, speech, reprompt, gameState);
@@ -119,7 +121,7 @@ module.exports = {
         let speechQuestion = null;
         let repromptQuestion = null;
 
-        repromptQuestion = listValidActions(gameState);
+        repromptQuestion = listValidActions(gameState, 'full');
         speechQuestion = 'You have ' + gameState.bankroll + ' dollars. ' + readHand(gameState) + ' ' + repromptQuestion;
         callback(null, null, speechQuestion, repromptQuestion, gameState);
       }
@@ -286,8 +288,9 @@ function getSpeechError(response) {
 
 //
 // Lists what the user can do next - provided in the form of a question
+// You can ask for either "full" or "summary" depending on the state
 //
-function listValidActions(gameState) {
+function listValidActions(gameState, type) {
   let result = '';
 
   if (gameState.possibleActions) {
@@ -299,8 +302,15 @@ function listValidActions(gameState) {
       } else {
         result = 'You don\'t have enough money to take insurance - say no to decline insurance.';
       }
-    } else {
+    } else if (type === 'full') {
       result = 'Would you like to ' + utils.or(gameState.possibleActions) + '?';
+    } else {
+      // Provide a summary
+      if (gameState.activePlayer == 'player') {
+        result = 'What would you like to do?';
+      } else {
+        result = 'Would you like to play again?';
+      }
     }
   }
 

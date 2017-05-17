@@ -18,7 +18,7 @@ module.exports = {
     } else {
       // Let's play this action
       playgame.playBlackjackAction(this.event.session.user.userId,
-          getBlackjackAction(actionSlot), 0,
+          {action: getBlackjackAction(actionSlot)},
           (error, response, speech, reprompt, gameState) => {
         this.handler.state = bjUtils.getState(gameState);
         bjUtils.emitResponse(this.emit, error, response, speech, reprompt);
