@@ -28,7 +28,22 @@ module.exports = {
       } else {
         playgame.changeRules(this.event.session.user.userId, rules,
           (error, response, speech, reprompt, gameState) => {
-          bjUtils.emitResponse(this.emit, error, response, speech, reprompt);
+          // Now get the full set of rules for the card
+          if (!error) {
+            playgame.readRules(this.event.session.user.userId,
+              (readError, readResponse, readSpeech, readPrompt, newGameState) => {
+              let cardText = '';
+
+              if (readSpeech) {
+                cardText += 'The full rules are ';
+                cardText += readSpeech + '/n/n';
+              }
+
+              this.emit(':askWithCard', speech, 'What else can I help with?', 'Play Blackjack', cardText);
+            });
+          } else {
+            bjUtils.emitResponse(this.emit, error, response, speech, reprompt);
+          }
         });
       }
     }
@@ -40,9 +55,9 @@ module.exports = {
       // Prepare card text with a full set of rules that can be changed
       playgame.readRules(this.event.session.user.userId,
         (error, response, speech, reprompt, gameState) => {
-        if (response) {
+        if (speech) {
           cardText += 'The current rules are ';
-          cardText += response + '/n/n';
+          cardText += speech + '/n/n';
         }
 
         cardText += bjUtils.getChangeCardText();
