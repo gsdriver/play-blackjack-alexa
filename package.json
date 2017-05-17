@@ -12,6 +12,7 @@
     "requestify": "^0.2.5"
   },
   "devDependencies": {
+    "alexa-conversation": "^0.1.0",
     "del": "^2.2.2",
     "eslint-config-google": "^0.7.1",
     "eslint-html-reporter": "^0.5.2",

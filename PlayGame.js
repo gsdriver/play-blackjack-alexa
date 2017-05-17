@@ -7,8 +7,10 @@
 const http = require('http');
 const requestify = require('requestify');
 const utils = require('alexa-speech-utils')();
+const stubbedGame = require('./StubbedGame');
 
 const cardRanks = ['none', 'ace', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'jack', 'queen', 'king'];
+const testUser = 'stubbed';
 
 module.exports = {
   // Plays a given action, returning either an error or a response string
@@ -211,6 +213,10 @@ function sendUserCallback(gameState, error, speechResponse,
  * Internal functions
  */
 function getGameState(userID, callback) {
+  if (userID == testUser) {
+    return stubbedGame.getGameState(callback);
+  }
+
   const queryString = 'get?userID=' + userID;
 
   http.get(process.env.SERVICEURL + queryString, (res) => {
@@ -235,6 +241,10 @@ function getGameState(userID, callback) {
 }
 
 function flushGameState(userID, callback) {
+  if (userID == testUser) {
+    return stubbedGame.flushGameState(callback);
+  }
+
   const queryString = 'flushcache?userID=' + userID;
 
   http.get(process.env.SERVICEURL + queryString, (res) => {
@@ -251,6 +261,10 @@ function flushGameState(userID, callback) {
 }
 
 function postUserAction(userID, action, value, callback) {
+  if (userID == testUser) {
+    return stubbedGame.postUserAction(action, value, callback);
+  }
+
   const payload = {userID: userID, action: action};
 
   if (action == 'bet') {
