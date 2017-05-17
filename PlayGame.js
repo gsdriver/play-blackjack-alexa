@@ -27,7 +27,7 @@ module.exports = {
         if (suggestText) {
           // Special case if it wasn't your turn
           if (suggestText == 'notplayerturn') {
-            suggestText = 'I can\'t give a suggestion when the game is over.';
+            suggestText = 'I can\'t give a suggestion when the game is over';
           } else {
             if (actionMapping[suggestText]) {
               const prefix = youShould[Math.floor(Math.random() * youShould.length)];
@@ -36,20 +36,23 @@ module.exports = {
           }
         }
 
-        callback(speechError, suggestText, null, null, null);
+        getGameState(userID, (err, gameState) => {
+          const reprompt = (gameState) ? listValidActions(gameState) : 'What can I help you with?';
+          suggestText += ('. ' + reprompt);
+          callback(speechError, null, suggestText, reprompt, null);
+        });
       });
     } else {
       // Get the game state so we can take action (the latest should be stored tied to this user ID)
       let speechError = null;
-      let speechResponse = null;
       let speechQuestion = null;
       let repromptQuestion = null;
 
       getGameState(userID, (error, gameState) => {
         if (error) {
-            speechError = 'There was an error: ' + error;
-            callback(speechError, null, null);
-            return;
+          speechError = 'There was an error: ' + error;
+          callback(speechError, null, null);
+          return;
         }
 
         // Is this a valid option?
@@ -66,15 +69,12 @@ module.exports = {
             if (error) {
               speechError = error;
             } else {
-              if (newGameState.activePlayer == 'player') {
-                repromptQuestion = listValidActions(newGameState);
-                speechQuestion = tellResult(action, gameState, newGameState) + ' ' + repromptQuestion;
-              } else {
-                speechResponse = tellResult(action, gameState, newGameState);
-              }
+              // Pose this as a question whether it's the player or dealer's turn
+              repromptQuestion = listValidActions(newGameState);
+              speechQuestion = tellResult(action, gameState, newGameState);
             }
 
-            sendUserCallback(newGameState, speechError, speechResponse,
+            sendUserCallback(newGameState, speechError, null,
               speechQuestion, repromptQuestion, callback);
           });
         }
@@ -83,21 +83,19 @@ module.exports = {
   },
   // Reads back the rules in play
   readRules: function(userID, callback) {
-    // Get the game state, which will have the rules
-    let speechError = null;
-    let speech = 'Sorry, internal error. What else can I help with?';
-
     // Get the game state so we can take action (the latest should be stored tied to this user ID)
     getGameState(userID, (error, gameState) => {
       if (error) {
-        speechError = 'There was an error: ' + error;
+        const speechError = 'There was an error: ' + error;
         callback(speechError, null, null, null, null);
         return;
       }
 
       // Convert the rules to text
-      speech = rulesToText(gameState.houseRules);
-      callback(speechError, speech, null, null, gameState);
+      const reprompt = listValidActions(gameState);
+      const speech = rulesToText(gameState.houseRules) + reprompt;
+
+      callback(null, null, speech, reprompt, gameState);
     });
   },
   // Flushes the current user from our store, which resets everything to the beginning state
@@ -113,18 +111,12 @@ module.exports = {
       if (error) {
         callback(error, null, null);
       } else {
-        let speechResponse = null;
         let speechQuestion = null;
         let repromptQuestion = null;
 
-        if (gameState.activePlayer == 'player') {
-          repromptQuestion = listValidActions(gameState);
-          speechQuestion = 'You have ' + gameState.bankroll + ' dollars. ' + readHand(gameState) + ' ' + repromptQuestion;
-        } else {
-          speechResponse = 'You have ' + gameState.bankroll + ' dollars. ' + readHand(gameState);
-        }
-
-        callback(null, speechResponse, speechQuestion, repromptQuestion, gameState);
+        repromptQuestion = listValidActions(gameState);
+        speechQuestion = 'You have ' + gameState.bankroll + ' dollars. ' + readHand(gameState) + ' ' + repromptQuestion;
+        callback(null, null, speechQuestion, repromptQuestion, gameState);
       }
     });
   },
@@ -163,11 +155,13 @@ module.exports = {
     postUserAction(userID, 'setrules', rules, (error, newGameState) => {
       if (!error) {
         // Read the new rules
-        speech = rulesToText(newGameState.houseRules);
+        speech = rulesToText(newGameState.houseRules, rules);
       }
 
       // If this is shuffle, we'll do the shuffle for them
-      sendUserCallback(newGameState, error, speech, null, null, callback);
+      const reprompt = 'Would you like to bet?';
+      speech += (' Check the Alexa companion application for the full set of rules. ' + reprompt);
+      sendUserCallback(newGameState, error, null, speech, reprompt, callback);
     });
   },
 };
@@ -612,49 +606,66 @@ function readHandNumber(gameState, handNumber) {
   return result;
 }
 
-function rulesToText(rules) {
+function rulesToText(rules, changeRules) {
   let text = '';
 
+  // If old rules were passed in, only state what's set in changeRules
+  // As that would be the elements that changed
   // Say the decks and betting range
-  text += rules.numberOfDecks + ' deck game, bet from ' + rules.minBet + ' to ' + rules.maxBet + ' dollars. ';
+  if (!changeRules || changeRules.hasOwnProperty('numberOfDecks')) {
+    text += rules.numberOfDecks + ' deck game. ';
+  }
+  if (!changeRules || changeRules.hasOwnProperty('minBet') || changeRules.hasOwnProperty('maxBet')) {
+    text += 'Bet from ' + rules.minBet + ' to ' + rules.maxBet + ' dollars. ';
+  }
 
   // Hit or stand on soft 17
-  text += 'Dealer ' + (rules.hitSoft17 ? 'hits' : 'stands') + ' on soft 17. ';
+  if (!changeRules || changeRules.hasOwnProperty('hitSoft17')) {
+    text += 'Dealer ' + (rules.hitSoft17 ? 'hits' : 'stands') + ' on soft 17. ';
+  }
 
   // Double rules
-  const doubleMapping = ['any', 'on any cards',
-                        '10or11', 'on 10 or 11 only',
-                        '9or10o11', 'on 9 thru 11 only',
-                        'none', 'not allowed'];
-  const iDouble = doubleMapping.indexOf(rules.double);
-  if (iDouble > -1) {
-    text += 'Double down ' + doubleMapping[iDouble + 1] + '. ';
-    if (rules.double != 'none') {
-      text += 'Double after split ' + (rules.doubleaftersplit ? 'allowed. ' : 'not allowed. ');
+  if (!changeRules || changeRules.hasOwnProperty('double') || changeRules.hasOwnProperty('doubleaftersplit')) {
+    const doubleMapping = ['any', 'on any cards',
+                          '10or11', 'on 10 or 11 only',
+                          '9or10o11', 'on 9 thru 11 only',
+                          'none', 'not allowed'];
+    const iDouble = doubleMapping.indexOf(rules.double);
+    if (iDouble > -1) {
+      text += 'Double down ' + doubleMapping[iDouble + 1] + '. ';
+      if (rules.double != 'none') {
+        text += 'Double after split ' + (rules.doubleaftersplit ? 'allowed. ' : 'not allowed. ');
+      }
     }
   }
 
   // Splitting (only metion if you can resplit aces 'cuz that's uncommon)
-  if (rules.resplitAces) {
-    text += 'Can resplit Aces. ';
+  if (!changeRules || changeRules.hasOwnProperty('resplitAces')) {
+    if (rules.resplitAces) {
+      text += 'Can resplit Aces. ';
+    }
   }
 
   // Surrender rules
-  const surrenderMapping = ['none', 'Surrender not offered. ',
-                        'early', 'Surrender allowed. ',
-                        'late', 'Surrender allowed. '];
-  const iSurrender = surrenderMapping.indexOf(rules.surrender);
-  if (iSurrender > -1) {
-    text += surrenderMapping[iSurrender + 1];
+  if (!changeRules || changeRules.hasOwnProperty('surrender')) {
+    const surrenderMapping = ['none', 'Surrender not offered. ',
+                          'early', 'Surrender allowed. ',
+                          'late', 'Surrender allowed. '];
+    const iSurrender = surrenderMapping.indexOf(rules.surrender);
+    if (iSurrender > -1) {
+      text += surrenderMapping[iSurrender + 1];
+    }
   }
 
-  // Blackjack payout
-  const blackjackPayout = ['0.5', '3 to 2',
-                       '0.2', '6 to 5',
-                       '0', 'even money'];
-  const iBlackjack = blackjackPayout.indexOf(rules.blackjackBonus.toString());
-  if (iBlackjack > -1) {
-    text += 'Blackjack pays ' + blackjackPayout[iBlackjack + 1];
+  if (!changeRules || changeRules.hasOwnProperty('blackjackBonus')) {
+    // Blackjack payout
+    const blackjackPayout = ['0.5', '3 to 2. ',
+                         '0.2', '6 to 5. ',
+                         '0', 'even money. '];
+    const iBlackjack = blackjackPayout.indexOf(rules.blackjackBonus.toString());
+    if (iBlackjack > -1) {
+      text += 'Blackjack pays ' + blackjackPayout[iBlackjack + 1];
+    }
   }
 
   return text;
