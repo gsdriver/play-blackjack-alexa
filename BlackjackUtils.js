@@ -14,6 +14,17 @@ module.exports = {
       emit(':ask', speech, reprompt);
     }
   },
+  // Figures out what state of the game we're in
+  getState: function(gameState) {
+    // New game - ready to start a new game
+    if (gameState.possibleActions.indexOf('bet') >= 0) {
+      return 'NEWGAME';
+    } else if (gameState.possibleActions.indexOf('noinsurance') >= 0) {
+      return 'INSURANCEOFFERED';
+    } else {
+      return 'INGAME';
+    }
+  },
   getChangeCardText: function() {
     let cardText = '';
 

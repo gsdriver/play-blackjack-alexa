@@ -24,6 +24,7 @@
     "no-param-reassign": "error",
     "prefer-arrow-callback": "error",
     "camelcase": "warn",
+    "new-cap": "warn",
     "no-var": "error"
   }
 }

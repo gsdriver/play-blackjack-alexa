@@ -72,6 +72,11 @@ module.exports = {
               // Pose this as a question whether it's the player or dealer's turn
               repromptQuestion = listValidActions(newGameState);
               speechQuestion = tellResult(action, gameState, newGameState);
+              if (newGameState.activePlayer == 'player') {
+                speechQuestion += ' What would you like to do?';
+              } else {
+                speechQuestion += ' Would you like to play again?';
+              }
             }
 
             sendUserCallback(newGameState, speechError, null,
