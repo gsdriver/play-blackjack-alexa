@@ -35,12 +35,5 @@ module.exports = {
       }
       bjUtils.emitResponse(this.emit, error, response, launchSpeech, reprompt);
     });
-/*
-    // If they opened the session, flush the previous state if any
-    playgame.flushGame(this.event.session.user.userId, (error, result) => {
-      // I don't care if this succeeds or not
-      this.emit(':ask', speech, reprompt);
-    });
-    */
   },
 };
