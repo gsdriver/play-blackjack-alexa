@@ -70,15 +70,22 @@ module.exports = {
             if (error) {
               speechError = error;
             } else {
+              // Special case - give a full read-out if this is a natural blackjack
+              const playerBlackjack = ((newGameState.playerHands.length == 1)
+                && (newGameState.activePlayer == 'player')
+                && (newGameState.playerHands[0].cards.length == 2)
+                && (newGameState.playerHands[0].total == 21));
+
               // If this was the first hand, or they specified a value, tell them how much they bet
               if ((action.action === 'bet') && (action.firsthand || (action.amount > 0))) {
-                speechQuestion += ('You bet ' + betAmount + ' dollars. ');
+                speechQuestion += ('You bet $' + betAmount + '. ');
               }
 
               // Pose this as a question whether it's the player or dealer's turn
               repromptQuestion = listValidActions(newGameState, 'full');
               speechQuestion += (tellResult(action.action, gameState, newGameState)
-                + ' ' + listValidActions(newGameState, 'summary'));
+                + ' ' + listValidActions(newGameState,
+                  (playerBlackjack) ? 'full' : 'summary'));
             }
 
             sendUserCallback(newGameState, speechError, null,
@@ -122,7 +129,7 @@ module.exports = {
         let repromptQuestion = null;
 
         repromptQuestion = listValidActions(gameState, 'full');
-        speechQuestion = 'You have ' + gameState.bankroll + ' dollars. ' + readHand(gameState) + ' ' + repromptQuestion;
+        speechQuestion = 'You have $' + gameState.bankroll + '. ' + readHand(gameState) + ' ' + repromptQuestion;
         callback(null, null, speechQuestion, repromptQuestion, gameState);
       }
     });
@@ -269,8 +276,8 @@ function postUserAction(userID, action, value, callback) {
 }
 
 function getSpeechError(response) {
-  const errorMapping = ['bettoosmall', 'Your bet is below the minimum of five dollars',
-                      'bettoolarge', 'Your bet is above the maximum of one thousand dollars',
+  const errorMapping = ['bettoosmall', 'Your bet is below the minimum of $5',
+                      'bettoolarge', 'Your bet is above the maximum of $1000',
                       'betoverbankroll', 'Your bet is more than your available bankroll'];
   let errorText = 'Internal error';
   const error = response.getBody();
@@ -377,7 +384,7 @@ function tellResult(action, gameState, newGameState) {
 
   if ((gameState.activePlayer == 'player') && (newGameState.activePlayer != 'player')) {
     // OK, game over - so let's give the new total
-    result += ' You have ' + newGameState.bankroll + ' dollars.';
+    result += ' You have $' + newGameState.bankroll + '.';
   }
 
   return result;
@@ -631,7 +638,7 @@ function rulesToText(rules, changeRules) {
     text += rules.numberOfDecks + ' deck game. ';
   }
   if (!changeRules || changeRules.hasOwnProperty('minBet') || changeRules.hasOwnProperty('maxBet')) {
-    text += 'Bet from ' + rules.minBet + ' to ' + rules.maxBet + ' dollars. ';
+    text += 'Bet from $' + rules.minBet + ' to $' + rules.maxBet + '. ';
   }
 
   // Hit or stand on soft 17

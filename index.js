@@ -14,8 +14,8 @@ const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const Reset = require('./intents/Reset');
 
-// const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
-const APP_ID = 'amzn1.ask.skill.cb6939d9-2dac-4a8c-af5e-eb94563053f3';
+const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
+// const APP_ID = 'amzn1.ask.skill.cb6939d9-2dac-4a8c-af5e-eb94563053f3';
 
 const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   'AMAZON.YesIntent': Reset.handleYesReset,

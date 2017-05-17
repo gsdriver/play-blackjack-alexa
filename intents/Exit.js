@@ -14,7 +14,7 @@ module.exports = {
 
       // Tell them how much money they are leaving with
       if (gameState) {
-        exitSpeech = 'You are leaving with ' + gameState.bankroll + ' dollars. ';
+        exitSpeech = 'You are leaving with $' + gameState.bankroll + '. ';
       }
       exitSpeech += 'Goodbye.';
       this.emit(':tell', exitSpeech);

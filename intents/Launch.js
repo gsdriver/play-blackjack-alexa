@@ -22,7 +22,7 @@ module.exports = {
         if (gameState.activePlayer === 'player') {
           launchSpeech += speech;
         } else {
-          launchSpeech += 'You have ' + gameState.bankroll + ' dollars. Say bet to start a new game';
+          launchSpeech += 'You have $' + gameState.bankroll + '. Say bet to start a new game';
           if (!bjUtils.isDefaultGameState(gameState)) {
             launchSpeech += ' or reset game to reset to the default rules and bankroll';
           }

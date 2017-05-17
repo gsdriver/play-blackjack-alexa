@@ -13,9 +13,9 @@ module.exports = {
       if (error) {
         this.emit(':ask', error, 'What else can I help with?');
       } else if (response) {
-        this.emit(':tellWithCard', response, 'Play Blackjack', response);
+        this.emit(':tellWithCard', response, 'Blackjack Rules', response);
       } else {
-        this.emit(':askWithCard', speech, reprompt, 'Play Blackjack', speech);
+        this.emit(':askWithCard', speech, reprompt, 'Blackjack Rules', speech);
       }
     });
   },
