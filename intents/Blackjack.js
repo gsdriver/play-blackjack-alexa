@@ -20,7 +20,9 @@ module.exports = {
       playgame.playBlackjackAction(this.event.session.user.userId,
           {action: getBlackjackAction(actionSlot)},
           (error, response, speech, reprompt, gameState) => {
-        this.handler.state = bjUtils.getState(gameState);
+        if (gameState) {
+          this.handler.state = bjUtils.getState(gameState);
+        }
         bjUtils.emitResponse(this.emit, error, response, speech, reprompt);
       });
     }
