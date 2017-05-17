@@ -10,6 +10,7 @@ function BuildEvent(argv)
     var betIntent = {"name": "BettingIntent", "slots": {"Amount": {"name": "Amount", "value": ""}}};
     var yesIntent = {"name": "AMAZON.YesIntent", "slots": {}};
     var noIntent = {"name": "AMAZON.NoIntent", "slots": {}};
+    var resetIntent = {"name": "ResetIntent", "slots": {}};
     var repeatIntent = {"name": "AMAZON.RepeatIntent", "slots": {}};
     var helpIntent = {"name": "AMAZON.HelpIntent", "slots": {}};
     var exitIntent = {"name": "AMAZON.CancelIntent", "slots": {}};
@@ -73,7 +74,10 @@ function BuildEvent(argv)
     }
     else if (argv[2] == "bet")
     {
-        betIntent.slots.Amount.value = (argv.length > 3) ? argv[3] : 100;
+        if (argv.length > 3)
+        {
+            betIntent.slots.Amount.value = argv[3];
+        }
         lambda.request.intent = betIntent;
     }
     else if (argv[2] == "change")
@@ -86,6 +90,10 @@ function BuildEvent(argv)
     {
         // Return the launch request
         return openEvent;
+    }
+    else if (argv[2] == "reset")
+    {
+        lambda.request.intent = resetIntent;
     }
     else if (argv[2] == "yes")
     {

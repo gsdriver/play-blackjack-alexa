@@ -12,12 +12,14 @@ const DeclineInsurance = require('./intents/DeclineInsurance');
 const Repeat = require('./intents/Repeat');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
+const Reset = require('./intents/Reset');
 
 // const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
 const APP_ID = 'amzn1.ask.skill.cb6939d9-2dac-4a8c-af5e-eb94563053f3';
 
 const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'BettingIntent': Betting.handleIntent,
+  'ResetIntent': Reset.handleIntent,
   'RulesIntent': Rules.handleIntent,
   'ChangeRulesIntent': ChangeRules.handleIntent,
   'AMAZON.YesIntent': Betting.handleIntent,
@@ -76,7 +78,7 @@ const handlers = {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'Unhandled': function() {
-    this.emit(':ask', 'Sorry, I didn\'t get that. Try saying Repeats to hear the current status.', 'Try saying Repeat.');
+    this.emit(':ask', 'Sorry, I didn\'t get that. Try saying Repeat to hear the current status.', 'Try saying Repeat.');
   },
 };
 

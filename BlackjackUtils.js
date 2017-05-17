@@ -25,6 +25,16 @@ module.exports = {
       return 'INGAME';
     }
   },
+  // Determines if this is the initial game state or not; somewhat of a hack because
+  // I don't want to rev the server to tell me this (could be passed back in a future
+  // version of the gameState variable)
+  isDefaultGameState: function(gameState) {
+    return ((gameState.activePlayer == 'none') && (gameState.bankroll == 5000) && (gameState.lastBet == 100)
+      && (gameState.rules.hitSoft17 == false) && (gameState.rules.surrender == 'late')
+      && (gameState.rules.double == 'any' && (gameState.doubleaftersplit == true)
+      && (gameState.rules.resplitAces == false) && (gameState.blackjackBonus == 0.5)
+      && (gameState.rules.numberOfDecks == 1)));
+  },
   getChangeCardText: function() {
     let cardText = '';
 
