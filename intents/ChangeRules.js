@@ -36,7 +36,7 @@ module.exports = {
 
               if (readSpeech) {
                 cardText += 'The full rules are ';
-                cardText += readSpeech + '/n/n';
+                cardText += readSpeech;
               }
 
               this.emit(':askWithCard', speech, 'What else can I help with?', 'Play Blackjack', cardText);
@@ -57,7 +57,7 @@ module.exports = {
         (error, response, speech, reprompt, gameState) => {
         if (speech) {
           cardText += 'The current rules are ';
-          cardText += speech + '/n/n';
+          cardText += speech + '\n';
         }
 
         cardText += bjUtils.getChangeCardText();
