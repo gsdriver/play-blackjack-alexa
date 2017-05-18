@@ -13,9 +13,10 @@ const Repeat = require('./intents/Repeat');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const Reset = require('./intents/Reset');
+const playgame = require('./PlayGame');
+const bjUtils = require('./BlackjackUtils');
 
 const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
-// const APP_ID = 'amzn1.ask.skill.cb6939d9-2dac-4a8c-af5e-eb94563053f3';
 
 const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   'AMAZON.YesIntent': Reset.handleYesReset,
@@ -78,12 +79,30 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
 const handlers = {
   'NewSession': function() {
     if (this.event.request.type === 'IntentRequest') {
-      this.emit(this.event.request.intent.name);
+      // Set the state and route accordingly
+      playgame.readCurrentHand(this.event.session.user.userId,
+        (error, response, speech, reprompt, gameState) => {
+        if (gameState) {
+          this.attributes['firsthand'] = true;
+          this.handler.state = bjUtils.getState(gameState);
+        }
+        this.emit(this.event.request.intent.name);
+      });
     } else {
       this.emit('LaunchRequest');
     }
   },
+  // Some intents don't make sense for a new session - so just launch instead
   'LaunchRequest': Launch.handleIntent,
+  'SuggestIntent': Launch.handleIntent,
+  'ResetIntent': Launch.handleIntent,
+  'ChangeRulesIntent': Launch.handleIntent,
+  'AMAZON.YesIntent': Launch.handleIntent,
+  'AMAZON.NoIntent': Launch.handleIntent,
+  'BettingIntent': Betting.handleIntent,
+  'BlackjackIntent': Blackjack.handleIntent,
+  'RulesIntent': Rules.handleIntent,
+  'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
   'SessionEndedRequest': Exit.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
