@@ -22,6 +22,9 @@
       "intent": "RulesIntent"
     },
     {
+      "intent": "ResetIntent"
+    },
+    {
       "intent": "ChangeRulesIntent",
       "slots": [
         {

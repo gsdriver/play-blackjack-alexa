@@ -1,4 +1,4 @@
-var mainApp = require('../src/index');
+var mainApp = require('../index');
 
 function BuildEvent(argv)
 {
@@ -10,7 +10,10 @@ function BuildEvent(argv)
     var betIntent = {"name": "BettingIntent", "slots": {"Amount": {"name": "Amount", "value": ""}}};
     var yesIntent = {"name": "AMAZON.YesIntent", "slots": {}};
     var noIntent = {"name": "AMAZON.NoIntent", "slots": {}};
+    var resetIntent = {"name": "ResetIntent", "slots": {}};
     var repeatIntent = {"name": "AMAZON.RepeatIntent", "slots": {}};
+    var helpIntent = {"name": "AMAZON.HelpIntent", "slots": {}};
+    var exitIntent = {"name": "AMAZON.CancelIntent", "slots": {}};
 
     var lambda = {
        "session": {
@@ -18,7 +21,7 @@ function BuildEvent(argv)
          "application": {
            "applicationId": "amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce"
          },
-         "attributes": {},
+         "attributes": {}, // 'STATE':'INGAME'},
          "user": {
            "userId": "amzn1.ask.account.AFLJ3RYNI3X6MQMX4KVH52CZKDSI6PMWCQWRBHSPJJPR2MKGDNJHW36XF2ET6I2BFUDRKH3SR2ACZ5VCRLXLGJFBTQGY4RNYZA763JED57USTK6F7IRYT6KR3XYO2ZTKK55OM6ID2WQXQKKXJCYMWXQ74YXREHVTQ3VUD5QHYBJTKHDDH5R4ALQAGIQKPFL52A3HQ377WNCCHYI"
          },
@@ -65,9 +68,16 @@ function BuildEvent(argv)
     {
         lambda.request.intent = suggestIntent;
     }
+    else if (argv[2] == "help")
+    {
+        lambda.request.intent = helpIntent;;
+    }
     else if (argv[2] == "bet")
     {
-        betIntent.slots.Amount.value = (argv.length > 3) ? argv[3] : 100;
+        if (argv.length > 3)
+        {
+            betIntent.slots.Amount.value = argv[3];
+        }
         lambda.request.intent = betIntent;
     }
     else if (argv[2] == "change")
@@ -81,6 +91,10 @@ function BuildEvent(argv)
         // Return the launch request
         return openEvent;
     }
+    else if (argv[2] == "reset")
+    {
+        lambda.request.intent = resetIntent;
+    }
     else if (argv[2] == "yes")
     {
         lambda.request.intent = yesIntent;
@@ -93,6 +107,10 @@ function BuildEvent(argv)
     {
         lambda.request.intent = repeatIntent;
     }
+    else if (argv[2] == "exit")
+    {
+        lambda.request.intent = exitIntent;
+    }
     else
     {
         blackjackIntent.slots.Action.value = argv[2];
@@ -102,16 +120,33 @@ function BuildEvent(argv)
     return lambda;
 }
 
+
 // Simple response - just print out what I'm given
 function myResponse(appId) {
-    this._appId = appId;
+  this._appId = appId;
 }
 
 myResponse.succeed = function(result) {
+  if (result.response.outputSpeech.ssml) {
+    console.log('AS SSML: ' + result.response.outputSpeech.ssml);
+  } else {
     console.log(result.response.outputSpeech.text);
-    console.log("The session " + ((!result.response.shouldEndSession) ? "stays open." : "closes."));
+  }
+  if (result.response.card && result.response.card.content) {
+    console.log('Card Content: ' + result.response.card.content);
+  }
+  console.log('The session ' + ((!result.response.shouldEndSession) ? 'stays open.' : 'closes.'));
+  if (result.sessionAttributes) {
+    console.log('Attributes: ' + JSON.stringify(result.sessionAttributes));
+  }
+}
+
+myResponse.fail = function(e) {
+  console.log(e);
 }
 
 // Build the event object and call the app
-mainApp.handler(BuildEvent(process.argv), myResponse);
-
+var event = BuildEvent(process.argv);
+if (event) {
+    mainApp.handler(event, myResponse);
+}

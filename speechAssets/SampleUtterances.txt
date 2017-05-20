@@ -61,6 +61,15 @@ RulesIntent what are the rules of the game
 RulesIntent tell me the rules of the game
 RulesIntent the rules of the game
 RulesIntent rules of the game
+ResetIntent reset game
+ResetIntent reset bankroll
+ResetIntent reset the game
+ResetIntent reset rules
+ResetIntent reset my game
+ResetIntent reset my bankroll
+ResetIntent reset rules
+ResetIntent reset the rules
+ResetIntent reset my rules
 SuggestIntent what should I do
 SuggestIntent give suggestion
 SuggestIntent give me suggestion
