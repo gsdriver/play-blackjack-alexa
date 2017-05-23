@@ -30,7 +30,8 @@ module.exports = {
           (error, response, speech, reprompt, gameState) => {
           // Now get the full set of rules for the card
           if (!error) {
-            playgame.readRules(this.event.session.user.userId,
+            playgame.readRules(this.attributes['gameState'],
+              this.event.session.user.userId,
               (readError, readResponse, readSpeech, readPrompt, newGameState) => {
               let cardText = '';
 
@@ -53,7 +54,8 @@ module.exports = {
       let cardText = '';
 
       // Prepare card text with a full set of rules that can be changed
-      playgame.readRules(this.event.session.user.userId,
+      playgame.readRules(this.attributes['gameState'],
+        this.event.session.user.userId,
         (error, response, speech, reprompt, gameState) => {
         if (speech) {
           cardText += 'The current rules are ';

@@ -9,8 +9,10 @@ const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
   handleIntent: function() {
-    playgame.playBlackjackAction(this.event.session.user.userId, {action: 'noinsurance'},
+    playgame.playBlackjackAction(this.attributes['gameState'],
+      this.event.session.user.userId, {action: 'noinsurance'},
       (error, response, speech, reprompt, gameState) => {
+      this.attributes['gameState'] = gameState;
       if (gameState) {
         this.handler.state = bjUtils.getState(gameState);
       }

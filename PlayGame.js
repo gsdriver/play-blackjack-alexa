@@ -14,7 +14,7 @@ const testUser = 'stubbed';
 
 module.exports = {
   // Plays a given action, returning either an error or a response string
-  playBlackjackAction: function(userID, action, callback) {
+  playBlackjackAction: function(savedGameState, userID, action, callback) {
     // Special case if this is suggest
     if (action.action == 'suggest') {
       postUserAction(userID, action.action, 0, (error, suggestion) => {
@@ -38,7 +38,7 @@ module.exports = {
           }
         }
 
-        getGameState(userID, (err, gameState) => {
+        getGameState(savedGameState, userID, (err, gameState) => {
           const reprompt = (gameState) ? listValidActions(gameState, 'full') : 'What can I help you with?';
           suggestText += ('. ' + reprompt);
           callback(speechError, null, suggestText, reprompt, null);
@@ -50,7 +50,7 @@ module.exports = {
       let speechQuestion = '';
       let repromptQuestion = null;
 
-      getGameState(userID, (error, gameState) => {
+      getGameState(savedGameState, userID, (error, gameState) => {
         if (error) {
           speechError = 'There was an error: ' + error;
           callback(speechError, null, null);
@@ -98,9 +98,9 @@ module.exports = {
     }
   },
   // Reads back the rules in play
-  readRules: function(userID, callback) {
+  readRules: function(savedGameState, userID, callback) {
     // Get the game state so we can take action (the latest should be stored tied to this user ID)
-    getGameState(userID, (error, gameState) => {
+    getGameState(savedGameState, userID, (error, gameState) => {
       if (error) {
         const speechError = 'There was an error: ' + error;
         callback(speechError, null, null, null, null);
@@ -122,8 +122,8 @@ module.exports = {
     });
   },
   // Reads back the current hand and game state
-  readCurrentHand: function(userID, callback) {
-    getGameState(userID, (error, gameState) => {
+  readCurrentHand: function(savedGameState, userID, callback) {
+    getGameState(savedGameState, userID, (error, gameState) => {
       if (error) {
         callback(error, null, null);
       } else {
@@ -137,8 +137,8 @@ module.exports = {
     });
   },
   // Gets contextual help based on the current state of the game
-  getContextualHelp: function(userID, callback) {
-    getGameState(userID, (error, gameState) => {
+  getContextualHelp: function(savedGameState, userID, callback) {
+    getGameState(savedGameState, userID, (error, gameState) => {
       if (error) {
         callback(error, null);
       } else {
@@ -212,32 +212,47 @@ function sendUserCallback(gameState, error, speechResponse,
 /*
  * Internal functions
  */
-function getGameState(userID, callback) {
+function getGameState(savedGameState, userID, callback) {
   if (userID == testUser) {
     return stubbedGame.getGameState(callback);
   }
 
-  const queryString = 'get?userID=' + userID;
+  // If they have a saved game state, just return that
+  if (savedGameState) {
+    callback(null, savedGameState);
+  } else {
+    const startTime = new Date().getTime();
+    let endTime;
+    const queryString = 'get?userID=' + userID;
 
-  http.get(process.env.SERVICEURL + queryString, (res) => {
-    if (res.statusCode == 200) {
-      // Great, we should have a game!
-      let fulltext = '';
+    http.get(process.env.SERVICEURL + queryString, (res) => {
+      if (res.statusCode == 200) {
+        // Great, we should have a game!
+        let fulltext = '';
 
-      res.on('data', (data) => {
-        fulltext += data;
-      });
+        res.on('data', (data) => {
+          fulltext += data;
+        });
 
-      res.on('end', () => {
-        callback(null, JSON.parse(fulltext));
-      });
-    } else {
-      // Sorry, there was an error calling the HTTP endpoint
-      callback('Unable to call endpoint', null);
-    }
-  }).on('error', (e) => {
-    callback('Communications error: ' + e.message, null);
-  });
+        res.on('end', () => {
+          endTime = new Date().getTime();
+          console.log('Elapsed time to call getGameState: ' + (endTime - startTime) + ' ms');
+          callback(null, JSON.parse(fulltext));
+        });
+      } else {
+        // Sorry, there was an error calling the HTTP endpoint
+        console.log('GetGameState response error: ' + res.statusCode);
+        endTime = new Date().getTime();
+        console.log('Elapsed time to call getGameState: ' + (endTime - startTime) + ' ms');
+        callback('Unable to call endpoint', null);
+      }
+    }).on('error', (e) => {
+      console.log('GetGameState Communications error: ' + e.message);
+      endTime = new Date().getTime();
+      console.log('Elapsed time to call getGameState: ' + (endTime - startTime) + ' ms');
+      callback('Communications error: ' + e.message, null);
+    });
+  }
 }
 
 function flushGameState(userID, callback) {
@@ -246,16 +261,26 @@ function flushGameState(userID, callback) {
   }
 
   const queryString = 'flushcache?userID=' + userID;
+  const startTime = new Date().getTime();
+  let endTime;
 
   http.get(process.env.SERVICEURL + queryString, (res) => {
     if (res.statusCode == 200) {
       // Great, I don't really care what the response is
+      endTime = new Date().getTime();
+      console.log('Elapsed time to call flushGameState: ' + (endTime - startTime) + ' ms');
       callback(null, 'OK');
     } else {
       // Sorry, there was an error calling the HTTP endpoint
+      console.log('flushGameState response error: ' + res.statusCode);
+      endTime = new Date().getTime();
+      console.log('Elapsed time to call flushGameState: ' + (endTime - startTime) + ' ms');
       callback('Unable to call endpoint', null);
     }
   }).on('error', (e) => {
+    console.log('flushGameState Communications error: ' + e.message);
+    endTime = new Date().getTime();
+    console.log('Elapsed time to call flushGameState: ' + (endTime - startTime) + ' ms');
     callback('Communications error: ' + e.message, null);
   });
 }
@@ -266,6 +291,8 @@ function postUserAction(userID, action, value, callback) {
   }
 
   const payload = {userID: userID, action: action};
+  const startTime = new Date().getTime();
+  let endTime;
 
   if (action == 'bet') {
     payload.value = value;
@@ -278,13 +305,15 @@ function postUserAction(userID, action, value, callback) {
   }
   requestify.post(process.env.SERVICEURL, payload)
   .then((response) => {
-    // Get the response body (JSON parsed or jQuery object for XMLs)
-    response.getBody();
-
     // Get the raw response body
+    endTime = new Date().getTime();
+    console.log('Elapsed time to call postUserAction ' + action + ': ' + (endTime - startTime) + ' ms');
     callback(null, JSON.parse(response.body));
   })
   .fail((response) => {
+    endTime = new Date().getTime();
+    console.log('Failed calling ' + action + ' ' + response.body);
+    console.log('Elapsed time to call postUserAction ' + action + ': ' + (endTime - startTime) + ' ms');
     callback(getSpeechError(response), null);
   });
 }

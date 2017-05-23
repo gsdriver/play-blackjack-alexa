@@ -8,7 +8,8 @@ const playgame = require('../PlayGame');
 
 module.exports = {
   handleIntent: function() {
-    playgame.readRules(this.event.session.user.userId,
+    playgame.readRules(this.attributes['gameState'],
+      this.event.session.user.userId,
       (error, response, speech, reprompt, gameState) => {
       if (error) {
         this.emit(':ask', error, 'What else can I help with?');

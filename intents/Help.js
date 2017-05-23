@@ -9,7 +9,8 @@ const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
   handleIntent: function() {
-    playgame.getContextualHelp(this.event.session.user.userId, (error, response) => {
+    playgame.getContextualHelp(this.attributes['gameState'],
+      this.event.session.user.userId, (error, response) => {
       let cardText = '';
       let speech = response;
 

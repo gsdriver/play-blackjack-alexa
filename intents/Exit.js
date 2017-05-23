@@ -8,7 +8,8 @@ const playgame = require('../PlayGame');
 
 module.exports = {
   handleIntent: function() {
-    playgame.readCurrentHand(this.event.session.user.userId,
+    playgame.readCurrentHand(this.attributes['gameState'],
+      this.event.session.user.userId,
       (error, response, speech, reprompt, gameState) => {
       let exitSpeech = '';
 

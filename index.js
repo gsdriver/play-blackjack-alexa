@@ -80,8 +80,9 @@ const handlers = {
   'NewSession': function() {
     if (this.event.request.type === 'IntentRequest') {
       // Set the state and route accordingly
-      playgame.readCurrentHand(this.event.session.user.userId,
+      playgame.readCurrentHand(undefined, this.event.session.user.userId,
         (error, response, speech, reprompt, gameState) => {
+        this.attributes['gameState'] = gameState;
         if (gameState) {
           this.attributes['firsthand'] = true;
           this.handler.state = bjUtils.getState(gameState);
