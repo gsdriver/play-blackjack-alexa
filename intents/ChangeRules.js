@@ -29,6 +29,7 @@ module.exports = {
         playgame.changeRules(this.event.session.user.userId, rules,
           (error, response, speech, reprompt, gameState) => {
           // Now get the full set of rules for the card
+          this.attributes['gameState'] = gameState;
           if (!error) {
             playgame.readRules(this.attributes['gameState'],
               this.event.session.user.userId,
