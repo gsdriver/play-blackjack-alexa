@@ -80,6 +80,7 @@ const handlers = {
   'NewSession': function() {
     if (this.event.request.type === 'IntentRequest') {
       // Set the state and route accordingly
+      console.log('New session started: ' + JSON.stringify(this.event.request.intent));
       playgame.readCurrentHand(undefined, this.event.session.user.userId,
         (error, response, speech, reprompt, gameState) => {
         this.attributes['gameState'] = gameState;
@@ -90,6 +91,7 @@ const handlers = {
         this.emit(this.event.request.intent.name);
       });
     } else {
+      console.log('New session started: Launch');
       this.emit('LaunchRequest');
     }
   },

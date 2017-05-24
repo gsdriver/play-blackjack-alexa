@@ -15,7 +15,7 @@ module.exports = {
     this.attributes['firsthand'] = true;
 
     // Figure out what the current game state is - give them option to reset
-    playgame.readCurrentHand(this.attributes['gameState'],
+    playgame.readCurrentHand(undefined,
       this.event.session.user.userId,
       (error, response, speech, reprompt, gameState) => {
       // Tell them how much money they are leaving with

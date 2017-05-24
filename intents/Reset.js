@@ -17,6 +17,7 @@ module.exports = {
     // Confirmed - let's reset
     playgame.flushGame(this.event.session.user.userId, (error, result) => {
       // I don't care if this succeeds or not
+      this.attributes['gameState'] = undefined;
       this.handler.state = 'NEWGAME';
       this.emit(':ask', 'You have $5000. Say bet to start a new game.', 'Say bet to start a new game.');
     });

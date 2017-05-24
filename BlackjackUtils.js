@@ -7,6 +7,7 @@
 module.exports = {
   emitResponse: function(emit, error, response, speech, reprompt) {
     if (error) {
+      console.log('Speech error: ' + error);
       emit(':ask', error, 'What else can I help with?');
     } else if (response) {
       emit(':tell', response);
