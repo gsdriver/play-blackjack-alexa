@@ -235,9 +235,26 @@ function getGameState(savedGameState, userID, callback) {
         });
 
         res.on('end', () => {
+          const gameState = JSON.parse(fulltext);
+
           endTime = new Date().getTime();
           console.log('Elapsed time to call getGameState: ' + (endTime - startTime) + ' ms');
-          callback(null, JSON.parse(fulltext));
+
+          // There is a bug in the response from the server IF the player had split the last hand
+          // AND on this new hand the dealer has a blackjack with a 10 showing.  In that case, this
+          // hand is over however currentHand was not reset to 0, so the player has only one hand
+          // but we think they're on the second hand.  We will blow up if we don't correct this
+          // Ideal fix is in the blackjack server, but this is a workaround the lambda function
+          // can make to let the game continue
+
+          if (gameState.playerHands && (gameState.activePlayer == 'none')
+            && (gameState.dealerHand && (gameState.dealerHand.outcome == 'dealerblackjack'))
+            && (gameState.currentPlayerHand >= gameState.playerHands.length)) {
+            console.log('Fixing dealerblackjack after split bug');
+            gameState.currentPlayerHand = 0;
+          }
+
+          callback(null, gameState);
         });
       } else {
         // Sorry, there was an error calling the HTTP endpoint
@@ -618,6 +635,10 @@ function readHand(gameState) {
     return '';
   }
   const currentHand = gameState.playerHands[gameState.currentPlayerHand];
+  if (!currentHand) {
+    // We're about to blow up - log for diagnosis
+    console.log('currentHand is undefined: ' + JSON.stringify(gameState));
+  }
 
   // If they have more than one hand, then say the hand number
   result += readHandNumber(gameState, gameState.currentPlayerHand);
