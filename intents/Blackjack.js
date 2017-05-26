@@ -18,6 +18,7 @@ module.exports = {
     } else {
       // Let's play this action
       playgame.playBlackjackAction(this.attributes['gameState'],
+          this.event.request.locale,
           this.event.session.user.userId,
           {action: getBlackjackAction(actionSlot)},
           (error, response, speech, reprompt, gameState) => {

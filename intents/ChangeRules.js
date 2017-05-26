@@ -26,12 +26,14 @@ module.exports = {
       if (!rules) {
         ruleError = 'I\'m sorry, I was unable to change ' + changeSlot.value + ' to ' + optionSlot.value + '. Check the Alexa companion app for available rules you can change. What else can I help with?';
       } else {
-        playgame.changeRules(this.event.session.user.userId, rules,
+        playgame.changeRules(this.event.request.locale,
+          this.event.session.user.userId, rules,
           (error, response, speech, reprompt, gameState) => {
           // Now get the full set of rules for the card
           this.attributes['gameState'] = gameState;
           if (!error) {
             playgame.readRules(this.attributes['gameState'],
+              this.event.request.locale,
               this.event.session.user.userId,
               (readError, readResponse, readSpeech, readPrompt, newGameState) => {
               let cardText = '';
@@ -56,6 +58,7 @@ module.exports = {
 
       // Prepare card text with a full set of rules that can be changed
       playgame.readRules(this.attributes['gameState'],
+        this.event.request.locale,
         this.event.session.user.userId,
         (error, response, speech, reprompt, gameState) => {
         if (speech) {

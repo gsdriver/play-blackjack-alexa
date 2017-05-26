@@ -14,10 +14,10 @@ const testUser = 'stubbed';
 
 module.exports = {
   // Plays a given action, returning either an error or a response string
-  playBlackjackAction: function(savedGameState, userID, action, callback) {
+  playBlackjackAction: function(savedGameState, locale, userID, action, callback) {
     // Special case if this is suggest
     if (action.action == 'suggest') {
-      postUserAction(userID, action.action, 0, (error, suggestion) => {
+      postUserAction(locale, userID, action.action, 0, (error, suggestion) => {
         const youShould = ['You should ', 'The book says you should ', 'The book would tell you to ', 'According to Basic Strategy you should ',
                 'The book would suggest that you ', 'I think you should ', 'Basic Strategy would suggest you '];
         const actionMapping = {'insurance': 'take insurance', 'noinsurance': 'not take insurance', 'hit': 'hit',
@@ -63,12 +63,13 @@ module.exports = {
           speechError = 'I\'m sorry, ' + action.action + ' is not a valid action at this time. ';
           speechError += readHand(gameState);
           speechError += ' ' + listValidActions(gameState, 'full');
-          sendUserCallback(gameState, speechError, null, null, null, callback);
+          sendUserCallback(locale, gameState, speechError, null, null, null, callback);
         } else {
           // OK, let's post this action and get a new game state
           const betAmount = (action.amount ? action.amount : gameState.lastBet);
 
-          postUserAction(gameState.userID, action.action, betAmount, (error, newGameState) => {
+          postUserAction(locale, gameState.userID, action.action,
+            betAmount, (error, newGameState) => {
             if (error) {
               speechError = error;
             } else {
@@ -80,17 +81,17 @@ module.exports = {
 
               // If this was the first hand, or they specified a value, tell them how much they bet
               if ((action.action === 'bet') && (action.firsthand || (action.amount > 0))) {
-                speechQuestion += ('You bet $' + betAmount + '. ');
+                speechQuestion += ('You bet ' + utils.formatCurrency(betAmount, locale) + '. ');
               }
 
               // Pose this as a question whether it's the player or dealer's turn
               repromptQuestion = listValidActions(newGameState, 'full');
-              speechQuestion += (tellResult(action.action, gameState, newGameState)
+              speechQuestion += (tellResult(locale, action.action, gameState, newGameState)
                 + ' ' + listValidActions(newGameState,
                   (playerBlackjack) ? 'full' : 'summary'));
             }
 
-            sendUserCallback(newGameState, speechError, null,
+            sendUserCallback(locale, newGameState, speechError, null,
               speechQuestion, repromptQuestion, callback);
           });
         }
@@ -98,7 +99,7 @@ module.exports = {
     }
   },
   // Reads back the rules in play
-  readRules: function(savedGameState, userID, callback) {
+  readRules: function(savedGameState, locale, userID, callback) {
     // Get the game state so we can take action (the latest should be stored tied to this user ID)
     getGameState(savedGameState, userID, (error, gameState) => {
       if (error) {
@@ -109,7 +110,7 @@ module.exports = {
 
       // Convert the rules to text
       const reprompt = listValidActions(gameState, 'full');
-      const speech = rulesToText(gameState.houseRules) + reprompt;
+      const speech = rulesToText(locale, gameState.houseRules) + reprompt;
 
       callback(null, null, speech, reprompt, gameState);
     });
@@ -122,7 +123,7 @@ module.exports = {
     });
   },
   // Reads back the current hand and game state
-  readCurrentHand: function(savedGameState, userID, callback) {
+  readCurrentHand: function(savedGameState, locale, userID, callback) {
     getGameState(savedGameState, userID, (error, gameState) => {
       if (error) {
         callback(error, null, null);
@@ -131,7 +132,7 @@ module.exports = {
         let repromptQuestion = null;
 
         repromptQuestion = listValidActions(gameState, 'full');
-        speechQuestion = 'You have $' + gameState.bankroll + '. ' + readHand(gameState) + ' ' + repromptQuestion;
+        speechQuestion = 'You have ' + utils.formatCurrency(gameState.bankroll, locale) + '. ' + readHand(gameState) + ' ' + repromptQuestion;
         callback(null, null, speechQuestion, repromptQuestion, gameState);
       }
     });
@@ -164,20 +165,20 @@ module.exports = {
     });
   },
   // Changes the rules in play
-  changeRules: function(userID, rules, callback) {
+  changeRules: function(locale, userID, rules, callback) {
     let speech = 'Sorry, internal error. What else can I help with?';
 
     // OK, let's post the rule change and get a new game state
-    postUserAction(userID, 'setrules', rules, (error, newGameState) => {
+    postUserAction(locale, userID, 'setrules', rules, (error, newGameState) => {
       if (!error) {
         // Read the new rules
-        speech = rulesToText(newGameState.houseRules, rules);
+        speech = rulesToText(locale, newGameState.houseRules, rules);
       }
 
       // If this is shuffle, we'll do the shuffle for them
       const reprompt = 'Would you like to bet?';
       speech += (' Check the Alexa companion application for the full set of rules. ' + reprompt);
-      sendUserCallback(newGameState, error, null, speech, reprompt, callback);
+      sendUserCallback(locale, newGameState, error, null, speech, reprompt, callback);
     });
   },
 };
@@ -186,19 +187,19 @@ module.exports = {
 // It's possible the game gets to a state where you have to reset the bankroll
 // or shuffle the deck.  Let's do that automatically for the user
 //
-function sendUserCallback(gameState, error, speechResponse,
+function sendUserCallback(locale, gameState, error, speechResponse,
         speechQuestion, repromptQuestion, callback) {
   // If this is shuffle, we'll do the shuffle for them
   if (gameState && gameState.possibleActions) {
     if (gameState.possibleActions.indexOf('shuffle') > -1) {
       // Simplify things and just shuffle for them
-      postUserAction(gameState.userID, 'shuffle', 0, (nextError, nextGameState) => {
+      postUserAction(locale, gameState.userID, 'shuffle', 0, (nextError, nextGameState) => {
         callback(error, speechResponse, speechQuestion, repromptQuestion, nextGameState);
       });
       return;
     } else if (gameState.possibleActions.indexOf('resetbankroll') > -1) {
       // Simplify things and just shuffle for them if this is resetbankroll
-      postUserAction(gameState.userID, 'resetbankroll', 0, (nextError, nextGameState) => {
+      postUserAction(locale, gameState.userID, 'resetbankroll', 0, (nextError, nextGameState) => {
         callback(error, speechResponse, speechQuestion, repromptQuestion, nextGameState);
       });
       return;
@@ -302,7 +303,7 @@ function flushGameState(userID, callback) {
   });
 }
 
-function postUserAction(userID, action, value, callback) {
+function postUserAction(locale, userID, action, value, callback) {
   if (userID == testUser) {
     return stubbedGame.postUserAction(action, value, callback);
   }
@@ -331,13 +332,14 @@ function postUserAction(userID, action, value, callback) {
     endTime = new Date().getTime();
     console.log('Failed calling ' + action + ' ' + response.body);
     console.log('Elapsed time to call postUserAction ' + action + ': ' + (endTime - startTime) + ' ms');
-    callback(getSpeechError(response), null);
+    callback(getSpeechError(response, locale), null);
   });
 }
 
-function getSpeechError(response) {
-  const errorMapping = ['bettoosmall', 'Your bet is below the minimum of $5',
-                      'bettoolarge', 'Your bet is above the maximum of $1000',
+function getSpeechError(response, locale) {
+  const errorMapping = ['bettoosmall', 'Your bet is below the minimum of ' + utils.formatCurrency(5, locale),
+                      'bettoolarge', 'Your bet is above the maximum of ' + utils.formatCurrency(1000, locale),
+                      'bettoolarge', 'Your bet is above the maximum of ' + utils.formatCurrency(1000, locale),
                       'betoverbankroll', 'Your bet is more than your available bankroll'];
   let errorText = 'Internal error';
   const error = response.getBody();
@@ -384,7 +386,7 @@ function listValidActions(gameState, type) {
   return result;
 }
 
-function tellResult(action, gameState, newGameState) {
+function tellResult(locale, action, gameState, newGameState) {
   let result = '';
 
   // It's possible they did something other than stand on the previous hand if this is a split
@@ -444,7 +446,7 @@ function tellResult(action, gameState, newGameState) {
 
   if ((gameState.activePlayer == 'player') && (newGameState.activePlayer != 'player')) {
     // OK, game over - so let's give the new total
-    result += ' You have $' + newGameState.bankroll + '.';
+    result += ' You have ' + utils.formatCurrency(newGameState.bankroll, locale) + '.';
   }
 
   return result;
@@ -628,7 +630,6 @@ function readInsurance(gameState) {
  */
 function readHand(gameState) {
   let result = '';
-  let i;
 
   // It's possible there is no hand
   if (gameState.playerHands.length == 0) {
@@ -650,13 +651,7 @@ function readHand(gameState) {
     // If no active player, use past tense
     result += (gameState.activePlayer == 'none') ? 'You had ' : 'You have ';
   }
-
-  for (i = 0; i < currentHand.cards.length; i++) {
-    result += cardRanks[currentHand.cards[i].rank];
-    if (i < currentHand.cards.length - 1) {
-      result += ' and ';
-    }
-  }
+  result += utils.and(currentHand.cards.map((x) => cardRanks[x.rank]));
 
   // If this is a blackjack (two-card 21 with only one hand), then say it
   if ((gameState.playerHands.length == 1) && (currentHand.cards.length == 2)
@@ -692,7 +687,7 @@ function readHandNumber(gameState, handNumber) {
   return result;
 }
 
-function rulesToText(rules, changeRules) {
+function rulesToText(locale, rules, changeRules) {
   let text = '';
 
   // If old rules were passed in, only state what's set in changeRules
@@ -702,7 +697,7 @@ function rulesToText(rules, changeRules) {
     text += rules.numberOfDecks + ' deck game. ';
   }
   if (!changeRules || changeRules.hasOwnProperty('minBet') || changeRules.hasOwnProperty('maxBet')) {
-    text += 'Bet from $' + rules.minBet + ' to $' + rules.maxBet + '. ';
+    text += 'Bet from ' + utils.formatCurrency(rules.minBet, locale) + ' to ' + utils.formatCurrency(rules.maxBet, locale) + '. ';
   }
 
   // Hit or stand on soft 17

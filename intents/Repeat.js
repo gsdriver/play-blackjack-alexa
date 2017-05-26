@@ -10,6 +10,7 @@ const bjUtils = require('../BlackjackUtils');
 module.exports = {
   handleIntent: function() {
     playgame.readCurrentHand(this.attributes['gameState'],
+      this.event.request.locale,
       this.event.session.user.userId,
       (error, response, speech, reprompt, gameState) => {
       bjUtils.emitResponse(this.emit, error, response, speech, reprompt);

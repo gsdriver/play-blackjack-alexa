@@ -6,6 +6,7 @@
 
 const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
+const utils = require('alexa-speech-utils')();
 
 module.exports = {
   handleIntent: function() {
@@ -16,6 +17,7 @@ module.exports = {
 
     // Figure out what the current game state is - give them option to reset
     playgame.readCurrentHand(undefined,
+      this.event.request.locale,
       this.event.session.user.userId,
       (error, response, speech, reprompt, gameState) => {
       // Tell them how much money they are leaving with
@@ -24,7 +26,7 @@ module.exports = {
         if (gameState.activePlayer === 'player') {
           launchSpeech += speech;
         } else {
-          launchSpeech += 'You have $' + gameState.bankroll + '. Say bet to start a new game';
+          launchSpeech += 'You have ' + utils.formatCurrency(gameState.bankroll, this.event.request.locale) + '. Say bet to start a new game';
           if (!bjUtils.isDefaultGameState(gameState)) {
             launchSpeech += ' or reset game to reset to the default rules and bankroll';
           }

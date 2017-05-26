@@ -81,7 +81,8 @@ const handlers = {
     if (this.event.request.type === 'IntentRequest') {
       // Set the state and route accordingly
       console.log('New session started: ' + JSON.stringify(this.event.request.intent));
-      playgame.readCurrentHand(undefined, this.event.session.user.userId,
+      playgame.readCurrentHand(undefined, this.event.request.locale,
+        this.event.session.user.userId,
         (error, response, speech, reprompt, gameState) => {
         this.attributes['gameState'] = gameState;
         if (gameState) {

@@ -23,7 +23,8 @@ module.exports = {
       // Take the bet
       const action = {action: 'bet', amount: amount, firsthand: this.attributes['firsthand']};
 
-      playgame.playBlackjackAction(this.attributes['gameState'], this.event.session.user.userId, action,
+      playgame.playBlackjackAction(this.attributes['gameState'], this.event.request.locale,
+        this.event.session.user.userId, action,
         (error, response, speech, reprompt, gameState) => {
         this.attributes['gameState'] = gameState;
         if (gameState) {

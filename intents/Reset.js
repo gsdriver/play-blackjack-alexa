@@ -5,6 +5,7 @@
 'use strict';
 
 const playgame = require('../PlayGame');
+const utils = require('alexa-speech-utils')();
 
 module.exports = {
   handleIntent: function() {
@@ -19,7 +20,7 @@ module.exports = {
       // I don't care if this succeeds or not
       this.attributes['gameState'] = undefined;
       this.handler.state = 'NEWGAME';
-      this.emit(':ask', 'You have $5000. Say bet to start a new game.', 'Say bet to start a new game.');
+      this.emit(':ask', 'You have ' + utils.formatCurrency(5000, this.event.request.locale)+ '. Say bet to start a new game.', 'Say bet to start a new game.');
     });
   },
   handleNoReset: function() {
