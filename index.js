@@ -25,7 +25,8 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'Unhandled': function() {
-    this.emit(':ask', 'Sorry, I didn\'t get that. Try saying Yes or No.', 'Try saying Yes or No.');
+    const res = require('./' + this.event.request.locale + '/resources');
+    this.emit(':ask', res.strings.UNKNOWNINTENT_RESET, res.strings.UNKNOWNINTENT_RESET_REPROMPT);
   },
 });
 
@@ -42,7 +43,8 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'Unhandled': function() {
-    this.emit(':ask', 'Sorry, I didn\'t get that. Try saying Bet.', 'Try saying Bet.');
+    const res = require('./' + this.event.request.locale + '/resources');
+    this.emit(':ask', res.strings.UNKNOWNINTENT_NEWGAME, res.strings.UNKNOWNINTENT_NEWGAME_REPROMPT);
   },
 });
 
@@ -57,7 +59,8 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'Unhandled': function() {
-    this.emit(':ask', 'Sorry, I didn\'t get that. Try saying Yes or No.', 'Try saying Yes or No.');
+    const res = require('./' + this.event.request.locale + '/resources');
+    this.emit(':ask', res.strings.UNKNOWNINTENT_INSURANCE, res.strings.UNKNOWNINTENT_INSURANCE_REPROMPT);
   },
 });
 
@@ -71,7 +74,8 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'Unhandled': function() {
-    this.emit(':ask', 'Sorry, I didn\'t get that. Try saying Repeat to hear the current status.', 'Try saying Repeat.');
+    const res = require('./' + this.event.request.locale + '/resources');
+    this.emit(':ask', res.strings.UNKNOWNINTENT_INGAME, res.strings.UNKNOWNINTENT_INGAME_REPROMPT);
   },
 });
 
@@ -112,7 +116,8 @@ const handlers = {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'Unhandled': function() {
-    this.emit(':ask', 'Sorry, I didn\'t get that. Try saying Repeat to hear the current status.', 'Try saying Repeat.');
+    const res = require('./' + this.event.request.locale + '/resources');
+    this.emit(':ask', res.strings.UNKNOWNINTENT_INGAME, res.strings.UNKNOWNINTENT_INGAME_REPROMPT);
   },
 };
 

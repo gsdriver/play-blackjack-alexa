@@ -6,11 +6,11 @@
 
 const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
-const utils = require('alexa-speech-utils')();
 
 module.exports = {
   handleIntent: function() {
-    let launchSpeech = 'Welcome to the Blackjack player. ';
+    const res = require('../' + this.event.request.locale + '/resources');
+    let launchSpeech = res.strings.LAUNCH_WELCOME;
 
     // Note that this is first hand (so we will say more on the first bet)
     this.attributes['firsthand'] = true;
@@ -26,18 +26,15 @@ module.exports = {
         if (gameState.activePlayer === 'player') {
           launchSpeech += speech;
         } else {
-          launchSpeech += 'You have ' + utils.formatCurrency(gameState.bankroll, this.event.request.locale) + '. Say bet to start a new game';
-          if (!bjUtils.isDefaultGameState(gameState)) {
-            launchSpeech += ' or reset game to reset to the default rules and bankroll';
-          }
-          launchSpeech += '. ... Now, what can I help you with?';
+          launchSpeech += (bjUtils.isDefaultGameState(gameState) ? res.strings.LAUNCH_DEFAULTSTATE_TEXT : res.strings.LAUNCH_NONDEFAULTSTATE_TEXT).replace('{0}', gameState.bankroll);
         }
 
         this.handler.state = bjUtils.getState(gameState);
       } else {
-        launchSpeech += 'You can start a blackjack game by saying Bet ... Now, what can I help you with?';
+        launchSpeech += res.strings.LAUNCH_STARTGAME;
       }
-      bjUtils.emitResponse(this.emit, error, response, launchSpeech, reprompt);
+      bjUtils.emitResponse(this.emit, this.event.request.locale,
+        error, response, launchSpeech, reprompt);
     });
   },
 };

@@ -17,7 +17,7 @@ module.exports = {
       if (gameState) {
         this.handler.state = bjUtils.getState(gameState);
       }
-      bjUtils.emitResponse(this.emit, error, response, speech, reprompt);
+      bjUtils.emitResponse(this.emit, this.event.request.locale, error, response, speech, reprompt);
     });
   },
 };

@@ -5,12 +5,13 @@
 'use strict';
 
 const playgame = require('../PlayGame');
-const utils = require('alexa-speech-utils')();
 
 module.exports = {
   handleIntent: function() {
     // We will ask them if they want to reset
-    const speech = 'Would you like to reset the game? This will reset your bankroll and rules of the game.';
+    const res = require('../' + this.event.request.locale + '/resources');
+    const speech = res.strings.RESET_CONFIRM;
+
     this.handler.state = 'CONFIRMRESET';
     this.emit(':ask', speech, speech);
   },
@@ -18,14 +19,18 @@ module.exports = {
     // Confirmed - let's reset
     playgame.flushGame(this.event.session.user.userId, (error, result) => {
       // I don't care if this succeeds or not
+      const res = require('../' + this.event.request.locale + '/resources');
+
       this.attributes['gameState'] = undefined;
       this.handler.state = 'NEWGAME';
-      this.emit(':ask', 'You have ' + utils.formatCurrency(5000, this.event.request.locale)+ '. Say bet to start a new game.', 'Say bet to start a new game.');
+      this.emit(':ask', res.strings.RESET_COMPLETED, res.strings.RESET_REPROMPT);
     });
   },
   handleNoReset: function() {
     // Nope, they are not going to reset - so go back to start a new game
+    const res = require('../' + this.event.request.locale + '/resources');
+
     this.handler.state = 'NEWGAME';
-    this.emit(':ask', 'Game not reset. Say bet to start a new game.', 'Say bet to start a new game.');
+    this.emit(':ask', res.strings.RESET_ABORTED, res.strings.RESET_REPROMPT);
   },
 };

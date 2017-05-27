@@ -5,7 +5,6 @@
 'use strict';
 
 const playgame = require('../PlayGame');
-const utils = require('alexa-speech-utils')();
 
 module.exports = {
   handleIntent: function() {
@@ -14,12 +13,13 @@ module.exports = {
       this.event.session.user.userId,
       (error, response, speech, reprompt, gameState) => {
       let exitSpeech = '';
+      const res = require('../' + this.event.request.locale + '/resources');
 
       // Tell them how much money they are leaving with
       if (gameState) {
-        exitSpeech = 'You are leaving with ' + utils.formatCurrency(gameState.bankroll, this.event.request.locale) + '. ';
+        exitSpeech = res.strings.EXIT_BANKROLL.replace('{0}', gameState.bankroll) + ' ';
       }
-      exitSpeech += 'Goodbye.';
+      exitSpeech += res.strings.EXIT_GOODBYE;
       this.emit(':tell', exitSpeech);
     });
   },
