@@ -21,10 +21,10 @@ const resources = {
   'BLACKJACKINTENT_NO_ACTION': 'Tut mir leid, dass ich diese Aktion nicht fangen. Bitte sagen Sie, was Sie wollen, zu tun auf dieser Seite wie Hit oder stehen. Wie kann ich helfen?',
   'BLACKJACKINTENT_UNKNOWN_ACTION': 'Tut mir leid, ich weiß nicht, wie {0}. Bitte sagen Sie, was Sie wollen, zu tun auf dieser Seite wie Hit oder stehen. Wie kann ich helfen?',
   // From ChangeRules.js
-  'CHANGERULES_NO_RULE': 'I\'m sorry, I didn\'t catch a rule to change. Check the Alexa companion app for rules you can change. Wie kann ich helfen?',
-  'CHANGERULES_NO_RULE_VALUE': 'I\'m sorry, I don\'t understand how to change {0}. Check the Alexa companion app for rules you can change. Wie kann ich helfen?',
-  'CHANGERULES_NO_RULE_OPTION': 'I\'m sorry, I didn\'t catch how to change {0}. Check the Alexa companion app for rules you can change. Wie kann ich helfen?',
-  'CHANGERULES_CANT_CHANGE_RULE': 'I\'m sorry, I was unable to change {0} to {1}. Check the Alexa companion app for available rules you can change. Wie kann ich helfen?',
+  'CHANGERULES_NO_RULE': 'Es tut mir leid, ich weiß nicht, welche Regel sich ändern muss. Überprüfen Sie die Alexa-Anwendung für Regeln, die Sie ändern können. Wie kann ich helfen?',
+  'CHANGERULES_NO_RULE_VALUE': 'Es tut mir leid, ich verstehe nicht, wie man die Anzahl {0}. Überprüfen Sie die Alexa-Anwendung für Regeln, die Sie ändern können. Wie kann ich helfen?',
+  'CHANGERULES_NO_RULE_OPTION': 'Es tut mir leid, ich verstehe nicht, wie man die Anzahl {0}. Überprüfen Sie die Alexa-Anwendung für Regeln, die Sie ändern können. Wie kann ich helfen?',
+  'CHANGERULES_CANT_CHANGE_RULE': 'Es tut mir leid, ich konnte die Anzahl {0} auf {1}. Überprüfen Sie die Alexa-Anwendung für Regeln, die Sie ändern können. Wie kann ich helfen?',
   'CHANGERULES_CARD_TITLE': 'Spielen Sie blackjack',
   'FULL_RULES': 'Die vollständigen Regeln sind {0}',
   // From Exit.js
@@ -60,7 +60,7 @@ const resources = {
   'INTERNAL_ERROR': 'Entschuldigung, interner Fehler. Was kann ich sonst noch helfen?',
   'CHANGERULES_REPROMPT': 'Wollen sie wetten?',
   'CHANGERULES_CHECKAPP': ' Überprüfen Sie die Alexa-Anwendung für den vollständigen Satz von Regeln. Wollen sie wetten?',
-  'SPEECH_ERROR_CODE': 'Error code {0}',
+  'SPEECH_ERROR_CODE': 'Fehlercode {0}',
   'ASK_TAKE_INSURANCE': 'Möchten Sie Versicherung nehmen? Sag ja oder nein',
   'ASK_POSSIBLE_ACTIONS': 'Sie wollen {0}?',
   'ASK_WHAT_TO_DO': 'Was würdest du gern tun?',
