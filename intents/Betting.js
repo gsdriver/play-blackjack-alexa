@@ -12,6 +12,9 @@ module.exports = {
     let amount = 0;
     const res = require('../' + this.event.request.locale + '/resources');
 
+    // Curious what language is betting...
+    console.log('Bet invoked for ' + this.event.request.locale);
+
     if (this.event.request.intent.slots && this.event.request.intent.slots.Amount
       && this.event.request.intent.slots.Amount.value) {
       amount = this.event.request.intent.slots.Amount.value;
