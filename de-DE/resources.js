@@ -14,7 +14,7 @@ const resources = {
   'UNKNOWNINTENT_INGAME_REPROMPT': 'Sagen sie wiederholen.',
   // From BlackjackUtils.js
   'ERROR_REPROMPT': 'Wie kann ich helfen?',
-  'CHANGE_CARD_TEXT': 'You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
+  'CHANGE_CARD_TEXT': 'You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Kann AN or AUS sein\n - DOUBLE DOWN: whether double down is offered or not.  Kann AN or AUS sein.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Kann AN or AUS sein.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Kann AN or AUS sein.\n - ANZAHL DER KARTENDECKS: die anzahl der kartendecks im spiel. Kann EINS, ZWEI, VIER, SECHS oder ACHT sein.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nZum beispiel sagen "Ändere anzahl der kartendecks zu zwei" wenn du mit zwei kartendecks spielen möchtest.\nNote that the deck will be shuffled if you change the rules of the game',
   // From Betting.js
   'BAD_BET_FORMAT': 'Nicht Wetten für {0}',
   // From Blackjack.js
@@ -33,7 +33,7 @@ const resources = {
   // From Help.js
   'HELP_GENERIC_HELP': 'Sie können ein Spiel spielen, indem Sie Wette sagen, oder Sie können sagen Ausfahrt<break time=\'300ms\'/>Wie kann ich Ihnen helfen?',
   'HELP_CARD_TITLE': 'Blackjack Befehle',
-  'HELP_CARD_TEXT': 'You can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
+  'HELP_CARD_TEXT': 'You can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Kann AN or AUS sein.\n - SURRENDER: whether surrender is offered as an option. Kann AN or AUS sein.\n - DOUBLE DOWN: whether double down is offered or not.  Kann AN or AUS sein.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair. Kann AN or AUS sein.\n - RESPLIT ACES: wheter you can resplit Aces or not. Kann AN or AUS sein.\n - ANZAHL DER KARTENDECKS: die anzahl der kartendecks im spiel. Kann EINS, ZWEI, VIER, SECHS oder ACHT sein.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nZum beispiel sagen "Ändere anzahl der kartendecks zu zwei" wenn du mit zwei kartendecks spielen möchtest.\nNote that the deck will be shuffled if you change the rules of the game',
   // From Launch.js
   'LAUNCH_WELCOME': 'Willkommen bei den Blackjack Spieler. ',
   'LAUNCH_STARTGAME': 'Sie können ein Spiel starten, indem Sie sagen die wort Wette ... Wie kann ich Ihnen helfen?',
@@ -68,7 +68,7 @@ const resources = {
   'RESULT_AFTER_HIT_BUST': 'Du hast eine {0} und überkaufen. ',
   'RESULT_AFTER_HIT_NOBUST': 'Du hast eine {0} für insgesamt {1}. ',
   'RESULT_BANKROLL_RESET': 'Bankroll zurücksetzen',
-  'RESULT_DECK_SHUFFLED': 'Deck gemischt',
+  'RESULT_DECK_SHUFFLED': 'Kartendeck gemischt',
   'DEALER_HOLE_CARD': 'Der händler hatte eine {0} unten.',
   'DEALER_BUSTED': ' Der Händler überkaufen.',
   'DEALER_BLACKJACK': ' Der Händler hatte einen blackjack.',
@@ -94,7 +94,7 @@ const resources = {
   'READHAND_PLAYER_TOTAL_END': 'Sie hatten {0} für insgesamt {1}.  ',
   'READHAND_DEALER_ACTIVE': 'der Händler zeigt eine {0}.',
   'READHAND_DEALER_DONE': 'der Händler zeigte eine {0}. ',
-  'RULES_DECKS': '{0} Deck Spiel. ',
+  'RULES_DECKS': '{0} kartendeck. ',
   'RULES_BET_RANGE': 'Einsatz von €{0} bis €{1}. ',
   'RULES_HIT_SOFT17': 'Händler schlägt bei weichen 17. ',
   'RULES_STAND_SOFT17': 'Händler steht auf weichen 17. ',
@@ -124,11 +124,11 @@ module.exports = {
     return (action == undefined) ? null : action;
   },
   mapChangeValue: function(value) {
-    const valueMapping = {'on': true, 'off': false, 'enable': true, 'disable': false, 'enabled': true, 'disabled': false,
-      '3 to 2': 0.5, 'three to two': 0.5, '6 to 5': 0.2, 'six to five': 0.2, 'even': 0, 'even money': 0,
-      'one deck': 1, 'two decks': 2, 'four decks': 4, 'six decks': 6, 'eight decks': 8,
-      'two deck': 2, 'four deck': 4, 'six deck': 6, 'eight deck': 8,
-      'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'eight': 8,
+    const valueMapping = {'an': true, 'aus': false, 'aktivieren': true, 'deaktivieren': false, 'aktiviert': true, 'deaktiviert': false,
+      '3 to 2': 0.5, 'drei zu zwei': 0.5, '6 to 5': 0.2, 'sechs zu fünf': 0.2, 'gleich': 0, 'gleiches geld': 0,
+      'ein kartendeck': 1, 'zwei kartendecks': 2, 'vier kartendecks': 4, 'sechs kartendecks': 6, 'acht kartendecks': 8,
+      'zwei kartendeck': 2, 'vier kartendeck': 4, 'sechs kartendeck': 6, 'acht kartendeck': 8,
+      'ein': 1, 'zwei': 2, 'drei': 3, 'vier': 4, 'fünf': 5, 'sechs': 6, 'acht': 8,
       '1': 1, '2': 2, '3': 3, '4': 4, '6': 6, '8': 8};
     return valueMapping[value];
   },

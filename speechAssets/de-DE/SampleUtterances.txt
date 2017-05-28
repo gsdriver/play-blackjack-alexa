@@ -66,6 +66,7 @@ ResetIntent mein bankroll zurücksetzen
 ResetIntent Zurücksetzen der Regeln
 ResetIntent Zurücksetzen mein Regeln
 SuggestIntent was soll ich tun
+SuggestIntent was soll ich machen
 SuggestIntent anregung zu geben
 SuggestIntent geben sie mir vorschlag
 SuggestIntent geben sie mir einen Vorschlag
@@ -77,9 +78,9 @@ SuggestIntent ein zug vorschlagen
 SuggestIntent zug vorschlagen
 SuggestIntent aktion vorschlagen
 SuggestIntent ein spiel vorschlagen
-ChangeRulesIntent change {Change} to {ChangeOption}
-ChangeRulesIntent make {Change} to {ChangeOption}
-ChangeRulesIntent turn {Change} to {ChangeOption}
-ChangeRulesIntent change {Change} {ChangeOption}
-ChangeRulesIntent make {Change} {ChangeOption}
-ChangeRulesIntent turn {Change} {ChangeOption}
+ChangeRulesIntent Ändere {Change} zu {ChangeOption}
+ChangeRulesIntent machen {Change} zu {ChangeOption}
+ChangeRulesIntent drehen sie {Change} zu {ChangeOption}
+ChangeRulesIntent Ändere {Change} {ChangeOption}
+ChangeRulesIntent machen {Change} {ChangeOption}
+ChangeRulesIntent drehen sie {Change} {ChangeOption}
