@@ -88,3 +88,5 @@ ChangeRulesIntent turn {Change} to {ChangeOption}
 ChangeRulesIntent change {Change} {ChangeOption}
 ChangeRulesIntent make {Change} {ChangeOption}
 ChangeRulesIntent turn {Change} {ChangeOption}
+ChangeRulesIntent turn {ChangeOption} {Change}
+ChangeRulesIntent {ChangeOption} {Change}
