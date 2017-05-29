@@ -6,8 +6,8 @@ const resources = {
   // From index.js
   'UNKNOWNINTENT_RESET': 'Tut mir leid, dass ich nicht bekommen, dass. Sagen ja oder nein.',
   'UNKNOWNINTENT_RESET_REPROMPT': 'Sagen ja oder nein.',
-  'UNKNOWNINTENT_NEWGAME': 'Tut mir leid, dass ich nicht bekommen, dass. Sagen Sie Wette.',
-  'UNKNOWNINTENT_NEWGAME_REPROMPT': 'Sagen Sie Wette.',
+  'UNKNOWNINTENT_NEWGAME': 'Tut mir leid, dass ich nicht bekommen, dass. Sagen sie wetten.',
+  'UNKNOWNINTENT_NEWGAME_REPROMPT': 'Sagen sie wetten.',
   'UNKNOWNINTENT_INSURANCE_RESET': 'Tut mir leid, dass ich nicht bekommen, dass. Sagen ja oder nein.',
   'UNKNOWNINTENT_INSURANCE_REPROMPT': 'Sagen ja oder nein.',
   'UNKNOWNINTENT_INGAME': 'Tut mir leid, dass ich nicht bekommen, dass. Sagen sie wiederholen.',
@@ -16,7 +16,7 @@ const resources = {
   'ERROR_REPROMPT': 'Wie kann ich helfen?',
   'CHANGE_CARD_TEXT': 'You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Kann AN or AUS sein\n - DOUBLE DOWN: whether double down is offered or not.  Kann AN or AUS sein.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Kann AN or AUS sein.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Kann AN or AUS sein.\n - ANZAHL DER KARTENDECKS: die anzahl der kartendecks im spiel. Kann EINS, ZWEI, VIER, SECHS oder ACHT sein.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nZum beispiel sagen "Ändere anzahl der kartendecks zu zwei" wenn du mit zwei kartendecks spielen möchtest.\nNote that the deck will be shuffled if you change the rules of the game',
   // From Betting.js
-  'BAD_BET_FORMAT': 'Nicht Wetten für {0}',
+  'BAD_BET_FORMAT': 'Nicht wette für {0}',
   // From Blackjack.js
   'BLACKJACKINTENT_NO_ACTION': 'Tut mir leid, dass ich diese Aktion nicht fangen. Bitte sagen Sie, was Sie wollen, zu tun auf dieser Seite wie Hit oder stehen. Wie kann ich helfen?',
   'BLACKJACKINTENT_UNKNOWN_ACTION': 'Tut mir leid, ich weiß nicht, wie {0}. Bitte sagen Sie, was Sie wollen, zu tun auf dieser Seite wie Hit oder stehen. Wie kann ich helfen?',
@@ -31,19 +31,19 @@ const resources = {
   'EXIT_BANKROLL': 'Verlassen Sie mit €{0}.',
   'EXIT_GOODBYE': 'Auf Wiedersehen.',
   // From Help.js
-  'HELP_GENERIC_HELP': 'Sie können ein Spiel spielen, indem Sie Wette sagen, oder Sie können sagen Ausfahrt<break time=\'300ms\'/>Wie kann ich Ihnen helfen?',
+  'HELP_GENERIC_HELP': 'Sie können ein Spiel spielen, indem Sie sagen wetten, oder Sie können sagen Ausfahrt<break time=\'300ms\'/>Wie kann ich Ihnen helfen?',
   'HELP_CARD_TITLE': 'Blackjack Befehle',
-  'HELP_CARD_TEXT': 'You can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Kann AN or AUS sein.\n - SURRENDER: whether surrender is offered as an option. Kann AN or AUS sein.\n - DOUBLE DOWN: whether double down is offered or not.  Kann AN or AUS sein.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair. Kann AN or AUS sein.\n - RESPLIT ACES: wheter you can resplit Aces or not. Kann AN or AUS sein.\n - ANZAHL DER KARTENDECKS: die anzahl der kartendecks im spiel. Kann EINS, ZWEI, VIER, SECHS oder ACHT sein.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nZum beispiel sagen "Ändere anzahl der kartendecks zu zwei" wenn du mit zwei kartendecks spielen möchtest.\nNote that the deck will be shuffled if you change the rules of the game',
+  'HELP_CARD_TEXT': 'Sie können sagen WETTEN um eine wette zu platzieren. If no amount is mentioned, the game will use the last amount bet.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Kann AN or AUS sein.\n - SURRENDER: whether surrender is offered as an option. Kann AN or AUS sein.\n - DOUBLE DOWN: whether double down is offered or not.  Kann AN or AUS sein.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair. Kann AN or AUS sein.\n - RESPLIT ACES: wheter you can resplit Aces or not. Kann AN or AUS sein.\n - ANZAHL DER KARTENDECKS: die anzahl der kartendecks im spiel. Kann EINS, ZWEI, VIER, SECHS oder ACHT sein.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nZum beispiel sagen "Ändere anzahl der kartendecks zu zwei" wenn du mit zwei kartendecks spielen möchtest.\nNote that the deck will be shuffled if you change the rules of the game',
   // From Launch.js
   'LAUNCH_WELCOME': 'Willkommen bei den Blackjack Spieler. ',
-  'LAUNCH_STARTGAME': 'Sie können ein Spiel starten, indem Sie sagen die wort Wette ... Wie kann ich Ihnen helfen?',
-  'LAUNCH_DEFAULTSTATE_TEXT': 'You have €{0}. Say bet to start a new game. ... Wie kann ich Ihnen helfen?',
-  'LAUNCH_NONDEFAULTSTATE_TEXT': 'You have €{0}. Say bet to start a new game or reset game to reset to the default rules and bankroll. ... Wie kann ich Ihnen helfen?',
+  'LAUNCH_STARTGAME': 'Sie können ein Spiel starten, indem Sie sagen die wort wetten ... Wie kann ich Ihnen helfen?',
+  'LAUNCH_DEFAULTSTATE_TEXT': 'Sie haben €{0}. Sie sagen wetten um ein neues spiel zu beginnen. ... Wie kann ich Ihnen helfen?',
+  'LAUNCH_NONDEFAULTSTATE_TEXT': 'Sie haben €{0}. Sie sagen wetten sagen um ein neues spiel zu beginnen oder Spiel Zurücksetzen um auf die Standard-Regeln und Bankroll zurücksetzen. ... Wie kann ich Ihnen helfen?',
   // From Reset.js
   'RESET_CONFIRM': 'Möchten Sie das Spiel zurücksetzen? Dies wird Ihre Bankroll und Regeln des Spiels zurücksetzen.',
-  'RESET_COMPLETED': 'Sie haben € 5000. Sagen Wette, um ein neues Spiel zu beginnen.',
-  'RESET_REPROMPT': 'Sagen Wette, um ein neues Spiel zu beginnen.',
-  'RESET_ABORTED': 'Spiel nicht zurückgesetzt. Sagen Wette, um ein neues Spiel zu beginnen.',
+  'RESET_COMPLETED': 'Sie haben € 5000. Sagen wetten, um ein neues Spiel zu beginnen.',
+  'RESET_REPROMPT': 'Sagen wetten, um ein neues Spiel zu beginnen.',
+  'RESET_ABORTED': 'Spiel nicht zurückgesetzt. Sagen wetten, um ein neues Spiel zu beginnen.',
   // From Rules.js
   'RULES_CARD_TITLE': 'Blackjack Regeln',
   // From PlayGame.js
@@ -117,7 +117,7 @@ module.exports = {
       'split': 'split',
       'shuffle': 'shuffle', 'shuffle deck': 'shuffle',
       'reset': 'resetbankroll', 'reset bankroll': 'resetbankroll',
-      'bet': 'bet', 'deal': 'bet'};
+      'wetten': 'bet', 'austeilen': 'bet'};
     const action = actionMapping[actionSlot.value.toLowerCase()];
 
     // Look it up in lowercase
@@ -142,9 +142,13 @@ module.exports = {
       'surrender': 'surrender',
       'double': 'double', 'double down': 'double', 'double after split': 'doubleaftersplit',
       'resplit aces': 'resplitAces',
-      'blackjack pays': 'blackjackBonus', 'blackjack bonus': 'blackjackBonus', 'number of decks': 'numberOfDecks',
-      'decks': 'numberOfDecks', 'deck count': 'numberOfDecks', 'number of splits': 'maxSplitHands',
-      'number of split hands': 'maxSplitHands', 'split hands': 'maxSplitHands'};
+      'blackjack pays': 'blackjackBonus', 'blackjack bonus': 'blackjackBonus',
+      'anzahl der kartendecks': 'numberOfDecks', 'decks': 'numberOfDecks', 'kartendecks': 'numberOfDecks',
+      'die anzahl der kartendecks': 'numberOfDecks', 'die decks': 'numberOfDecks', 'die kartendecks': 'numberOfDecks',
+      'geteilte hände': 'maxSplitHands', 'hände geteilt': 'maxSplitHands', 'anzahl der geteilte hände': 'maxSplitHands',
+      'die geteilte hände': 'maxSplitHands', 'die hände geteilt': 'maxSplitHands', 'die anzahl der geteilte hände': 'maxSplitHands',
+      'anzahl der hände geteilt': 'maxSplitHands', 'anzahl der splits': 'maxSplitHands',
+      'die anzahl der hände geteilt': 'maxSplitHands', 'die anzahl der splits': 'maxSplitHands'};
     return ruleMapping[rule];
   },
   mapActionToSuggestion: function(action) {
@@ -166,8 +170,21 @@ module.exports = {
     const names = ['keine', 'asse', 'zweien', 'dreier', 'vieren', 'fünfer', 'sechser', 'siebener', 'achter', 'neunen', 'zehnen', 'buben', 'damen', 'könige'];
     return names[card.rank];
   },
+  mapPlayOption: function(option) {
+    const optionMapping = {'resetbankroll': 'spiel zurücksetzen',
+                          'shuffle': 'shuffle',
+                          'bet': 'wetten',
+                          'hit': 'hit',
+                          'stand': 'stand',
+                          'double': 'double down',
+                          'insurance': 'take insurance',
+                          'noinsurance': 'decline insurance',
+                          'split': 'split',
+                          'surrender': 'surrender'};
+    return (optionMapping[option] ? optionMapping[option] : option);
+  },
   mapOutcome: function(outcome) {
-    const outcomeMapping = {'blackjack': 'Gewinnen Sie mit einem natürlichen Blackjack',
+    const outcomeMapping = {'blackjack': 'Gewinnen Sie mit einem natürlichen Blackjack!',
                'dealerblackjack': 'Der Händler hat einen Blackjack.',
                'nodealerblackjack': 'Die Händler haben keinen Blackjack.',
                'win': 'Sie gewann!',

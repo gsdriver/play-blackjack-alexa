@@ -166,6 +166,19 @@ module.exports = {
     const names = ['none', 'aces', 'twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'jacks', 'queens', 'kings'];
     return names[card.rank];
   },
+  mapPlayOption: function(option) {
+    const optionMapping = {'resetbankroll': 'reset game',
+                          'shuffle': 'shuffle',
+                          'bet': 'bet',
+                          'hit': 'hit',
+                          'stand': 'stand',
+                          'double': 'double down',
+                          'insurance': 'take insurance',
+                          'noinsurance': 'decline insurance',
+                          'split': 'split',
+                          'surrender': 'surrender'};
+    return (optionMapping[option] ? optionMapping[option] : option);
+  },
   mapOutcome: function(outcome) {
     const outcomeMapping = {'blackjack': 'You win with a Natural Blackjack!',
                'dealerblackjack': 'The dealer has Blackjack.',

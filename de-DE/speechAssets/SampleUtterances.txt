@@ -27,19 +27,27 @@ BlackjackIntent take a {Action} this time
 BlackjackIntent take an {Action} this time
 BlackjackIntent take a {Action} on this time
 BlackjackIntent take an {Action} on this time
-BettingIntent wette {Amount}
+BettingIntent wetten {Amount}
+BettingIntent spielen {Amount}
 BettingIntent spielen {Amount}
 BettingIntent für {Amount} wetten
 BettingIntent für {Amount} spielen
+BettingIntent für {Amount} austeilen
 BettingIntent wetten {Amount} euros
 BettingIntent spielen {Amount} euros
+BettingIntent austeilen {Amount} euros
 BettingIntent für {Amount} euros wetten
 BettingIntent für {Amount} euros spielen
+BettingIntent für {Amount} euros austeilen
 BettingIntent wetten {Amount} euro
 BettingIntent spielen {Amount} euro
-BettingIntent Wetten für {Amount} euro
+BettingIntent austeilen {Amount} euro
+BettingIntent wetten für {Amount} euro
 BettingIntent für {Amount} euro spielen
+BettingIntent für {Amount} euro austeilen
 BettingIntent wetten
+BettingIntent austeilen
+BettingIntent spielen
 RulesIntent Lesen Sie Regeln
 RulesIntent Lesen Sie die Regeln
 RulesIntent Was sind die Regeln

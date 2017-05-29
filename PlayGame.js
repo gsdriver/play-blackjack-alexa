@@ -159,7 +159,9 @@ module.exports = {
               result = resources.strings.HELP_INSURANCE_INSUFFICIENT_BANKROLL;
             }
           } else {
-            result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}', utils.or(gameState.possibleActions, {locale: locale}));
+            result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}',
+              utils.or(gameState.possibleActions.map((x) => resources.mapPlayOption(x)),
+              {locale: locale}));
           }
         }
 
@@ -365,7 +367,9 @@ function listValidActions(gameState, locale, type) {
         result = resources.strings.HELP_INSURANCE_INSUFFICIENT_BANKROLL;
       }
     } else if (type === 'full') {
-      result = resources.strings.ASK_POSSIBLE_ACTIONS.replace('{0}', utils.or(gameState.possibleActions, {locale: locale}));
+      result = resources.strings.ASK_POSSIBLE_ACTIONS.replace('{0}',
+        utils.or(gameState.possibleActions.map((x) => resources.mapPlayOption(x)),
+        {locale: locale}));
     } else {
       // Provide a summary
       if (gameState.activePlayer == 'player') {
