@@ -14,7 +14,7 @@ const resources = {
   'UNKNOWNINTENT_INGAME_REPROMPT': 'Sagen sie wiederholen.',
   // From BlackjackUtils.js
   'ERROR_REPROMPT': 'Wie kann ich helfen?',
-  'CHANGE_CARD_TEXT': 'You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Kann AN or AUS sein\n - DOUBLE DOWN: whether double down is offered or not.  Kann AN or AUS sein.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Kann AN or AUS sein.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Kann AN or AUS sein.\n - ANZAHL DER KARTENDECKS: die anzahl der kartendecks im spiel. Kann EINS, ZWEI, VIER, SECHS oder ACHT sein.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nZum beispiel sagen "Ändere anzahl der kartendecks zu zwei" wenn du mit zwei kartendecks spielen möchtest.\nNote that the deck will be shuffled if you change the rules of the game',
+  'CHANGE_CARD_TEXT': 'Sie können die folgenden optionen ändern:\n\n - SCHLÄGT SOFT SIEBZEHN: Ob der händler eine weiche 17 summe treffen wird. Kann AN or AUS sein.\n - AUFGEBEN: Ob eine aufgeben angeboten wird. Kann AN or AUS sein\n - EINSATZ VERDOPPELN: Ob eine einsatz verdoppeln angeboten wird.  Kann AN or AUS sein.\n - VERDOPPLUNG NACH SPLIT: Ob sie nach dem spalten verdoppeln können.  Kann AN or AUS sein.\n - RESPLIT ACES: Ob sie Asse wieder spalten können oder nicht.  Kann AN or AUS sein.\n - ANZAHL DER KARTENDECKS: die anzahl der kartendecks im spiel. Kann EINS, ZWEI, VIER, SECHS oder ACHT sein.\n - ANZAHL DER SPIELHANDS SPLATEN: Die maximale anzahl an spielhands, die sie haben können. Kann EINS, ZWEI, DREI oder VIER sein.\n\nZum beispiel sagen "Ändere anzahl der kartendecks zu zwei" wenn du mit zwei kartendecks spielen möchtest.\nBeachten sie, dass das kartendeck gemischt wird, wenn sie die spielregeln ändern',
   // From Betting.js
   'BAD_BET_FORMAT': 'Nicht wette für {0}',
   // From Blackjack.js
@@ -33,7 +33,7 @@ const resources = {
   // From Help.js
   'HELP_GENERIC_HELP': 'Sie können ein Spiel spielen, indem Sie sagen wetten, oder Sie können sagen Ausfahrt<break time=\'300ms\'/>Wie kann ich Ihnen helfen?',
   'HELP_CARD_TITLE': 'Blackjack Befehle',
-  'HELP_CARD_TEXT': 'Sie können sagen WETTEN um eine wette zu platzieren. If no amount is mentioned, the game will use the last amount bet.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Kann AN or AUS sein.\n - SURRENDER: whether surrender is offered as an option. Kann AN or AUS sein.\n - DOUBLE DOWN: whether double down is offered or not.  Kann AN or AUS sein.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair. Kann AN or AUS sein.\n - RESPLIT ACES: wheter you can resplit Aces or not. Kann AN or AUS sein.\n - ANZAHL DER KARTENDECKS: die anzahl der kartendecks im spiel. Kann EINS, ZWEI, VIER, SECHS oder ACHT sein.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nZum beispiel sagen "Ändere anzahl der kartendecks zu zwei" wenn du mit zwei kartendecks spielen möchtest.\nNote that the deck will be shuffled if you change the rules of the game',
+  'HELP_CARD_TEXT': 'Sie können sagen WETTEN um eine wette zu platzieren. Wenn kein betrag erwähnt wird, wird das spiel die letzte wette verwenden.\nWährend einer Hand, fragen WAS SOLLTE ICH TUN um die grundlegende Strategie Vorschlag zu hören.\nSagen SPIELREGELN ZU LESEN wenn du die regeln hören willst.\nÄNDERE wird die Spielregeln ändern. Sie können die folgenden optionen ändern:\n\n - SCHLÄGT SOFT SIEBZEHN: Ob der händler eine weiche 17 summe treffen wird. Kann AN or AUS sein.\n - AUFGEBEN: Ob eine aufgeben angeboten wird. Kann AN or AUS sein\n - EINSATZ VERDOPPELN: Ob eine einsatz verdoppeln angeboten wird.  Kann AN or AUS sein.\n - VERDOPPLUNG NACH SPLIT: Ob sie nach dem spalten verdoppeln können.  Kann AN or AUS sein.\n - RESPLIT ACES: Ob sie Asse wieder spalten können oder nicht.  Kann AN or AUS sein.\n - ANZAHL DER KARTENDECKS: die anzahl der kartendecks im spiel. Kann EINS, ZWEI, VIER, SECHS oder ACHT sein.\n - ANZAHL DER SPIELHANDS SPLATEN: Die maximale anzahl an spielhands, die sie haben können. Kann EINS, ZWEI, DREI oder VIER sein.\n\nZum beispiel sagen "Ändere anzahl der kartendecks zu zwei" wenn du mit zwei kartendecks spielen möchtest.\nBeachten sie, dass das kartendeck gemischt wird, wenn sie die spielregeln ändern',
   // From Launch.js
   'LAUNCH_WELCOME': 'Willkommen bei den Blackjack Spieler. ',
   'LAUNCH_STARTGAME': 'Sie können ein Spiel starten, indem Sie sagen die wort wetten ... Wie kann ich Ihnen helfen?',
@@ -99,8 +99,8 @@ const resources = {
   'RULES_HIT_SOFT17': 'Händler schlägt bei weichen 17. ',
   'RULES_STAND_SOFT17': 'Händler steht auf weichen 17. ',
   'RULES_RESPLIT_ACES': 'Können Asse resplit. ',
-  'RULES_SPLIT_NOT_ALLOWED': 'Spalten von Händen sind nicht erlaubt. ',
-  'RULES_NUMBER_OF_SPLITS': 'Teilen sie bis zu {0} händen. ',
+  'RULES_SPLIT_NOT_ALLOWED': 'Spalten von spielhands sind nicht erlaubt. ',
+  'RULES_NUMBER_OF_SPLITS': 'Spalten sie bis zu {0} spielhands. ',
   'RULES_DAS_ALLOWED': 'Doppelklicken Sie nach Split erlaubt. ',
   'RULES_DAS_NOT_ALLOWED': 'Doppelklicken Sie nach Split ist nicht möglich. ',
   'RULES_DOUBLE': 'Verdoppeln {0}. ',
@@ -112,13 +112,13 @@ const resources = {
 module.exports = {
   strings: resources,
   getBlackjackAction: function(actionSlot) {
-    const actionMapping = {'hit': 'hit', 'take a hit': 'hit', 'hit me': 'hit', 'take one': 'hit',
-      'stand': 'stand', 'stay': 'stand', 'done': 'stand',
+    const actionMapping = {'hit': 'hit', 'karte': 'hit', 'carte': 'hit', 'nehmen sie eine karte': 'hit',
+      'stay': 'stand', 'keine karte': 'stand', 'reste': 'stand',
       'surrender': 'surrender', 'give up': 'surrender',
-      'double': 'double', 'double down': 'double',
-      'split': 'split',
+      'double': 'double', 'verdoppeln': 'double', 'einsatz verdoppeln': 'double',
+      'split': 'split', 'teilen': 'split',
       'shuffle': 'shuffle', 'shuffle deck': 'shuffle',
-      'reset': 'resetbankroll', 'reset bankroll': 'resetbankroll',
+      'zurücksetzen': 'resetbankroll', 'spiel zurücksetzen': 'resetbankroll',
       'wetten': 'bet', 'austeilen': 'bet'};
     const action = actionMapping[actionSlot.value.toLowerCase()];
 
@@ -135,27 +135,26 @@ module.exports = {
     return valueMapping[value];
   },
   mapChangeRule: function(rule) {
-    const ruleMapping = {'hit soft seventeen': 'hitSoft17', 'soft seventeen': 'hitSoft17', 'dealer hits seventeen': 'hitSoft17',
-      'hit seventeen': 'hitSoft17', 'hits seventeen': 'hitSoft17',
-      'dealer hit seventeen': 'hitSoft17', 'dealer hits soft seventeen': 'hitSoft17', 'dealer hit soft seventeen': 'hitSoft17',
-      'hit soft 17': 'hitSoft17', 'soft 17': 'hitSoft17', 'dealer hits 17': 'hitSoft17',
-      'hit 17': 'hitSoft17', 'hits 17': 'hitSoft17',
-      'dealer hit 17': 'hitSoft17', 'dealer hits soft 17': 'hitSoft17', 'dealer hit soft 17': 'hitSoft17',
-      'surrender': 'surrender',
-      'double': 'double', 'double down': 'double', 'double after split': 'doubleaftersplit',
-      'resplit aces': 'resplitAces',
-      'blackjack pays': 'blackjackBonus', 'blackjack bonus': 'blackjackBonus',
+    const ruleMapping = {'hit soft seventeen': 'hitSoft17', 'hit seventeen': 'hitSoft17', 'soft seventeen': 'hitSoft17',
+      'händler schlägt seventeen': 'hitSoft17', 'händler schlägt soft seventeen': 'hitSoft17',
+      'schlägt soft siebzehn': 'hitSoft17', 'schlägt siebzehn': 'hitSoft17', 'soft siebzehn': 'hitSoft17',
+      'händler schlägt siebzehn': 'hitSoft17', 'händler schlägt soft siebzehn': 'hitSoft17',
+      'surrender': 'surrender', 'aufgeben': 'surrender',
+      'verdoppeln': 'double', 'einsatz verdoppeln': 'double',
+      'verdopplung nach split': 'doubleaftersplit', 'verdopplung nach splaten': 'doubleaftersplit',
+      'split asse': 'resplitAces', 'splaten asse': 'resplitAces',
+      'blackjack zahlt': 'blackjackBonus',
       'anzahl der kartendecks': 'numberOfDecks', 'decks': 'numberOfDecks', 'kartendecks': 'numberOfDecks',
       'die anzahl der kartendecks': 'numberOfDecks', 'die decks': 'numberOfDecks', 'die kartendecks': 'numberOfDecks',
-      'geteilte hände': 'maxSplitHands', 'hände geteilt': 'maxSplitHands', 'anzahl der geteilte hände': 'maxSplitHands',
-      'die geteilte hände': 'maxSplitHands', 'die hände geteilt': 'maxSplitHands', 'die anzahl der geteilte hände': 'maxSplitHands',
-      'anzahl der hände geteilt': 'maxSplitHands', 'anzahl der splits': 'maxSplitHands',
-      'die anzahl der hände geteilt': 'maxSplitHands', 'die anzahl der splits': 'maxSplitHands'};
+      'splaten spielhands': 'maxSplitHands', 'spielhands splaten': 'maxSplitHands', 'anzahl der splaten spielhands': 'maxSplitHands',
+      'die splaten spielhands': 'maxSplitHands', 'die spielhands splaten': 'maxSplitHands', 'die anzahl der splaten spielhands': 'maxSplitHands',
+      'anzahl der spielhands splaten': 'maxSplitHands', 'anzahl der splits': 'maxSplitHands',
+      'die anzahl der spielhands splaten': 'maxSplitHands', 'die anzahl der splits': 'maxSplitHands'};
     return ruleMapping[rule];
   },
   mapActionToSuggestion: function(action) {
-    const actionMapping = {'insurance': 'take insurance', 'noinsurance': 'not take insurance', 'hit': 'hit',
-                    'stand': 'stand', 'split': 'split', 'double': 'double', 'surrender': 'surrender'};
+    const actionMapping = {'insurance': 'versicherung', 'noinsurance': 'keine versicherung', 'hit': 'hit',
+                    'stand': 'stay', 'split': 'teilen', 'double': 'einsatz verdoppeln', 'surrender': 'aufgeben'};
     return actionMapping[action];
   },
   mapServerError: function(error) {
@@ -177,12 +176,12 @@ module.exports = {
                           'shuffle': 'shuffle',
                           'bet': 'wetten',
                           'hit': 'hit',
-                          'stand': 'stand',
-                          'double': 'double down',
-                          'insurance': 'take insurance',
-                          'noinsurance': 'decline insurance',
-                          'split': 'split',
-                          'surrender': 'surrender'};
+                          'stand': 'stay',
+                          'double': 'einsatz verdoppeln',
+                          'insurance': 'versicherung',
+                          'noinsurance': 'keine versicherung',
+                          'split': 'teilen',
+                          'surrender': 'aufgeben'};
     return (optionMapping[option] ? optionMapping[option] : option);
   },
   mapOutcome: function(outcome) {
