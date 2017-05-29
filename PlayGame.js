@@ -719,8 +719,17 @@ function rulesToText(locale, rules, changeRules) {
 
   // Splitting (only metion if you can resplit aces 'cuz that's uncommon)
   if (!changeRules || changeRules.hasOwnProperty('resplitAces')) {
-    if (rules.resplitAces) {
+    if (rules.resplitAces && (rules.maxSplitHands > 1)) {
       text += resources.strings.RULES_RESPLIT_ACES;
+    }
+  }
+
+  // Number of split hands allowed
+  if (!changeRules || changeRules.hasOwnProperty('maxSplitHands')) {
+    if (rules.maxSplitHands > 1) {
+      text += resources.strings.RULES_NUMBER_OF_SPLITS.replace('{0}', rules.maxSplitHands);
+    } else {
+      text += resources.strings.RULES_SPLIT_NOT_ALLOWED;
     }
   }
 

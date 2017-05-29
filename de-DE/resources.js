@@ -99,6 +99,8 @@ const resources = {
   'RULES_HIT_SOFT17': 'Händler schlägt bei weichen 17. ',
   'RULES_STAND_SOFT17': 'Händler steht auf weichen 17. ',
   'RULES_RESPLIT_ACES': 'Können Asse resplit. ',
+  'RULES_SPLIT_NOT_ALLOWED': 'Spalten von Händen sind nicht erlaubt. ',
+  'RULES_NUMBER_OF_SPLITS': 'Teilen sie bis zu {0} händen. ',
   'RULES_DAS_ALLOWED': 'Doppelklicken Sie nach Split erlaubt. ',
   'RULES_DAS_NOT_ALLOWED': 'Doppelklicken Sie nach Split ist nicht möglich. ',
   'RULES_DOUBLE': 'Verdoppeln {0}. ',

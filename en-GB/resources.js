@@ -99,6 +99,8 @@ const resources = {
   'RULES_HIT_SOFT17': 'Dealer hits on soft 17. ',
   'RULES_STAND_SOFT17': 'Dealer stands on soft 17. ',
   'RULES_RESPLIT_ACES': 'Can resplit Aces. ',
+  'RULES_SPLIT_NOT_ALLOWED': 'Splitting hands is not allowed. ',
+  'RULES_NUMBER_OF_SPLITS': 'Split up to {0} hands. ',
   'RULES_DAS_ALLOWED': 'Double after split allowed. ',
   'RULES_DAS_NOT_ALLOWED': 'Double after split not allowed. ',
   'RULES_DOUBLE': 'Double down {0}. ',
