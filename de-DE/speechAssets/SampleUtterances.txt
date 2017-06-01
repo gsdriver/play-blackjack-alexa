@@ -1,32 +1,30 @@
-BlackjackIntent do {Action}
 BlackjackIntent {Action}
-BlackjackIntent take a {Action}
-BlackjackIntent take an {Action}
-BlackjackIntent {Action} me
-BlackjackIntent {Action} this hand
-BlackjackIntent {Action} on this hand
-BlackjackIntent do {Action} this hand
-BlackjackIntent do {Action} on this hand
-BlackjackIntent take a {Action} this hand
-BlackjackIntent take an {Action} this hand
-BlackjackIntent take a {Action} on this hand
-BlackjackIntent take an {Action} on this hand
-BlackjackIntent {Action} this round
-BlackjackIntent {Action} on this round
-BlackjackIntent do {Action} this round
-BlackjackIntent do {Action} on this round
-BlackjackIntent take a {Action} this round
-BlackjackIntent take an {Action} this round
-BlackjackIntent take a {Action} on this round
-BlackjackIntent take an {Action} on this round
-BlackjackIntent {Action} this time
-BlackjackIntent {Action} on this time
-BlackjackIntent do {Action} this time
-BlackjackIntent do {Action} on this time
-BlackjackIntent take a {Action} this time
-BlackjackIntent take an {Action} this time
-BlackjackIntent take a {Action} on this time
-BlackjackIntent take an {Action} on this time
+BlackjackIntent nehmen einen {Action}
+BlackjackIntent {Action} mich
+BlackjackIntent {Action} diese hand
+BlackjackIntent {Action} diese spielhand
+BlackjackIntent {Action} auf dieser hand
+BlackjackIntent {Action} auf dieser spielhand
+BlackjackIntent nehmen einen {Action} diese hand
+BlackjackIntent {Action} mich diese hand
+BlackjackIntent nehmen einen {Action} diese spielhand
+BlackjackIntent {Action} mich diese spielhand
+BlackjackIntent nehmen einen {Action} auf dieser hand
+BlackjackIntent {Action} mich auf dieser hand
+BlackjackIntent nehmen einen {Action} auf dieser spielhand
+BlackjackIntent {Action} mich auf dieser spielhand
+BlackjackIntent {Action} diese partie
+BlackjackIntent {Action} auf dieser partie
+BlackjackIntent nehmen einen {Action} diese partie
+BlackjackIntent {Action} mich diese partie
+BlackjackIntent nehmen einen {Action} auf dieser partie
+BlackjackIntent {Action} mich auf dieser partie
+BlackjackIntent {Action} diese runde
+BlackjackIntent {Action} auf dieser runde
+BlackjackIntent nehmen einen {Action} diese runde
+BlackjackIntent {Action} mich diese runde
+BlackjackIntent nehmen einen {Action} auf dieser runde
+BlackjackIntent {Action} mich auf dieser runde
 BettingIntent wetten {Amount}
 BettingIntent spielen {Amount}
 BettingIntent spielen {Amount}
