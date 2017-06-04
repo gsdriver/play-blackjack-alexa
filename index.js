@@ -21,9 +21,12 @@ const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
 const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   'AMAZON.YesIntent': Reset.handleYesReset,
   'AMAZON.NoIntent': Reset.handleNoReset,
-  'SessionEndedRequest': Exit.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
+  'SessionEndedRequest': function() {
+    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
+    this.emit(':saveState', true);
+  },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
     this.emit(':ask', res.strings.UNKNOWNINTENT_RESET, res.strings.UNKNOWNINTENT_RESET_REPROMPT);
@@ -39,9 +42,12 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'AMAZON.NoIntent': Exit.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
-  'SessionEndedRequest': Exit.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
+  'SessionEndedRequest': function() {
+    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
+    this.emit(':saveState', true);
+  },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
     this.emit(':ask', res.strings.UNKNOWNINTENT_NEWGAME, res.strings.UNKNOWNINTENT_NEWGAME_REPROMPT);
@@ -55,9 +61,12 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'AMAZON.NoIntent': DeclineInsurance.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
-  'SessionEndedRequest': Exit.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
+  'SessionEndedRequest': function() {
+    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
+    this.emit(':saveState', true);
+  },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
     this.emit(':ask', res.strings.UNKNOWNINTENT_INSURANCE, res.strings.UNKNOWNINTENT_INSURANCE_REPROMPT);
@@ -70,9 +79,12 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'RulesIntent': Rules.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
-  'SessionEndedRequest': Exit.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
+  'SessionEndedRequest': function() {
+    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
+    this.emit(':saveState', true);
+  },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
     this.emit(':ask', res.strings.UNKNOWNINTENT_INGAME, res.strings.UNKNOWNINTENT_INGAME_REPROMPT);
@@ -112,9 +124,12 @@ const handlers = {
   'RulesIntent': Rules.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
-  'SessionEndedRequest': Exit.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
+  'SessionEndedRequest': function() {
+    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
+    this.emit(':saveState', true);
+  },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
     this.emit(':ask', res.strings.UNKNOWNINTENT_INGAME, res.strings.UNKNOWNINTENT_INGAME_REPROMPT);
@@ -122,9 +137,13 @@ const handlers = {
 };
 
 exports.handler = function(event, context, callback) {
+  const AWS = require('aws-sdk');
+  AWS.config.update({region: 'us-east-1'});
+
   const alexa = Alexa.handler(event, context);
 
   alexa.APP_ID = APP_ID;
+  alexa.dynamoDBTableName = 'PlayBlackjack';
   alexa.registerHandlers(handlers, resetHandlers, newGameHandlers,
     insuranceHandlers, inGameHandlers);
   alexa.execute();

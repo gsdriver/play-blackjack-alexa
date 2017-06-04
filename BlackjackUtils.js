@@ -37,4 +37,16 @@ module.exports = {
       && (gameState.houseRules.resplitAces == false) && (gameState.houseRules.blackjackBonus == 0.5)
       && (gameState.houseRules.numberOfDecks == 1)));
   },
+  prepareToSave: function(attributes, locale) {
+    if (attributes) {
+      attributes['playerLocale'] = locale;
+      if (attributes['numRounds']) {
+        attributes['numRounds']++;
+      } else {
+        attributes['numRounds'] = 1;
+      }
+      attributes['firsthand'] = undefined;
+      attributes['gameState'] = undefined;
+    }
+  },
 };

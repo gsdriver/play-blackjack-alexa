@@ -7,3 +7,5 @@ config.bat
 update.bat
 src/test.json
 .idea
+summary.csv
+attributes.txt

@@ -29,6 +29,8 @@ const resources = {
   'FULL_RULES': 'The full rules are {0}',
   // From Exit.js
   'EXIT_BANKROLL': 'You are leaving with ${0}.',
+  'EXIT_AD': 'If you enjoyed this game, check out our Roulette Wheel skill. ',
+  // 'EXIT_AD': 'Thanks for playing. ',
   'EXIT_GOODBYE': 'Goodbye.',
   // From Help.js
   'HELP_GENERIC_HELP': 'You can play a game by saying Deal, or you can say exit<break time=\'300ms\'/>Now, what can I help you with?',

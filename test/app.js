@@ -1,5 +1,7 @@
 var mainApp = require('../index');
 
+const attributeFile = 'attributes.txt';
+
 function BuildEvent(argv)
 {
     // Templates that can fill in the intent
@@ -13,7 +15,7 @@ function BuildEvent(argv)
     var resetIntent = {"name": "ResetIntent", "slots": {}};
     var repeatIntent = {"name": "AMAZON.RepeatIntent", "slots": {}};
     var helpIntent = {"name": "AMAZON.HelpIntent", "slots": {}};
-    var exitIntent = {"name": "AMAZON.CancelIntent", "slots": {}};
+    var exitIntent = {"name": "SessionEndedRequest", "slots": {}};
 
     var lambda = {
        "session": {
@@ -22,7 +24,7 @@ function BuildEvent(argv)
            "applicationId": "amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce"
          },
          "attributes": {},
-         "user": {
+        "user": {
            "userId": "amzn1.ask.account.AFLJ3RYNI3X6MQMX4KVH52CZKDSI6PMWCQWRBHSPJJPR2MKGDNJHW36XF2ET6I2BFUDRKH3SR2ACZ5VCRLXLGJFBTQGY4RNYZA763JED57USTK6F7IRYT6KR3XYO2ZTKK55OM6ID2WQXQKKXJCYMWXQ74YXREHVTQ3VUD5QHYBJTKHDDH5R4ALQAGIQKPFL52A3HQ377WNCCHYI"
          },
          "new": true
@@ -58,6 +60,15 @@ function BuildEvent(argv)
        },
        "version": "1.0"
     };
+
+    // If there is an attributes.txt file, read the attributes from there
+    const fs = require('fs');
+    if (fs.existsSync(attributeFile)) {
+      data = fs.readFileSync(attributeFile, 'utf8');
+      if (data) {
+        lambda.session.attributes = JSON.parse(data);
+      }
+    }
 
     // If there is no argument, then we'll just ask for the rules
     if ((argv.length <= 2) || (argv[2] == "rules"))
@@ -138,6 +149,13 @@ myResponse.succeed = function(result) {
   console.log('The session ' + ((!result.response.shouldEndSession) ? 'stays open.' : 'closes.'));
   if (result.sessionAttributes) {
     console.log('"attributes": ' + JSON.stringify(result.sessionAttributes));
+  }
+  if (result.sessionAttributes) {
+    // Output the attributes too
+    const fs = require('fs');
+    fs.writeFile(attributeFile, JSON.stringify(result.sessionAttributes), (err) => {
+      console.log('attributes:' + JSON.stringify(result.sessionAttributes) + ',');
+    });
   }
 }
 
