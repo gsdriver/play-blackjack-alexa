@@ -15,10 +15,18 @@ module.exports = {
       this.emit(':ask', res.strings.BLACKJACKINTENT_UNKNOWN_ACTION.replace('{0}', actionSlot.value), res.strings.ERROR_REPROMPT);
     } else {
       // Let's play this action
+      const actionObj = {action: res.getBlackjackAction(actionSlot)};
+
+      if (!actionObj.action) {
+        // What did they specify?
+        console.log('NULL ACTION: ' + JSON.stringify(this.event.request));
+        actionObj.action = actionSlot.value;
+      }
+
       playgame.playBlackjackAction(this.attributes['gameState'],
           this.event.request.locale,
           this.event.session.user.userId,
-          {action: res.getBlackjackAction(actionSlot)},
+          actionObj,
           (error, response, speech, reprompt, gameState) => {
         this.attributes['gameState'] = gameState;
         if (gameState) {

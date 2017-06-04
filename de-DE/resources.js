@@ -114,7 +114,7 @@ module.exports = {
   strings: resources,
   getBlackjackAction: function(actionSlot) {
     const actionMapping = {'hit': 'hit', 'karte': 'hit', 'carte': 'hit', 'nehmen sie eine karte': 'hit',
-      'stay': 'stand', 'keine karte': 'stand', 'reste': 'stand',
+      'stand': 'stand', 'stay': 'stand', 'keine karte': 'stand', 'reste': 'stand',
       'surrender': 'surrender', 'give up': 'surrender',
       'double': 'double', 'verdoppeln': 'double', 'einsatz verdoppeln': 'double',
       'split': 'split', 'teilen': 'split',

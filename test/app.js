@@ -25,7 +25,7 @@ function BuildEvent(argv)
          },
          "attributes": {},
         "user": {
-           "userId": "amzn1.ask.account.AFLJ3RYNI3X6MQMX4KVH52CZKDSI6PMWCQWRBHSPJJPR2MKGDNJHW36XF2ET6I2BFUDRKH3SR2ACZ5VCRLXLGJFBTQGY4RNYZA763JED57USTK6F7IRYT6KR3XYO2ZTKK55OM6ID2WQXQKKXJCYMWXQ74YXREHVTQ3VUD5QHYBJTKHDDH5R4ALQAGIQKPFL52A3HQ377WNCCHYI"
+          "userId": "not-amazon",
          },
          "new": true
        },
@@ -47,7 +47,7 @@ function BuildEvent(argv)
          },
          "attributes": {},
          "user": {
-           "userId": "amzn1.ask.account.AFLJ3RYNI3X6MQMX4KVH52CZKDSI6PMWCQWRBHSPJJPR2MKGDNJHW36XF2ET6I2BFUDRKH3SR2ACZ5VCRLXLGJFBTQGY4RNYZA763JED57USTK6F7IRYT6KR3XYO2ZTKK55OM6ID2WQXQKKXJCYMWXQ74YXREHVTQ3VUD5QHYBJTKHDDH5R4ALQAGIQKPFL52A3HQ377WNCCHYI"
+            "userId": "not-amazon",
          },
          "new": true
        },
@@ -154,7 +154,9 @@ myResponse.succeed = function(result) {
     // Output the attributes too
     const fs = require('fs');
     fs.writeFile(attributeFile, JSON.stringify(result.sessionAttributes), (err) => {
-      console.log('attributes:' + JSON.stringify(result.sessionAttributes) + ',');
+      if (err) {
+        console.log(err);
+      }
     });
   }
 }
