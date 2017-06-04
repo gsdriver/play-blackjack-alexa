@@ -30,6 +30,7 @@ function getEntriesFromDB(callback) {
 
            entry.numRounds = parseInt(data.Items[i].mapAttr.M.numRounds.N);
            entry.locale = data.Items[i].mapAttr.M.playerLocale.S;
+           entry.adplayed = (data.Items[i].mapAttr.M.adStamp != undefined);
            results.push(entry);
          }
        }
@@ -55,6 +56,7 @@ getEntriesFromDB((err, results) => {
     let i;
     const players = {};
     let csvString = '';
+    let ads = 0;
 
     console.log(JSON.stringify(results));
     console.log('There are ' + results.length + ' registered players.');
@@ -70,6 +72,10 @@ getEntriesFromDB((err, results) => {
         maxRounds = results[i].numRounds;
       }
 
+      if (results[i].adplayed) {
+        ads++;
+      }
+
       csvString += (results[i].locale + ',' + results[i].numRounds + '\r\n');
     }
 
@@ -79,6 +85,7 @@ getEntriesFromDB((err, results) => {
 
     console.log('There has been a total of ' + totalRounds + ' rounds played.');
     console.log('The most rounds played by one person is ' + maxRounds);
+    console.log(ads + ' people have heard your ad.');
 
     const fs = require('fs');
     fs.writeFile('summary.csv', csvString, (err) => {
