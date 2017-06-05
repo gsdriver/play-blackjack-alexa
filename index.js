@@ -19,6 +19,7 @@ const bjUtils = require('./BlackjackUtils');
 const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
 
 const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
+  'LaunchRequest': Reset.handleNoReset,
   'AMAZON.YesIntent': Reset.handleYesReset,
   'AMAZON.NoIntent': Reset.handleNoReset,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -34,6 +35,7 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
 });
 
 const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
+  'LaunchRequest': Launch.handleIntent,
   'BettingIntent': Betting.handleIntent,
   'ResetIntent': Reset.handleIntent,
   'RulesIntent': Rules.handleIntent,
@@ -55,6 +57,7 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
 });
 
 const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
+  'LaunchRequest': Launch.handleIntent,
   'SuggestIntent': Suggest.handleIntent,
   'RulesIntent': Rules.handleIntent,
   'AMAZON.YesIntent': TakeInsurance.handleIntent,
@@ -74,6 +77,7 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
 });
 
 const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
+  'LaunchRequest': Launch.handleIntent,
   'BlackjackIntent': Blackjack.handleIntent,
   'SuggestIntent': Suggest.handleIntent,
   'RulesIntent': Rules.handleIntent,
@@ -139,6 +143,10 @@ const handlers = {
 exports.handler = function(event, context, callback) {
   const AWS = require('aws-sdk');
   AWS.config.update({region: 'us-east-1'});
+
+  if (event) {
+    console.log(JSON.stringify(event.request));
+  }
 
   const alexa = Alexa.handler(event, context);
 

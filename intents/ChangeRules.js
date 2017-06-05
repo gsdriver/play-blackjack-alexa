@@ -78,7 +78,7 @@ module.exports = {
 // Determines which rules to change
 //
 function buildRulesObject(res, option, value) {
-  const ruleValue = res.mapChangeValue(value.toLowerCase());
+  let ruleValue = res.mapChangeValue(value.toLowerCase());
   const ruleOption = res.mapChangeRule(option.toLowerCase());
   const rules = {};
 
@@ -127,15 +127,15 @@ function buildRulesObject(res, option, value) {
       rules[ruleOption] = ruleValue;
       break;
     case 'maxSplitHands':
-    // 1-4 only
-    if (ruleValue < 1) {
-      ruleValue = 1;
-    } else if (ruleValue > 4) {
-      ruleValue = 4;
-    }
+      // 1-4 only
+      if (ruleValue < 1) {
+        ruleValue = 1;
+      } else if (ruleValue > 4) {
+        ruleValue = 4;
+      }
 
-    rules[ruleOption] = ruleValue;
-    break;
+      rules[ruleOption] = ruleValue;
+      break;
   }
 
   return rules;

@@ -21,8 +21,8 @@ module.exports = {
         exitSpeech = res.strings.EXIT_BANKROLL.replace('{0}', gameState.bankroll) + ' ';
       }
 
-      // Ad if they haven't
-      if (!this.attributes['adStamp']) {
+      // Ad if they haven't (ignore if NOADS environment variable is set)
+      if (!process.env.NOADS && !this.attributes['adStamp']) {
         // Keep track of when we played the ad
         this.attributes['adStamp'] = Date.now();
         exitSpeech += res.strings.EXIT_AD;
