@@ -30,7 +30,10 @@ function getEntriesFromDB(callback) {
 
            entry.numRounds = parseInt(data.Items[i].mapAttr.M.numRounds.N);
            entry.locale = data.Items[i].mapAttr.M.playerLocale.S;
-           entry.adplayed = (data.Items[i].mapAttr.M.adStamp != undefined);
+           if (data.Items[i].mapAttr.M.adStamp) {
+             entry.adplayed = true;
+             entry.adplayedDate = new Date(parseInt(data.Items[i].mapAttr.M.adStamp.N));
+           }
            results.push(entry);
          }
        }
@@ -140,7 +143,17 @@ getEntriesFromDB((err, results) => {
         ads++;
       }
 
-      csvString += (results[i].locale + ',' + results[i].numRounds + '\r\n');
+      csvString += (results[i].locale + ',' + results[i].numRounds);
+      if (results[i].adplayedDate) {
+        const datestring = (results[i].adplayedDate.getMonth()+1)  + "-" +
+          results[i].adplayedDate.getDate() + "-" +
+          results[i].adplayedDate.getFullYear() + " " +
+          results[i].adplayedDate.getHours() + ":" +
+          results[i].adplayedDate.getMinutes();
+
+        csvString += (',' + datestring);
+      }
+      csvString += '\r\n';
     }
 
     text = 'There are ' + results.length + ' registered players: ';
