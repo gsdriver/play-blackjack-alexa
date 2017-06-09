@@ -10,6 +10,10 @@ const bjUtils = require('../BlackjackUtils');
 module.exports = {
   handleIntent: function() {
     let amount = 0;
+    const res = require('../' + this.event.request.locale + '/resources');
+
+    // Curious what language is betting...
+    console.log('Bet invoked for ' + this.event.request.locale);
 
     if (this.event.request.intent.slots && this.event.request.intent.slots.Amount
       && this.event.request.intent.slots.Amount.value) {
@@ -18,7 +22,8 @@ module.exports = {
 
     // If the bet is non-numeric, refuse it
     if (isNaN(amount)) {
-      bjUtils.emitResponse(this.emit, 'Unable to place a bet for ' + amountSlot.value, null, null, null);
+      const betError = res.strings.BAD_BET_FORMAT.replace('{0}', amount);
+      bjUtils.emitResponse(this.emit, this.event.request.locale, betError, null, null, null);
     } else {
       // Take the bet
       const action = {action: 'bet', amount: amount, firsthand: this.attributes['firsthand']};
@@ -31,7 +36,8 @@ module.exports = {
           this.attributes['firsthand'] = undefined;
           this.handler.state = bjUtils.getState(gameState);
         }
-        bjUtils.emitResponse(this.emit, error, response, speech, reprompt);
+        bjUtils.emitResponse(this.emit, this.event.request.locale,
+          error, response, speech, reprompt);
       });
     }
   },

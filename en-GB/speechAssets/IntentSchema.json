@@ -1,0 +1,62 @@
+{
+  "intents": [
+    {
+      "intent": "BlackjackIntent",
+      "slots": [
+      {
+        "name": "Action",
+        "type": "LIST_OF_ACTIONS"
+      }
+     ]
+    },
+    {
+      "intent": "BettingIntent",
+      "slots": [
+        {
+          "name": "Amount",
+          "type": "AMAZON.Number"
+        }
+      ]
+    },
+    {
+      "intent": "RulesIntent"
+    },
+    {
+      "intent": "ResetIntent"
+    },
+    {
+      "intent": "ChangeRulesIntent",
+      "slots": [
+        {
+          "name": "Change",
+          "type": "LIST_OF_RULE_OPTIONS"
+        },
+        {
+          "name": "ChangeOption",
+          "type": "LIST_OF_RULE_VALUES"
+        }
+      ]
+    },
+    {
+      "intent": "SuggestIntent"
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    },
+    {
+      "intent": "AMAZON.StopIntent"
+    },
+    {
+      "intent": "AMAZON.CancelIntent"
+    },
+    {
+      "intent": "AMAZON.RepeatIntent"
+    },
+    {
+      "intent": "AMAZON.YesIntent"
+    },
+    {
+      "intent": "AMAZON.NoIntent"
+    }
+  ]
+}

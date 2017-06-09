@@ -9,37 +9,36 @@ const requestify = require('requestify');
 const utils = require('alexa-speech-utils')();
 const stubbedGame = require('./StubbedGame');
 
-const cardRanks = ['none', 'ace', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'jack', 'queen', 'king'];
 const testUser = 'stubbed';
+let resources;
 
 module.exports = {
   // Plays a given action, returning either an error or a response string
   playBlackjackAction: function(savedGameState, locale, userID, action, callback) {
     // Special case if this is suggest
+    resources = require('./' + locale + '/resources');
+
     if (action.action == 'suggest') {
       postUserAction(locale, userID, action.action, 0, (error, suggestion) => {
-        const youShould = ['You should ', 'The book says you should ', 'The book would tell you to ', 'According to Basic Strategy you should ',
-                'The book would suggest that you ', 'I think you should ', 'Basic Strategy would suggest you '];
-        const actionMapping = {'insurance': 'take insurance', 'noinsurance': 'not take insurance', 'hit': 'hit',
-                        'stand': 'stand', 'split': 'split', 'double': 'double', 'surrender': 'surrender'};
-
         const speechError = (suggestion.error) ? suggestion.error : error;
         let suggestText = suggestion.suggestion;
 
         if (suggestText) {
           // Special case if it wasn't your turn
           if (suggestText == 'notplayerturn') {
-            suggestText = 'I can\'t give a suggestion when the game is over';
+            suggestText = resources.strings.SUGGEST_TURNOVER;
           } else {
-            if (actionMapping[suggestText]) {
+            if (resources.mapActionToSuggestion(suggestText)) {
+              const youShould = resources.strings.SUGGEST_OPTIONS.split('|');
               const prefix = youShould[Math.floor(Math.random() * youShould.length)];
-              suggestText = prefix + actionMapping[suggestText];
+
+              suggestText = prefix.replace('{0}', resources.mapActionToSuggestion(suggestText));
             }
           }
         }
 
         getGameState(savedGameState, userID, (err, gameState) => {
-          const reprompt = (gameState) ? listValidActions(gameState, 'full') : 'What can I help you with?';
+          const reprompt = (gameState) ? listValidActions(gameState, locale, 'full') : resources.ERROR_REPROMPT;
           suggestText += ('. ' + reprompt);
           callback(speechError, null, suggestText, reprompt, null);
         });
@@ -52,7 +51,7 @@ module.exports = {
 
       getGameState(savedGameState, userID, (error, gameState) => {
         if (error) {
-          speechError = 'There was an error: ' + error;
+          speechError = resources.strings.REPORT_ERROR.replace('{0}', error);
           callback(speechError, null, null);
           return;
         }
@@ -60,9 +59,9 @@ module.exports = {
         // Is this a valid option?
         if (!gameState.possibleActions || (gameState.possibleActions.indexOf(action.action) < 0)) {
           // Probably need a way to read out the game state better
-          speechError = 'I\'m sorry, ' + action.action + ' is not a valid action at this time. ';
-          speechError += readHand(gameState);
-          speechError += ' ' + listValidActions(gameState, 'full');
+          speechError = resources.strings.INVALID_ACTION.replace('{0}', action.action);
+          speechError += readHand(gameState, locale);
+          speechError += ' ' + listValidActions(gameState, locale, 'full');
           sendUserCallback(locale, gameState, speechError, null, null, null, callback);
         } else {
           // OK, let's post this action and get a new game state
@@ -81,13 +80,13 @@ module.exports = {
 
               // If this was the first hand, or they specified a value, tell them how much they bet
               if ((action.action === 'bet') && (action.firsthand || (action.amount > 0))) {
-                speechQuestion += ('You bet ' + utils.formatCurrency(betAmount, locale) + '. ');
+                speechQuestion += resources.strings.YOU_BET_TEXT.replace('{0}', betAmount);
               }
 
               // Pose this as a question whether it's the player or dealer's turn
-              repromptQuestion = listValidActions(newGameState, 'full');
+              repromptQuestion = listValidActions(newGameState, locale, 'full');
               speechQuestion += (tellResult(locale, action.action, gameState, newGameState)
-                + ' ' + listValidActions(newGameState,
+                + ' ' + listValidActions(newGameState, locale,
                   (playerBlackjack) ? 'full' : 'summary'));
             }
 
@@ -100,16 +99,18 @@ module.exports = {
   },
   // Reads back the rules in play
   readRules: function(savedGameState, locale, userID, callback) {
+    resources = require('./' + locale + '/resources');
+
     // Get the game state so we can take action (the latest should be stored tied to this user ID)
     getGameState(savedGameState, userID, (error, gameState) => {
       if (error) {
-        const speechError = 'There was an error: ' + error;
+        const speechError = resources.strings.REPORT_ERROR.replace('{0}', error);
         callback(speechError, null, null, null, null);
         return;
       }
 
       // Convert the rules to text
-      const reprompt = listValidActions(gameState, 'full');
+      const reprompt = listValidActions(gameState, locale, 'full');
       const speech = rulesToText(locale, gameState.houseRules) + reprompt;
 
       callback(null, null, speech, reprompt, gameState);
@@ -124,6 +125,8 @@ module.exports = {
   },
   // Reads back the current hand and game state
   readCurrentHand: function(savedGameState, locale, userID, callback) {
+    resources = require('./' + locale + '/resources');
+
     getGameState(savedGameState, userID, (error, gameState) => {
       if (error) {
         callback(error, null, null);
@@ -131,14 +134,15 @@ module.exports = {
         let speechQuestion = null;
         let repromptQuestion = null;
 
-        repromptQuestion = listValidActions(gameState, 'full');
-        speechQuestion = 'You have ' + utils.formatCurrency(gameState.bankroll, locale) + '. ' + readHand(gameState) + ' ' + repromptQuestion;
+        repromptQuestion = listValidActions(gameState, locale, 'full');
+        speechQuestion = resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', gameState.bankroll) + readHand(gameState, locale) + ' ' + repromptQuestion;
         callback(null, null, speechQuestion, repromptQuestion, gameState);
       }
     });
   },
   // Gets contextual help based on the current state of the game
-  getContextualHelp: function(savedGameState, userID, callback) {
+  getContextualHelp: function(savedGameState, locale, userID, callback) {
+    resources = require('./' + locale + '/resources');
     getGameState(savedGameState, userID, (error, gameState) => {
       if (error) {
         callback(error, null);
@@ -150,23 +154,26 @@ module.exports = {
           if (gameState.possibleActions.indexOf('noinsurance') > -1) {
             // It's possible you can't take insurance because you don't have enough money
             if (gameState.possibleActions.indexOf('insurance') > -1) {
-              result = 'You can say yes to take insurance or no to decline insurance.';
+              result = resources.strings.HELP_TAKE_INSURANCE;
             } else {
-              result = 'You don\'t have enough money to take insurance - say no to decline insurance.';
+              result = resources.strings.HELP_INSURANCE_INSUFFICIENT_BANKROLL;
             }
           } else {
-            result = 'You can say ' + utils.or(gameState.possibleActions) + '.';
+            result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}',
+              utils.or(gameState.possibleActions.map((x) => resources.mapPlayOption(x)),
+              {locale: locale}));
           }
         }
 
-        result += ' For more options, please check the Alexa companion application.<break time=\'300ms\'/> What can I help you with?';
+        result += resources.strings.HELP_MORE_OPTIONS;
         callback(null, result);
       }
     });
   },
   // Changes the rules in play
   changeRules: function(locale, userID, rules, callback) {
-    let speech = 'Sorry, internal error. What else can I help with?';
+    resources = require('./' + locale + '/resources');
+    let speech = resources.strings.INTERNAL_ERROR;
 
     // OK, let's post the rule change and get a new game state
     postUserAction(locale, userID, 'setrules', rules, (error, newGameState) => {
@@ -176,8 +183,8 @@ module.exports = {
       }
 
       // If this is shuffle, we'll do the shuffle for them
-      const reprompt = 'Would you like to bet?';
-      speech += (' Check the Alexa companion application for the full set of rules. ' + reprompt);
+      const reprompt = resources.strings.CHANGERULES_REPROMPT;
+      speech += resources.strings.CHANGERULES_CHECKAPP;
       sendUserCallback(locale, newGameState, error, null, speech, reprompt, callback);
     });
   },
@@ -337,29 +344,17 @@ function postUserAction(locale, userID, action, value, callback) {
 }
 
 function getSpeechError(response, locale) {
-  const errorMapping = ['bettoosmall', 'Your bet is below the minimum of ' + utils.formatCurrency(5, locale),
-                      'bettoolarge', 'Your bet is above the maximum of ' + utils.formatCurrency(1000, locale),
-                      'bettoolarge', 'Your bet is above the maximum of ' + utils.formatCurrency(1000, locale),
-                      'betoverbankroll', 'Your bet is more than your available bankroll'];
-  let errorText = 'Internal error';
   const error = response.getBody();
-  let index;
-
-  if (error && error.error) {
-    index = errorMapping.indexOf(error.error);
-    errorText = (index > -1) ? errorMapping[index + 1] : error.error;
-  } else {
-    errorText = 'Error code ' + response.getCode();
-  }
-
-  return errorText;
+  return (error && error.error) ?
+    resources.mapServerError(error.error) :
+    resources.strings.SPEECH_ERROR_CODE.replace('{0}', response.getCode());
 }
 
 //
 // Lists what the user can do next - provided in the form of a question
 // You can ask for either "full" or "summary" depending on the state
 //
-function listValidActions(gameState, type) {
+function listValidActions(gameState, locale, type) {
   let result = '';
 
   if (gameState.possibleActions) {
@@ -367,18 +362,20 @@ function listValidActions(gameState, type) {
     if (gameState.possibleActions.indexOf('noinsurance') > -1) {
       // It's possible you can't take insurance because you don't have enough money
       if (gameState.possibleActions.indexOf('insurance') > -1) {
-        result = 'Do you want to take insurance?  Say yes or no.';
+        result = resources.strings.ASK_TAKE_INSURANCE;
       } else {
-        result = 'You don\'t have enough money to take insurance - say no to decline insurance.';
+        result = resources.strings.HELP_INSURANCE_INSUFFICIENT_BANKROLL;
       }
     } else if (type === 'full') {
-      result = 'Would you like to ' + utils.or(gameState.possibleActions) + '?';
+      result = resources.strings.ASK_POSSIBLE_ACTIONS.replace('{0}',
+        utils.or(gameState.possibleActions.map((x) => resources.mapPlayOption(x)),
+        {locale: locale}));
     } else {
       // Provide a summary
       if (gameState.activePlayer == 'player') {
-        result = 'What would you like to do?';
+        result = resources.strings.ASK_WHAT_TO_DO;
       } else {
-        result = 'Would you like to play again?';
+        result = resources.strings.ASK_PLAY_AGAIN;
       }
     }
   }
@@ -398,8 +395,11 @@ function tellResult(locale, action, gameState, newGameState) {
     // or split Aces (which only draws on card) or did a double before we read this hand.
     if ((oldHand.total > 21) ||
       (oldHand.bet > newGameState.playerHands[newGameState.currentPlayerHand].bet)) {
-      result = 'You got a ' + cardRanks[oldHand.cards[oldHand.cards.length - 1].rank];
-      result += (oldHand.total > 21) ? ' and busted. ' : (' for a total of ' + oldHand.total + '. ');
+      if (oldHand.total > 21) {
+        result = resources.strings.RESULT_AFTER_HIT_BUST.replace('{0}', resources.cardRanks(oldHand.cards[oldHand.cards.length - 1]));
+      } else {
+        result = resources.strings.RESULT_AFTER_HIT_NOBUST.replace('{0}', resources.cardRanks(oldHand.cards[oldHand.cards.length - 1])).replace('{1}', oldHand.total);
+      }
 
       // And now preface with the next hand before we tell them what happened
       result += readHandNumber(newGameState, newGameState.currentPlayerHand);
@@ -409,44 +409,44 @@ function tellResult(locale, action, gameState, newGameState) {
   // So what happened?
   switch (action) {
     case 'resetbankroll':
-      result += 'Bankroll reset';
+      result += resources.strings.RESULT_BANKROLL_RESET;
       break;
     case 'shuffle':
-      result += 'Deck shuffled';
+      result += resources.strings.RESULT_DECK_SHUFFLED;
       break;
     case 'bet':
       // A new hand was dealt
-      result += readHand(newGameState);
+      result += readHand(newGameState, locale);
       break;
     case 'hit':
       // Tell them the new card, the total, and the dealer up card
-      result += readHit(newGameState);
+      result += readHit(newGameState, locale);
       break;
     case 'stand':
       // OK, let's read what the dealer had, what they drew, and what happened
-      result += readStand(newGameState);
+      result += readStand(newGameState, locale);
       break;
     case 'double':
       // Tell them the new card, and what the dealer did
-      result += readDouble(newGameState);
+      result += readDouble(newGameState, locale);
       break;
     case 'insurance':
     case 'noinsurance':
       // Say whether the dealer had blackjack, and what the next thing is to do
-      result += readInsurance(newGameState);
+      result += readInsurance(newGameState, locale);
       break;
     case 'split':
       // OK, now you have multiple hands - makes reading the game state more interesting
-      result += readSplit(newGameState);
+      result += readSplit(newGameState, locale);
       break;
     case 'surrender':
-      result += readSurrender(newGameState);
+      result += readSurrender(newGameState, locale);
       break;
     }
 
   if ((gameState.activePlayer == 'player') && (newGameState.activePlayer != 'player')) {
     // OK, game over - so let's give the new total
-    result += ' You have ' + utils.formatCurrency(newGameState.bankroll, locale) + '.';
+    result += resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', newGameState.bankroll);
   }
 
   return result;
@@ -455,29 +455,22 @@ function tellResult(locale, action, gameState, newGameState) {
 //
 // Recaps what the dealer has done now that he played his turn
 //
-function readDealerAction(gameState) {
+function readDealerAction(gameState, locale) {
   let result;
-  let i;
 
-  result = 'The dealer had a ' + cardRanks[gameState.dealerHand.cards[0].rank] + ' down.';
+  result = resources.strings.DEALER_HOLE_CARD.replace('{0}', resources.cardRanks(gameState.dealerHand.cards[0]));
   if (gameState.dealerHand.cards.length > 2) {
-    result += ' The dealer drew ';
-    for (i = 2; i < gameState.dealerHand.cards.length; i++) {
-      result += 'a ' + cardRanks[gameState.dealerHand.cards[i].rank];
-      if (i < gameState.dealerHand.cards.length - 1) {
-        result += ' and ';
-      }
-    }
-
+    result += resources.strings.DEALER_DRAW;
+    result += utils.and(gameState.dealerHand.cards.slice(2).map((x) => resources.strings.DEALER_CARD_ARTICLE.replace('{0}', resources.cardRanks(x))), {locale: locale});
     result += '.';
   }
 
   if (gameState.dealerHand.total > 21) {
-    result += ' The dealer busted.';
+    result += resources.strings.DEALER_BUSTED;
   } else if ((gameState.dealerHand.total == 21) && (gameState.dealerHand.cards.length == 2)) {
-    result += ' The dealer has Blackjack.';
+    result += resources.strings.DEALER_BLACKJACK;
   } else {
-    result += ' The dealer had a total of ' + gameState.dealerHand.total + '.';
+    result += resources.strings.DEALER_TOTAL.replace('{0}', gameState.dealerHand.total);
   }
 
   return result;
@@ -487,22 +480,13 @@ function readDealerAction(gameState) {
 // Read the result of the game
 //
 function readGameResult(gameState) {
-  const outcomeMapping = ['blackjack', 'You win with a Natural Blackjack!',
-             'dealerblackjack', 'The dealer has Blackjack.',
-             'nodealerblackjack', 'The dealer doesn\'t have Blackjack.',
-             'win', 'You won!',
-             'loss', 'You lost.',
-             'push', 'It\'s a tie.',
-             'surrender', 'You surrendered.'];
   let i;
-  let index;
   let outcome = '';
 
   // If multiple hands, say so
   for (i = 0; i < gameState.playerHands.length; i++) {
     outcome += readHandNumber(gameState, i);
-    index = outcomeMapping.indexOf(gameState.playerHands[i].outcome);
-    outcome += (index > -1) ? outcomeMapping[index + 1] : '';
+    outcome += resources.mapOutcome(gameState.playerHands[i].outcome);
     outcome += ' ';
   }
 
@@ -513,21 +497,22 @@ function readGameResult(gameState) {
 /*
  * We will read the new card, the total, and the dealer up card
  */
-function readHit(gameState) {
+function readHit(gameState, locale) {
   const currentHand = gameState.playerHands[gameState.currentPlayerHand];
+  const cardText = resources.cardRanks(currentHand.cards[currentHand.cards.length - 1]);
   let result;
 
-  result = 'You got a ' + cardRanks[currentHand.cards[currentHand.cards.length - 1].rank];
   if (currentHand.total > 21) {
-    result += ' and busted. ';
+    result = resources.strings.PLAYER_HIT_BUSTED.replace('{0}', cardText);
   } else {
-    result += ' for a total of ' + (currentHand.soft ? 'soft ' : '') + currentHand.total + '.';
-    result += ' The dealer is showing a ' + cardRanks[gameState.dealerHand.cards[1].rank];
-    result += '.';
+    const resultFormat = ((currentHand.soft) ? resources.strings.PLAYER_HIT_NOTBUSTED_SOFT
+              : resources.strings.PLAYER_HIT_NOTBUSTED);
+    result = resultFormat.replace('{0}', cardText).replace('{1}', currentHand.total);
+    result += resources.strings.DEALER_SHOWING.replace('{0}', resources.cardRanks(gameState.dealerHand.cards[1]));
   }
 
   if (gameState.activePlayer != 'player') {
-    result += readDealerAction(gameState);
+    result += readDealerAction(gameState, locale);
     result += ' ' + readGameResult(gameState);
   }
 
@@ -537,19 +522,21 @@ function readHit(gameState) {
 //
 // We read the card that the player got, then the dealer's hand, action, and final outcome
 //
-function readDouble(gameState) {
+function readDouble(gameState, locale) {
   const currentHand = gameState.playerHands[gameState.currentPlayerHand];
+  const cardText = resources.cardRanks(currentHand.cards[currentHand.cards.length - 1]);
   let result;
 
-  result = 'You got a ' + cardRanks[currentHand.cards[currentHand.cards.length - 1].rank];
   if (currentHand.total > 21) {
-    result += ' and busted.';
+    result = resources.strings.PLAYER_HIT_BUSTED.replace('{0}', cardText);
   } else {
-    result += ' for a total of ' + (currentHand.soft ? 'soft ' : '') + currentHand.total + '. ';
+    const resultFormat = ((currentHand.soft) ? resources.strings.PLAYER_HIT_NOTBUSTED_SOFT
+              : resources.strings.PLAYER_HIT_NOTBUSTED);
+    result = resultFormat.replace('{0}', cardText).replace('{1}', currentHand.total);
   }
 
   if (gameState.activePlayer != 'player') {
-    result += readDealerAction(gameState);
+    result += readDealerAction(gameState, locale);
     result += ' ' + readGameResult(gameState);
   }
 
@@ -559,15 +546,15 @@ function readDouble(gameState) {
 //
 // We will read the dealer's hand, action, and what the final outcome was
 //
-function readStand(gameState) {
+function readStand(gameState, locale) {
   let result;
 
   // If they are still playing, then read the next hand, otherwise read
   // the dealer action
   if (gameState.activePlayer == 'player') {
-    result = readHand(gameState);
+    result = readHand(gameState, locale);
   } else {
-    result = readDealerAction(gameState);
+    result = readDealerAction(gameState, locale);
     result += ' ' + readGameResult(gameState);
   }
 
@@ -577,18 +564,18 @@ function readStand(gameState) {
 //
 // You split, so now let's read the result
 //
-function readSplit(gameState) {
-  let result = 'You split ';
+function readSplit(gameState, locale) {
+  let result;
+  const pairCard = gameState.playerHands[gameState.currentPlayerHand].cards[0];
 
-  if (gameState.playerHands[gameState.currentPlayerHand].cards[0].rank >= 10) {
-    result += 'tens';
+  if (pairCard.rank >= 10) {
+    result = resources.strings.SPLIT_TENS;
   } else {
-    result += 'a pair of ' + cardRanks[gameState.playerHands[gameState.currentPlayerHand].cards[0].rank] + 's';
+    result = resources.strings.SPLIT_PAIR.replace('{0}', resources.pluralCardRanks(pairCard));
   }
-  result += '. ';
 
   // Now read the current hand
-  result += readHand(gameState);
+  result += readHand(gameState, locale);
 
   return result;
 }
@@ -596,11 +583,11 @@ function readSplit(gameState) {
 /*
  * You surrendered, so the game is over
  */
-function readSurrender(gameState) {
-  let result = 'You surrendered. ';
+function readSurrender(gameState, locale) {
+  let result = resources.strings.SURRENDER_RESULT;
 
   // Rub it in by saying what the dealer had
-  result += readDealerAction(gameState);
+  result += readDealerAction(gameState, locale);
 
   return result;
 }
@@ -609,17 +596,17 @@ function readSurrender(gameState) {
  * Say whether the dealer had blackjack - if not, reiterate the current hand,
  * if so then we're done and let them know to bet
  */
-function readInsurance(gameState) {
-  let result = '';
+function readInsurance(gameState, locale) {
+  let result;
 
   if (gameState.dealerHand.outcome == 'dealerblackjack') {
     // Game over
-    result += 'The dealer had a blackjack. ';
+    result = resources.strings.DEALER_HAD_BLACKJACK;
     result += readGameResult(gameState);
   } else if (gameState.dealerHand.outcome == 'nodealerblackjack') {
     // No blackjack - so what do you want to do now?
-    result += 'The dealer didn\'t have a blackjack. ';
-    result += readHand(gameState);
+    result = resources.strings.DEALER_NO_BLACKJACK;
+    result += readHand(gameState, locale);
   }
 
   return result;
@@ -628,8 +615,9 @@ function readInsurance(gameState) {
 /*
  * Reads the state of the hand - your cards and total, and the dealer up card
  */
-function readHand(gameState) {
+function readHand(gameState, locale) {
   let result = '';
+  let resultFormat;
 
   // It's possible there is no hand
   if (gameState.playerHands.length == 0) {
@@ -643,31 +631,43 @@ function readHand(gameState) {
 
   // If they have more than one hand, then say the hand number
   result += readHandNumber(gameState, gameState.currentPlayerHand);
+  const readCards = utils.and(currentHand.cards.map((x) => resources.cardRanks(x)),
+                        {locale: locale});
 
   // Read the full hand
   if (currentHand.total > 21) {
-    result += 'You busted with ';
-  } else {
+    resultFormat = (currentHand.soft) ? resources.strings.READHAND_PLAYER_BUSTED_SOFT
+            : resources.strings.READHAND_PLAYER_BUSTED;
+    result += resultFormat.replace('{0}', readCards).replace('{1}', currentHand.total);
+  } else if (gameState.activePlayer == 'none') {
     // If no active player, use past tense
-    result += (gameState.activePlayer == 'none') ? 'You had ' : 'You have ';
-  }
-  result += utils.and(currentHand.cards.map((x) => cardRanks[x.rank]));
-
-  // If this is a blackjack (two-card 21 with only one hand), then say it
-  if ((gameState.playerHands.length == 1) && (currentHand.cards.length == 2)
-    && (currentHand.total == 21)) {
-    result += ' for a blackjack';
+    if ((gameState.playerHands.length == 1) && (currentHand.cards.length == 2)
+      && (currentHand.total == 21)) {
+      result += resources.strings.READHAND_PLAYER_TOTAL_END_BLACKJACK.replace('{0}', readCards);
+    } else {
+      resultFormat = (currentHand.soft) ? resources.strings.READHAND_PLAYER_TOTAL_END_SOFT
+                  : resources.strings.READHAND_PLAYER_TOTAL_END;
+      result += resultFormat.replace('{0}', readCards).replace('{1}', currentHand.total);
+    }
   } else {
-    result += ' for a total of ' + (currentHand.soft ? 'soft ' : '') + currentHand.total;
+    if ((gameState.playerHands.length == 1) && (currentHand.cards.length == 2)
+      && (currentHand.total == 21)) {
+      result += resources.strings.READHAND_PLAYER_TOTAL_ACTIVE_BLACKJACK.replace('{0}', readCards);
+    } else {
+      resultFormat = (currentHand.soft) ? resources.strings.READHAND_PLAYER_TOTAL_ACTIVE_SOFT
+                  : resources.strings.READHAND_PLAYER_TOTAL_ACTIVE;
+      result += resultFormat.replace('{0}', readCards).replace('{1}', currentHand.total);
+    }
   }
 
-  result += '. The dealer ';
+  const dealerCardText = resources.cardRanks(gameState.dealerHand.cards[1]);
+
   if (gameState.activePlayer == 'none') {
     // Game over, so read the whole dealer hand
-    result += 'had a ' + cardRanks[gameState.dealerHand.cards[1].rank] + ' showing. ';
-    result += readDealerAction(gameState);
+    result += resources.strings.READHAND_DEALER_DONE.replace('{0}', dealerCardText);
+    result += readDealerAction(gameState, locale);
   } else {
-    result += 'has a ' + cardRanks[gameState.dealerHand.cards[1].rank] + ' showing.';
+    result += resources.strings.READHAND_DEALER_ACTIVE.replace('{0}', dealerCardText);
   }
 
   return result;
@@ -678,10 +678,9 @@ function readHand(gameState) {
 //
 function readHandNumber(gameState, handNumber) {
   let result = '';
-  const mapping = ['First hand ', 'Second hand ', 'Third hand ', 'Fourth hand '];
 
   if (gameState.playerHands.length > 1) {
-    result = mapping[handNumber];
+    result = resources.mapHandNumber(handNumber);
   }
 
   return result;
@@ -694,58 +693,56 @@ function rulesToText(locale, rules, changeRules) {
   // As that would be the elements that changed
   // Say the decks and betting range
   if (!changeRules || changeRules.hasOwnProperty('numberOfDecks')) {
-    text += rules.numberOfDecks + ' deck game. ';
+    text += resources.strings.RULES_DECKS.replace('{0}', rules.numberOfDecks);
   }
   if (!changeRules || changeRules.hasOwnProperty('minBet') || changeRules.hasOwnProperty('maxBet')) {
-    text += 'Bet from ' + utils.formatCurrency(rules.minBet, locale) + ' to ' + utils.formatCurrency(rules.maxBet, locale) + '. ';
+    text += resources.strings.RULES_BET_RANGE.replace('{0}', rules.minBet).replace('{1}', rules.maxBet);
   }
 
   // Hit or stand on soft 17
   if (!changeRules || changeRules.hasOwnProperty('hitSoft17')) {
-    text += 'Dealer ' + (rules.hitSoft17 ? 'hits' : 'stands') + ' on soft 17. ';
+    text += (rules.hitSoft17 ? resources.strings.RULES_HIT_SOFT17
+                : resources.strings.RULES_STAND_SOFT17);
   }
 
   // Double rules
   if (!changeRules || changeRules.hasOwnProperty('double') || changeRules.hasOwnProperty('doubleaftersplit')) {
-    const doubleMapping = ['any', 'on any cards',
-                          '10or11', 'on 10 or 11 only',
-                          '9or10o11', 'on 9 thru 11 only',
-                          'none', 'not allowed'];
-    const iDouble = doubleMapping.indexOf(rules.double);
-    if (iDouble > -1) {
-      text += 'Double down ' + doubleMapping[iDouble + 1] + '. ';
+    const doubleRule = resources.mapDouble(rules.double);
+    if (doubleRule) {
+      text += resources.strings.RULES_DOUBLE.replace('{0}', doubleRule);
       if (rules.double != 'none') {
-        text += 'Double after split ' + (rules.doubleaftersplit ? 'allowed. ' : 'not allowed. ');
+        text += (rules.doubleaftersplit) ? resources.strings.RULES_DAS_ALLOWED
+                : resources.strings.RULES_DAS_NOT_ALLOWED;
       }
     }
   }
 
   // Splitting (only metion if you can resplit aces 'cuz that's uncommon)
   if (!changeRules || changeRules.hasOwnProperty('resplitAces')) {
-    if (rules.resplitAces) {
-      text += 'Can resplit Aces. ';
+    if (rules.resplitAces && (rules.maxSplitHands > 1)) {
+      text += resources.strings.RULES_RESPLIT_ACES;
+    }
+  }
+
+  // Number of split hands allowed
+  if (!changeRules || changeRules.hasOwnProperty('maxSplitHands')) {
+    if (rules.maxSplitHands > 1) {
+      text += resources.strings.RULES_NUMBER_OF_SPLITS.replace('{0}', rules.maxSplitHands);
+    } else {
+      text += resources.strings.RULES_SPLIT_NOT_ALLOWED;
     }
   }
 
   // Surrender rules
   if (!changeRules || changeRules.hasOwnProperty('surrender')) {
-    const surrenderMapping = ['none', 'Surrender not offered. ',
-                          'early', 'Surrender allowed. ',
-                          'late', 'Surrender allowed. '];
-    const iSurrender = surrenderMapping.indexOf(rules.surrender);
-    if (iSurrender > -1) {
-      text += surrenderMapping[iSurrender + 1];
-    }
+    text += ((rules.surrender == 'none') ? resources.strings.RULES_NO_SURRENDER : resources.strings.RULES_SURRENDER_OFFERED);
   }
 
   if (!changeRules || changeRules.hasOwnProperty('blackjackBonus')) {
     // Blackjack payout
-    const blackjackPayout = ['0.5', '3 to 2. ',
-                         '0.2', '6 to 5. ',
-                         '0', 'even money. '];
-    const iBlackjack = blackjackPayout.indexOf(rules.blackjackBonus.toString());
-    if (iBlackjack > -1) {
-      text += 'Blackjack pays ' + blackjackPayout[iBlackjack + 1];
+    const payoutText = resources.mapBlackjackPayout(rules.blackjackBonus.toString());
+    if (payoutText) {
+      text += resources.strings.RULES_BLACKJACK.replace('{0}', payoutText);
     }
   }
 

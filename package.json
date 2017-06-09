@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "alexa-sdk": "^1.0.9",
-    "alexa-speech-utils": "0.0.2",
+    "alexa-speech-utils": "~0.0.4",
     "requestify": "^0.2.5"
   },
   "devDependencies": {

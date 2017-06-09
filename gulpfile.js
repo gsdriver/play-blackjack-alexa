@@ -11,13 +11,13 @@ const del = require('del');
 
 gulp.task('build:prepare', ['clean'], () =>
   // copy only what we need for deployment
-  gulp.src(['**/*', '!build/**', '!.git', '!.git/**', '!package.json', '!README.md', '!speechAssets', '!speechAssets/**', '!.gitignore', '!.idea', '!.idea/**', '!*.zip'], {dot: true})
+  gulp.src(['**/*', '!build/**', '!.git', '!.git/**', '!analyze', '!analyze/**', '!package.json', '!README.md', '!speechAssets', '!speechAssets/**', '!.gitignore', '!.idea', '!.idea/**', '!*.zip'], {dot: true})
     .pipe(gulp.dest('build/'))
 );
 
 // task to run es lint.
 gulp.task('lint', () =>
-  gulp.src(['*.js', '*/**/*.js', '!test/**', '!build/**', '!node_modules/**', '!ext/**'])
+  gulp.src(['*.js', '*/**/*.js', '!test/**', '!build/**', '!node_modules/**', '!analyze/**', '!ext/**'])
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.format(reporter, (results) => {
