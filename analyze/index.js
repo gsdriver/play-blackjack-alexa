@@ -33,7 +33,16 @@ function getEntriesFromDB(callback) {
            if (data.Items[i].mapAttr.M.adStamp) {
              entry.adplayed = true;
              entry.adplayedDate = new Date(parseInt(data.Items[i].mapAttr.M.adStamp.N));
+           } else if (data.Items[i].mapAttr.M.adsPlayed) {
+             const ads = data.Items[i].mapAttr.M.adsPlayed.M;
+             let ad;
+
+             entry.adsPlayed = {};
+             for (ad in ads) {
+               entry.adsPlayed[ad] = true;
+             }
            }
+
            results.push(entry);
          }
        }
@@ -55,60 +64,133 @@ function getEntriesFromDB(callback) {
 function getRouletteData(callback) {
   const american = {high: 0, spins: 0, players: 0};
   const european = {high: 0, spins: 0, players: 0};
+  const tournament = {high: 0, spins: 0, players: 0};
   let spins;
+  let oldFormat = 0;
+  let adsPlayed = {};
 
   // Loop thru to read in all items from the DB
   (function loop(firstRun, startKey) {
-   const params = {TableName: 'RouletteWheel'};
+    const params = {TableName: 'RouletteWheel'};
 
-   if (firstRun || startKey) {
-     params.ExclusiveStartKey = startKey;
+    if (firstRun || startKey) {
+      params.ExclusiveStartKey = startKey;
 
-     const scanPromise = dynamodb.scan(params).promise();
-     return scanPromise.then((data) => {
-       // OK, let's see where you rank among American and European players
-       let i;
+      const scanPromise = dynamodb.scan(params).promise();
+      return scanPromise.then((data) => {
+        // OK, let's see where you rank among American and European players
+        let i;
 
-       for (i = 0; i < data.Items.length; i++) {
-         if (data.Items[i].mapAttr && data.Items[i].mapAttr.M
-           && data.Items[i].mapAttr.M.highScore
-           && data.Items[i].mapAttr.M.highScore.M) {
-          // Only counts if they spinned
-          const score = data.Items[i].mapAttr.M.highScore.M;
-          if (score.spinsAmerican && score.spinsAmerican.N) {
-            spins = parseInt(score.spinsAmerican.N);
-            american.spins += spins;
-            if (spins) {
-              american.players++;
-            }
-            if (parseInt(score.highAmerican.N) > american.high) {
-              american.high = parseInt(score.highAmerican.N);
-            }
-          }
+        for (i = 0; i < data.Items.length; i++) {
+          // Any ads played?
+          if (data.Items[i].mapAttr && data.Items[i].mapAttr.M
+                   && data.Items[i].mapAttr.M.adsPlayed
+                   && data.Items[i].mapAttr.M.adsPlayed.M) {
+            const ads = data.Items[i].mapAttr.M.adsPlayed.M;
+            let ad;
 
-          if (score.spinsEuropean && score.spinsEuropean.N) {
-            spins = parseInt(score.spinsEuropean.N);
-            european.spins += spins;
-            if (spins) {
-              european.players++;
-            }
-            if (parseInt(score.highEuropean.N) > european.high) {
-              european.high = parseInt(score.highEuropean.N);
+            for (ad in ads) {
+              if (adsPlayed[ad]) {
+                adsPlayed[ad]++;
+              } else {
+                adsPlayed[ad] = 1;
+              }
             }
           }
-         }
-       }
 
-       if (data.LastEvaluatedKey) {
-         return loop(false, data.LastEvaluatedKey);
-       }
-     });
-   }
+          if (data.Items[i].mapAttr && data.Items[i].mapAttr.M) {
+            if (data.Items[i].mapAttr.M.highScore
+                 && data.Items[i].mapAttr.M.highScore.M) {
+              // This is the old format
+              oldFormat++;
+
+              // Only counts if they spinned
+              const score = data.Items[i].mapAttr.M.highScore.M;
+              if (score.spinsAmerican && score.spinsAmerican.N) {
+                spins = parseInt(score.spinsAmerican.N);
+                american.spins += spins;
+                if (spins) {
+                  american.players++;
+                }
+                if (parseInt(score.highAmerican.N) > american.high) {
+                  american.high = parseInt(score.highAmerican.N);
+                }
+              }
+
+              if (score.spinsEuropean && score.spinsEuropean.N) {
+                spins = parseInt(score.spinsEuropean.N);
+                european.spins += spins;
+                if (spins) {
+                  european.players++;
+                }
+                if (parseInt(score.highEuropean.N) > european.high) {
+                  european.high = parseInt(score.highEuropean.N);
+                }
+              }
+            } else {
+              let scoreData;
+
+              if (data.Items[i].mapAttr.M.american && data.Items[i].mapAttr.M.american.M) {
+                // This is the new format
+                scoreData = data.Items[i].mapAttr.M.american.M;
+
+                if (scoreData.spins && scoreData.spins.N) {
+                  spins = parseInt(scoreData.spins.N);
+                  american.spins += spins;
+                  if (spins) {
+                    american.players++;
+                  }
+                  if (parseInt(scoreData.high.N) > american.high) {
+                    american.high = parseInt(scoreData.high.N);
+                  }
+                }
+              }
+
+              if (data.Items[i].mapAttr.M.european && data.Items[i].mapAttr.M.european.M) {
+                // This is the new format
+                scoreData = data.Items[i].mapAttr.M.european.M;
+
+                if (scoreData.spins && scoreData.spins.N) {
+                  spins = parseInt(scoreData.spins.N);
+                  european.spins += spins;
+                  if (spins) {
+                    european.players++;
+                  }
+                  if (parseInt(scoreData.high.N) > european.high) {
+                    european.high = parseInt(scoreData.high.N);
+                  }
+                }
+              }
+
+              if (data.Items[i].mapAttr.M.tournament && data.Items[i].mapAttr.M.tournament.M) {
+                // This is the new format
+                scoreData = data.Items[i].mapAttr.M.tournament.M;
+
+                if (scoreData.spins && scoreData.spins.N) {
+                  spins = parseInt(scoreData.spins.N);
+                  tournament.spins += spins;
+                  if (spins) {
+                    tournament.players++;
+                  }
+                  if (parseInt(scoreData.high.N) > tournament.high) {
+                    tournament.high = parseInt(scoreData.high.N);
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        if (data.LastEvaluatedKey) {
+          return loop(false, data.LastEvaluatedKey);
+        }
+      });
+    }
   })(true, null).then(() => {
-    callback(null, american, european);
+    callback(null, oldFormat, adsPlayed, american, european, tournament);
   }).catch((err) => {
     console.log('Error scanning: ' + err);
-    callback(err, null, null);
+    callback(err, 0, null, null, null);
   });
 }
 
@@ -122,6 +204,7 @@ getEntriesFromDB((err, results) => {
     const players = {};
     let csvString = '';
     let ads = 0;
+    let newads = 0;
     let text;
 
     for (i = 0; i < results.length; i++) {
@@ -153,6 +236,14 @@ getEntriesFromDB((err, results) => {
 
         csvString += (',' + datestring);
       }
+
+      if (results[i].adsPlayed) {
+        let ad;
+        for (ad in results[i].adsPlayed) {
+          newads++;
+        }
+      }
+
       csvString += '\r\n';
     }
 
@@ -167,6 +258,7 @@ getEntriesFromDB((err, results) => {
     console.log(text);
 
     console.log(ads + ' people have heard your ad.');
+    console.log(newads + ' people have heard the new ads.');
 
     const fs = require('fs');
     fs.writeFile('summary.csv', csvString, (err) => {
@@ -175,11 +267,23 @@ getEntriesFromDB((err, results) => {
       }
     });
 
-    getRouletteData((err, american, european) => {
+    getRouletteData((err, oldFormat, adsPlayed, american, european, tournament) => {
       if (!err) {
         console.log('');
         console.log('On roulette, you have ' + american.players + ' people who have done ' + american.spins + ' total spins on an American wheel with a high score of ' + american.high + ' units.');
         console.log('On roulette, you have ' + european.players + ' people who have done ' + european.spins + ' total spins on a European wheel with a high score of ' + european.high + ' units.');
+        console.log('On roulette, you have ' + tournament.players + ' people who have done ' + tournament.spins + ' total spins in the tournament with a high score of ' + tournament.high + ' units.');
+        console.log('There are ' + oldFormat + ' people still using the old format.');
+        if (adsPlayed) {
+          let ad;
+
+          text += '\r\nAds played - \r\n';
+          for (ad in adsPlayed) {
+            if (ad) {
+              text += ('  ' + ad + ': ' + adsPlayed[ad] + '\r\n');
+            }
+          }
+        }
       }
     });
   }

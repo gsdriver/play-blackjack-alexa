@@ -6,6 +6,7 @@
 
 const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
+const ads = require('../ads');
 
 module.exports = {
   handleIntent: function() {
@@ -21,17 +22,11 @@ module.exports = {
         exitSpeech = res.strings.EXIT_BANKROLL.replace('{0}', gameState.bankroll) + ' ';
       }
 
-      // Ad if they haven't (ignore if NOADS environment variable is set)
-      if (!process.env.NOADS && !this.attributes['adStamp']) {
-        // Keep track of when we played the ad
-        this.attributes['adStamp'] = Date.now();
-        exitSpeech += res.strings.EXIT_AD;
-      }
-      exitSpeech += res.strings.EXIT_GOODBYE;
-
-      // Get ready to save
-      bjUtils.prepareToSave(this.attributes, this.event.request.locale);
-      this.emit(':tell', exitSpeech);
+      ads.getAd(this.attributes, 'blackjack', this.event.request.locale, (adText) => {
+        exitSpeech += (adText + ' ' + res.strings.EXIT_GOODBYE);
+        bjUtils.prepareToSave(this.attributes, this.event.request.locale);
+        this.emit(':tell', exitSpeech);
+      });
     });
   },
 };

@@ -29,7 +29,6 @@ const resources = {
   'FULL_RULES': 'Die vollständigen Regeln sind {0}',
   // From Exit.js
   'EXIT_BANKROLL': 'Verlassen Sie mit €{0}.',
-  'EXIT_AD': '',
   'EXIT_GOODBYE': 'Auf Wiedersehen.',
   // From Help.js
   'HELP_GENERIC_HELP': 'Sie können ein Spiel spielen, indem Sie sagen wetten, oder Sie können sagen Ausfahrt<break time=\'300ms\'/>Wie kann ich Ihnen helfen?',
