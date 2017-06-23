@@ -262,6 +262,18 @@ function getGameState(savedGameState, userID, callback) {
             gameState.currentPlayerHand = 0;
           }
 
+          // It's also possible that they had split the last hand AND on this new hand
+          // the dealer has a blackjack with a 10 showing, AND the player also has a blackjack.
+          // Same as above, but the game state will be slightly different
+
+          if (gameState.playerHands && (gameState.activePlayer == 'none')
+            && (gameState.dealerHand && (gameState.dealerHand.total == 21))
+            && (gameState.playerHands.length == 1) && (gameState.playerHands[0].outcome == 'push')
+            && (gameState.currentPlayerHand >= gameState.playerHands.length)) {
+            console.log('Fixing blackjack push after split bug');
+            gameState.currentPlayerHand = 0;
+          }
+
           callback(null, gameState);
         });
       } else {
