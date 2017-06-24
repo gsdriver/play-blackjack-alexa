@@ -145,7 +145,7 @@ exports.handler = function(event, context, callback) {
   AWS.config.update({region: 'us-east-1'});
 
   if (event) {
-    console.log(JSON.stringify(event.request));
+    console.log(JSON.stringify(event));
   }
 
   const alexa = Alexa.handler(event, context);
