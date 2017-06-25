@@ -31,7 +31,7 @@ function BuildEvent(argv)
         "user": {
           "userId": "not-amazon",
          },
-         "new": true
+         "new": false
        },
        "request": {
          "type": "IntentRequest",

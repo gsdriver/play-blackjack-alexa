@@ -19,6 +19,10 @@ const gameService = require('./GameService');
 const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
 
 const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
+  'NewSession': function() {
+    this.handler.state = '';
+    this.emitWithState('NewSession');
+  },
   'LaunchRequest': Reset.handleNoReset,
   'AMAZON.YesIntent': Reset.handleYesReset,
   'AMAZON.NoIntent': Reset.handleNoReset,
@@ -35,6 +39,10 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
 });
 
 const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
+  'NewSession': function() {
+    this.handler.state = '';
+    this.emitWithState('NewSession');
+  },
   'LaunchRequest': Launch.handleIntent,
   'BettingIntent': Betting.handleIntent,
   'ResetIntent': Reset.handleIntent,
@@ -57,6 +65,10 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
 });
 
 const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
+  'NewSession': function() {
+    this.handler.state = '';
+    this.emitWithState('NewSession');
+  },
   'LaunchRequest': Launch.handleIntent,
   'SuggestIntent': Suggest.handleIntent,
   'RulesIntent': Rules.handleIntent,
@@ -77,6 +89,10 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
 });
 
 const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
+  'NewSession': function() {
+    this.handler.state = '';
+    this.emitWithState('NewSession');
+  },
   'LaunchRequest': Launch.handleIntent,
   'BlackjackIntent': Blackjack.handleIntent,
   'SuggestIntent': Suggest.handleIntent,
@@ -102,7 +118,6 @@ const handlers = {
     if (!this.attributes['game']) {
       gameService.initializeGame(this.attributes);
     }
-
     this.emit('LaunchRequest');
   },
   // Some intents don't make sense for a new session - so just launch instead

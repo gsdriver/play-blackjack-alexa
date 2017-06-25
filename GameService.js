@@ -5,6 +5,8 @@
 
 const suggest = require('blackjack-strategy');
 
+const STARTING_BANKROLL = 5000;
+
 module.exports = {
   initializeGame: function(attributes, userID) {
     // NOTE: Here is where we would add a call to the service to
@@ -212,7 +214,7 @@ function getGameJSONResponse(game) {
   let i = 0;
   if ((game.activePlayer == 'player') && game.dealerHand.cards.length) {
     // Pop the 'empty card'
-    gameState.dealerHand.cards.push({'rank': 0, 'suit': 'none'});
+    gameState.dealerHand.cards.push({'rank': 0, 'suit': 'N'});
     i = 1;
   }
   for (; i < game.dealerHand.cards.length; i++) {
@@ -271,18 +273,12 @@ function shuffleDeck(game) {
   let rank;
 
   game.deck.cards = [];
-
+  const suits = ['C', 'D', 'H', 'S'];
   for (i = 0; i < game.rules.numberOfDecks; i++) {
     for (rank = 1; rank <= 13; rank++) {
-      const club = {'rank': rank, 'suit': 'clubs'};
-      const diamond = {'rank': rank, 'suit': 'diamonds'};
-      const hearts = {'rank': rank, 'suit': 'hearts'};
-      const spades = {'rank': rank, 'suit': 'spades'};
-
-      game.deck.cards.push(club);
-      game.deck.cards.push(diamond);
-      game.deck.cards.push(hearts);
-      game.deck.cards.push(spades);
+      suits.map((item) => {
+        game.deck.cards.push({'rank': rank, 'suit': item});
+      });
     }
   }
 

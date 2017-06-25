@@ -156,7 +156,7 @@ function sendUserCallback(attributes, error, response, speech, reprompt, callbac
   }
 
   // Nope, just do a regular callback
-  callback(error, speechResponse, speechQuestion, repromptQuestion);
+  callback(error, response, speech, reprompt);
 }
 
 /*
