@@ -4,7 +4,7 @@
 
 'use strict';
 
-const playgame = require('../PlayGame');
+const gameService = require('../GameService');
 
 module.exports = {
   handleIntent: function() {
@@ -16,15 +16,12 @@ module.exports = {
     this.emit(':ask', speech, speech);
   },
   handleYesReset: function() {
-    // Confirmed - let's reset
-    playgame.flushGame(this.event.session.user.userId, (error, result) => {
-      // I don't care if this succeeds or not
-      const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../' + this.event.request.locale + '/resources');
 
-      this.attributes['gameState'] = undefined;
-      this.handler.state = 'NEWGAME';
-      this.emit(':ask', res.strings.RESET_COMPLETED, res.strings.RESET_REPROMPT);
-    });
+    // Confirmed - let's reset
+    gameService.initializeGame(this.attributes);
+    this.handler.state = 'NEWGAME';
+    this.emit(':ask', res.strings.RESET_COMPLETED, res.strings.RESET_REPROMPT);
   },
   handleNoReset: function() {
     // Nope, they are not going to reset - so go back to start a new game

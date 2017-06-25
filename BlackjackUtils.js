@@ -46,7 +46,6 @@ module.exports = {
         attributes['numRounds'] = 1;
       }
       attributes['firsthand'] = undefined;
-      attributes['gameState'] = undefined;
     }
   },
 };

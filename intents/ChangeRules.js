@@ -27,16 +27,13 @@ module.exports = {
       if (!rules) {
         ruleError = res.strings.CHANGERULES_CANT_CHANGE_RULE.replace('{0}', changeSlot.value).replace('{1}', optionSlot.value);
       } else {
-        playgame.changeRules(this.event.request.locale,
-          this.event.session.user.userId, rules,
-          (error, response, speech, reprompt, gameState) => {
+        playgame.changeRules(this.attributes,
+          this.event.request.locale, rules,
+          (error, response, speech, reprompt) => {
           // Now get the full set of rules for the card
-          this.attributes['gameState'] = gameState;
           if (!error) {
-            playgame.readRules(this.attributes['gameState'],
-              this.event.request.locale,
-              this.event.session.user.userId,
-              (readError, readResponse, readSpeech, readPrompt, newGameState) => {
+            playgame.readRules(this.attributes, this.event.request.locale,
+                      (readSpeech, readPrompt) => {
               let cardText = '';
 
               if (readSpeech) {
@@ -58,10 +55,7 @@ module.exports = {
       let cardText = '';
 
       // Prepare card text with a full set of rules that can be changed
-      playgame.readRules(this.attributes['gameState'],
-        this.event.request.locale,
-        this.event.session.user.userId,
-        (error, response, speech, reprompt, gameState) => {
+      playgame.readRules(this.attributes, this.event.request.locale, (speech, reprompt) => {
         if (speech) {
           cardText = res.strings.FULL_RULES.replace('{0}', speech);
           cardText += '\n';

@@ -1,192 +1,137 @@
 //
-// Handles core playing of the game and interaction with back-end service
+// Handles translation of core playing of the game into speech output
 //
 
 'use strict';
 
-const http = require('http');
-const requestify = require('requestify');
 const utils = require('alexa-speech-utils')();
-const stubbedGame = require('./StubbedGame');
+const gameService = require('./GameService');
 
-const testUser = 'stubbed';
 let resources;
 
 module.exports = {
   // Plays a given action, returning either an error or a response string
-  playBlackjackAction: function(savedGameState, locale, userID, action, callback) {
+  playBlackjackAction: function(attributes, locale, userID, action, callback) {
     // Special case if this is suggest
     resources = require('./' + locale + '/resources');
 
     if (action.action == 'suggest') {
-      postUserAction(locale, userID, action.action, 0, (error, suggestion) => {
-        const speechError = (suggestion.error) ? suggestion.error : error;
-        let suggestText = suggestion.suggestion;
+      let speech;
+      const suggestText = gameService.getRecommendedAction(attributes.game);
 
-        if (suggestText) {
-          // Special case if it wasn't your turn
-          if (suggestText == 'notplayerturn') {
-            suggestText = resources.strings.SUGGEST_TURNOVER;
-          } else {
-            if (resources.mapActionToSuggestion(suggestText)) {
-              const youShould = resources.strings.SUGGEST_OPTIONS.split('|');
-              const prefix = youShould[Math.floor(Math.random() * youShould.length)];
+      if (suggestText === 'notplayerturn') {
+        speech = resource.strings.SUGGEST_TURNOVER;
+      } else if (resources.mapActionToSuggestion(suggestText)) {
+        const youShould = resources.strings.SUGGEST_OPTIONS.split('|');
+        const prefix = youShould[Math.floor(Math.random() * youShould.length)];
 
-              suggestText = prefix.replace('{0}', resources.mapActionToSuggestion(suggestText));
-            }
-          }
-        }
+        speech = prefix.replace('{0}', resources.mapActionToSuggestion(suggestText));
+      } else {
+        speech = suggestText;
+      }
 
-        getGameState(savedGameState, userID, (err, gameState) => {
-          const reprompt = (gameState) ? listValidActions(gameState, locale, 'full') : resources.ERROR_REPROMPT;
-          suggestText += ('. ' + reprompt);
-          callback(speechError, null, suggestText, reprompt, null);
-        });
-      });
+      const reprompt = listValidActions(attributes.gameState, locale, 'full');
+      speech += ('. ' + reprompt);
+      callback(null, null, speech, reprompt, null);
     } else {
       // Get the game state so we can take action (the latest should be stored tied to this user ID)
       let speechError = null;
       let speechQuestion = '';
       let repromptQuestion = null;
 
-      getGameState(savedGameState, userID, (error, gameState) => {
-        if (error) {
-          speechError = resources.strings.REPORT_ERROR.replace('{0}', error);
-          callback(speechError, null, null);
-          return;
+      // Is this a valid option?
+      if (!attributes.gameState.possibleActions
+            || (attributes.gameState.possibleActions.indexOf(action.action) < 0)) {
+        // Probably need a way to read out the game state better
+        speechError = resources.strings.INVALID_ACTION.replace('{0}', action.action);
+        speechError += readHand(attributes.gameState, locale);
+        speechError += ' ' + listValidActions(attributes.gameState, locale, 'full');
+        sendUserCallback(attributes, speechError, null, null, null, callback);
+      } else {
+        // OK, let's post this action and get a new game state
+        const betAmount = (action.amount ? action.amount : attributes.gameState.lastBet);
+        const oldGameState = attributes.gameState;
+
+        speechError = gameService.userAction(attributes, action.action, betAmount);
+        if (!speechError) {
+          // Special case - give a full read-out if this is a natural blackjack
+          const playerBlackjack = ((attributes.gameState.playerHands.length == 1)
+            && (attributes.gameState.activePlayer == 'player')
+            && (attributes.gameState.playerHands[0].cards.length == 2)
+            && (attributes.gameState.playerHands[0].total == 21));
+
+          // If this was the first hand, or they specified a value, tell them how much they bet
+          if ((action.action === 'bet') && (action.firsthand || (action.amount > 0))) {
+            speechQuestion += resources.strings.YOU_BET_TEXT.replace('{0}', betAmount);
+          }
+
+          // Pose this as a question whether it's the player or dealer's turn
+          repromptQuestion = listValidActions(attributes.gameState, locale, 'full');
+          speechQuestion += (tellResult(attributes, locale, action.action, oldGameState) + ' '
+            + listValidActions(attributes.gameState, locale, (playerBlackjack) ? 'full' : 'summary'));
         }
 
-        // Is this a valid option?
-        if (!gameState.possibleActions || (gameState.possibleActions.indexOf(action.action) < 0)) {
-          // Probably need a way to read out the game state better
-          speechError = resources.strings.INVALID_ACTION.replace('{0}', action.action);
-          speechError += readHand(gameState, locale);
-          speechError += ' ' + listValidActions(gameState, locale, 'full');
-          sendUserCallback(locale, gameState, speechError, null, null, null, callback);
-        } else {
-          // OK, let's post this action and get a new game state
-          const betAmount = (action.amount ? action.amount : gameState.lastBet);
-
-          postUserAction(locale, gameState.userID, action.action,
-            betAmount, (error, newGameState) => {
-            if (error) {
-              speechError = error;
-            } else {
-              // Special case - give a full read-out if this is a natural blackjack
-              const playerBlackjack = ((newGameState.playerHands.length == 1)
-                && (newGameState.activePlayer == 'player')
-                && (newGameState.playerHands[0].cards.length == 2)
-                && (newGameState.playerHands[0].total == 21));
-
-              // If this was the first hand, or they specified a value, tell them how much they bet
-              if ((action.action === 'bet') && (action.firsthand || (action.amount > 0))) {
-                speechQuestion += resources.strings.YOU_BET_TEXT.replace('{0}', betAmount);
-              }
-
-              // Pose this as a question whether it's the player or dealer's turn
-              repromptQuestion = listValidActions(newGameState, locale, 'full');
-              speechQuestion += (tellResult(locale, action.action, gameState, newGameState)
-                + ' ' + listValidActions(newGameState, locale,
-                  (playerBlackjack) ? 'full' : 'summary'));
-            }
-
-            sendUserCallback(locale, newGameState, speechError, null,
-              speechQuestion, repromptQuestion, callback);
-          });
-        }
-      });
+        sendUserCallback(attributes, speechError, null, speechQuestion, repromptQuestion, callback);
+      }
     }
   },
   // Reads back the rules in play
-  readRules: function(savedGameState, locale, userID, callback) {
+  readRules: function(attributes, locale, callback) {
     resources = require('./' + locale + '/resources');
+    const reprompt = listValidActions(attributes.gameState, locale, 'full');
+    const speech = rulesToText(locale, attributes.gameState.houseRules) + reprompt;
 
-    // Get the game state so we can take action (the latest should be stored tied to this user ID)
-    getGameState(savedGameState, userID, (error, gameState) => {
-      if (error) {
-        const speechError = resources.strings.REPORT_ERROR.replace('{0}', error);
-        callback(speechError, null, null, null, null);
-        return;
-      }
-
-      // Convert the rules to text
-      const reprompt = listValidActions(gameState, locale, 'full');
-      const speech = rulesToText(locale, gameState.houseRules) + reprompt;
-
-      callback(null, null, speech, reprompt, gameState);
-    });
-  },
-  // Flushes the current user from our store, which resets everything to the beginning state
-  flushGame: function(userID, callback) {
-    flushGameState(userID, (error, result) => {
-      // Just call back
-      callback(error, result);
-    });
+    callback(speech, reprompt);
   },
   // Reads back the current hand and game state
-  readCurrentHand: function(savedGameState, locale, userID, callback) {
+  readCurrentHand: function(attributes, locale, callback) {
     resources = require('./' + locale + '/resources');
+    const reprompt = listValidActions(attributes.gameState, locale, 'full');
+    const speech = resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', attributes.gameState.bankroll)
+              + readHand(attributes.gameState, locale) + ' ' + reprompt;
 
-    getGameState(savedGameState, userID, (error, gameState) => {
-      if (error) {
-        callback(error, null, null);
-      } else {
-        let speechQuestion = null;
-        let repromptQuestion = null;
-
-        repromptQuestion = listValidActions(gameState, locale, 'full');
-        speechQuestion = resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', gameState.bankroll) + readHand(gameState, locale) + ' ' + repromptQuestion;
-        callback(null, null, speechQuestion, repromptQuestion, gameState);
-      }
-    });
+    callback(speech, reprompt);
   },
   // Gets contextual help based on the current state of the game
-  getContextualHelp: function(savedGameState, locale, userID, callback) {
+  getContextualHelp: function(attributes, locale, userID, callback) {
     resources = require('./' + locale + '/resources');
-    getGameState(savedGameState, userID, (error, gameState) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        let result = '';
+    let result = '';
 
-        if (gameState.possibleActions) {
-          // Special case - if there is insurance and noinsurance in the list, then pose as a yes/no
-          if (gameState.possibleActions.indexOf('noinsurance') > -1) {
-            // It's possible you can't take insurance because you don't have enough money
-            if (gameState.possibleActions.indexOf('insurance') > -1) {
-              result = resources.strings.HELP_TAKE_INSURANCE;
-            } else {
-              result = resources.strings.HELP_INSURANCE_INSUFFICIENT_BANKROLL;
-            }
-          } else {
-            result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}',
-              utils.or(gameState.possibleActions.map((x) => resources.mapPlayOption(x)),
-              {locale: locale}));
-          }
+    if (attributes.gameState.possibleActions) {
+      // Special case - if there is insurance and noinsurance in the list, then pose as a yes/no
+      if (attributes.gameState.possibleActions.indexOf('noinsurance') > -1) {
+        // It's possible you can't take insurance because you don't have enough money
+        if (attributes.gameState.possibleActions.indexOf('insurance') > -1) {
+          result = resources.strings.HELP_TAKE_INSURANCE;
+        } else {
+          result = resources.strings.HELP_INSURANCE_INSUFFICIENT_BANKROLL;
         }
-
-        result += resources.strings.HELP_MORE_OPTIONS;
-        callback(null, result);
+      } else {
+        result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}',
+          utils.or(attributes.gameState.possibleActions.map((x) => resources.mapPlayOption(x)),
+          {locale: locale}));
       }
-    });
+    }
+
+    result += resources.strings.HELP_MORE_OPTIONS;
+    return result;
   },
   // Changes the rules in play
-  changeRules: function(locale, userID, rules, callback) {
+  changeRules: function(attributes, locale, rules, callback) {
     resources = require('./' + locale + '/resources');
     let speech = resources.strings.INTERNAL_ERROR;
 
     // OK, let's post the rule change and get a new game state
-    postUserAction(locale, userID, 'setrules', rules, (error, newGameState) => {
-      if (!error) {
-        // Read the new rules
-        speech = rulesToText(locale, newGameState.houseRules, rules);
-      }
+    const error = gameService.userAction(attributes, 'setrules', rules);
+    if (!error) {
+      // Read the new rules
+      speech = rulesToText(locale, attributes.gameState.houseRules, rules);
+    }
 
-      // If this is shuffle, we'll do the shuffle for them
-      const reprompt = resources.strings.CHANGERULES_REPROMPT;
-      speech += resources.strings.CHANGERULES_CHECKAPP;
-      sendUserCallback(locale, newGameState, error, null, speech, reprompt, callback);
-    });
+    // If this is shuffle, we'll do the shuffle for them
+    const reprompt = resources.strings.CHANGERULES_REPROMPT;
+    speech += resources.strings.CHANGERULES_CHECKAPP;
+    sendUserCallback(attributes, error, null, speech, reprompt, callback);
   },
 };
 
@@ -194,173 +139,29 @@ module.exports = {
 // It's possible the game gets to a state where you have to reset the bankroll
 // or shuffle the deck.  Let's do that automatically for the user
 //
-function sendUserCallback(locale, gameState, error, speechResponse,
-        speechQuestion, repromptQuestion, callback) {
+function sendUserCallback(attributes, error, response, speech, reprompt, callback) {
   // If this is shuffle, we'll do the shuffle for them
-  if (gameState && gameState.possibleActions) {
-    if (gameState.possibleActions.indexOf('shuffle') > -1) {
+  if (attributes.gameState && attributes.gameState.possibleActions) {
+    if (attributes.gameState.possibleActions.indexOf('shuffle') > -1) {
       // Simplify things and just shuffle for them
-      postUserAction(locale, gameState.userID, 'shuffle', 0, (nextError, nextGameState) => {
-        callback(error, speechResponse, speechQuestion, repromptQuestion, nextGameState);
-      });
+      gameService.userAction(attributes, 'shuffle', 0);
+      callback(error, response, speech, reprompt);
       return;
-    } else if (gameState.possibleActions.indexOf('resetbankroll') > -1) {
+    } else if (attributes.gameState.possibleActions.indexOf('resetbankroll') > -1) {
       // Simplify things and just shuffle for them if this is resetbankroll
-      postUserAction(locale, gameState.userID, 'resetbankroll', 0, (nextError, nextGameState) => {
-        callback(error, speechResponse, speechQuestion, repromptQuestion, nextGameState);
-      });
+      gameService.userAction(attributes, 'resetbankroll', 0);
+      callback(error, response, speech, reprompt);
       return;
     }
   }
 
   // Nope, just do a regular callback
-  callback(error, speechResponse, speechQuestion, repromptQuestion, gameState);
+  callback(error, speechResponse, speechQuestion, repromptQuestion);
 }
 
 /*
  * Internal functions
  */
-function getGameState(savedGameState, userID, callback) {
-  if (userID == testUser) {
-    return stubbedGame.getGameState(callback);
-  }
-
-  // If they have a saved game state, just return that
-  if (savedGameState) {
-    callback(null, savedGameState);
-  } else {
-    const startTime = new Date().getTime();
-    let endTime;
-    const queryString = 'get?userID=' + userID;
-
-    http.get(process.env.SERVICEURL + queryString, (res) => {
-      if (res.statusCode == 200) {
-        // Great, we should have a game!
-        let fulltext = '';
-
-        res.on('data', (data) => {
-          fulltext += data;
-        });
-
-        res.on('end', () => {
-          const gameState = JSON.parse(fulltext);
-
-          endTime = new Date().getTime();
-          console.log('Elapsed time to call getGameState: ' + (endTime - startTime) + ' ms');
-
-          // There is a bug in the response from the server IF the player had split the last hand
-          // AND on this new hand the dealer has a blackjack with a 10 showing.  In that case, this
-          // hand is over however currentHand was not reset to 0, so the player has only one hand
-          // but we think they're on the second hand.  We will blow up if we don't correct this
-          // Ideal fix is in the blackjack server, but this is a workaround the lambda function
-          // can make to let the game continue
-
-          if (gameState.playerHands && (gameState.activePlayer == 'none')
-            && (gameState.dealerHand && (gameState.dealerHand.outcome == 'dealerblackjack'))
-            && (gameState.currentPlayerHand >= gameState.playerHands.length)) {
-            console.log('Fixing dealerblackjack after split bug');
-            gameState.currentPlayerHand = 0;
-          }
-
-          // It's also possible that they had split the last hand AND on this new hand
-          // the dealer has a blackjack with a 10 showing, AND the player also has a blackjack.
-          // Same as above, but the game state will be slightly different
-
-          if (gameState.playerHands && (gameState.activePlayer == 'none')
-            && (gameState.dealerHand && (gameState.dealerHand.total == 21))
-            && (gameState.playerHands.length == 1) && (gameState.playerHands[0].outcome == 'push')
-            && (gameState.currentPlayerHand >= gameState.playerHands.length)) {
-            console.log('Fixing blackjack push after split bug');
-            gameState.currentPlayerHand = 0;
-          }
-
-          callback(null, gameState);
-        });
-      } else {
-        // Sorry, there was an error calling the HTTP endpoint
-        console.log('GetGameState response error: ' + res.statusCode);
-        endTime = new Date().getTime();
-        console.log('Elapsed time to call getGameState: ' + (endTime - startTime) + ' ms');
-        callback('Unable to call endpoint', null);
-      }
-    }).on('error', (e) => {
-      console.log('GetGameState Communications error: ' + e.message);
-      endTime = new Date().getTime();
-      console.log('Elapsed time to call getGameState: ' + (endTime - startTime) + ' ms');
-      callback('Communications error: ' + e.message, null);
-    });
-  }
-}
-
-function flushGameState(userID, callback) {
-  if (userID == testUser) {
-    return stubbedGame.flushGameState(callback);
-  }
-
-  const queryString = 'flushcache?userID=' + userID;
-  const startTime = new Date().getTime();
-  let endTime;
-
-  http.get(process.env.SERVICEURL + queryString, (res) => {
-    if (res.statusCode == 200) {
-      // Great, I don't really care what the response is
-      endTime = new Date().getTime();
-      console.log('Elapsed time to call flushGameState: ' + (endTime - startTime) + ' ms');
-      callback(null, 'OK');
-    } else {
-      // Sorry, there was an error calling the HTTP endpoint
-      console.log('flushGameState response error: ' + res.statusCode);
-      endTime = new Date().getTime();
-      console.log('Elapsed time to call flushGameState: ' + (endTime - startTime) + ' ms');
-      callback('Unable to call endpoint', null);
-    }
-  }).on('error', (e) => {
-    console.log('flushGameState Communications error: ' + e.message);
-    endTime = new Date().getTime();
-    console.log('Elapsed time to call flushGameState: ' + (endTime - startTime) + ' ms');
-    callback('Communications error: ' + e.message, null);
-  });
-}
-
-function postUserAction(locale, userID, action, value, callback) {
-  if (userID == testUser) {
-    return stubbedGame.postUserAction(action, value, callback);
-  }
-
-  const payload = {userID: userID, action: action};
-  const startTime = new Date().getTime();
-  let endTime;
-
-  if (action == 'bet') {
-    payload.value = value;
-  } else if (action == 'setrules') {
-    for (const attrname in value) {
-      if (Object.prototype.hasOwnProperty.call(value, attrname)) {
-        payload[attrname] = value[attrname];
-      }
-    }
-  }
-  requestify.post(process.env.SERVICEURL, payload)
-  .then((response) => {
-    // Get the raw response body
-    endTime = new Date().getTime();
-    console.log('Elapsed time to call postUserAction ' + action + ': ' + (endTime - startTime) + ' ms');
-    callback(null, JSON.parse(response.body));
-  })
-  .fail((response) => {
-    endTime = new Date().getTime();
-    console.log('Failed calling ' + action + ' ' + response.body);
-    console.log('Elapsed time to call postUserAction ' + action + ': ' + (endTime - startTime) + ' ms');
-    callback(getSpeechError(response, locale), null);
-  });
-}
-
-function getSpeechError(response, locale) {
-  const error = response.getBody();
-  return (error && error.error) ?
-    resources.mapServerError(error.error) :
-    resources.strings.SPEECH_ERROR_CODE.replace('{0}', response.getCode());
-}
 
 //
 // Lists what the user can do next - provided in the form of a question
@@ -395,18 +196,19 @@ function listValidActions(gameState, locale, type) {
   return result;
 }
 
-function tellResult(locale, action, gameState, newGameState) {
+function tellResult(attributes, locale, action, oldGameState) {
   let result = '';
+  const gameState = attributes.gameState;
 
   // It's possible they did something other than stand on the previous hand if this is a split
   // If so, read that off first (but try to avoid it if they just stood on the prior hand)
-  if ((gameState.activePlayer == 'player') && (newGameState.currentPlayerHand != gameState.currentPlayerHand)) {
-    const oldHand = newGameState.playerHands[gameState.currentPlayerHand];
+  if ((oldGameState.activePlayer == 'player') && (gameState.currentPlayerHand != oldGameState.currentPlayerHand)) {
+    const oldHand = gameState.playerHands[oldGameState.currentPlayerHand];
 
     // I don't want to re-read this hand if they just stood, so let's make sure they busted
     // or split Aces (which only draws on card) or did a double before we read this hand.
     if ((oldHand.total > 21) ||
-      (oldHand.bet > newGameState.playerHands[newGameState.currentPlayerHand].bet)) {
+      (oldHand.bet > gameState.playerHands[gameState.currentPlayerHand].bet)) {
       if (oldHand.total > 21) {
         result = resources.strings.RESULT_AFTER_HIT_BUST.replace('{0}', resources.cardRanks(oldHand.cards[oldHand.cards.length - 1]));
       } else {
@@ -414,7 +216,7 @@ function tellResult(locale, action, gameState, newGameState) {
       }
 
       // And now preface with the next hand before we tell them what happened
-      result += readHandNumber(newGameState, newGameState.currentPlayerHand);
+      result += readHandNumber(gameState, gameState.currentPlayerHand);
     }
   }
 
@@ -428,37 +230,37 @@ function tellResult(locale, action, gameState, newGameState) {
       break;
     case 'bet':
       // A new hand was dealt
-      result += readHand(newGameState, locale);
+      result += readHand(gameState, locale);
       break;
     case 'hit':
       // Tell them the new card, the total, and the dealer up card
-      result += readHit(newGameState, locale);
+      result += readHit(gameState, locale);
       break;
     case 'stand':
       // OK, let's read what the dealer had, what they drew, and what happened
-      result += readStand(newGameState, locale);
+      result += readStand(gameState, locale);
       break;
     case 'double':
       // Tell them the new card, and what the dealer did
-      result += readDouble(newGameState, locale);
+      result += readDouble(gameState, locale);
       break;
     case 'insurance':
     case 'noinsurance':
       // Say whether the dealer had blackjack, and what the next thing is to do
-      result += readInsurance(newGameState, locale);
+      result += readInsurance(gameState, locale);
       break;
     case 'split':
       // OK, now you have multiple hands - makes reading the game state more interesting
-      result += readSplit(newGameState, locale);
+      result += readSplit(gameState, locale);
       break;
     case 'surrender':
-      result += readSurrender(newGameState, locale);
+      result += readSurrender(gameState, locale);
       break;
     }
 
-  if ((gameState.activePlayer == 'player') && (newGameState.activePlayer != 'player')) {
+  if ((oldGameState.activePlayer == 'player') && (gameState.activePlayer != 'player')) {
     // OK, game over - so let's give the new total
-    result += resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', newGameState.bankroll);
+    result += resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', gameState.bankroll);
   }
 
   return result;
