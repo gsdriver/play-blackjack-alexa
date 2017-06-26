@@ -76,8 +76,8 @@ const resources = {
   'DEALER_DRAW': ' Der Händler erhält ',
   'DEALER_CARD_ARTICLE': 'eine {0}',
   'PLAYER_HIT_BUSTED': 'Du hast eine {0} und überkaufen. ',
-  'PLAYER_HIT_NOTBUSTED_SOFT': 'Du hast eine {0} für insgesamt weiche {1}.',
-  'PLAYER_HIT_NOTBUSTED': 'Du hast eine {0} für insgesamt {1}.',
+  'PLAYER_HIT_NOTBUSTED_SOFT': 'Du hast eine {0} für insgesamt weiche {1}. ',
+  'PLAYER_HIT_NOTBUSTED': 'Du hast eine {0} für insgesamt {1}. ',
   'DEALER_SHOWING': ' Der Händler zeigt eine {0}.',
   'SPLIT_TENS': 'Sie teilen Zehner. ',
   'SPLIT_PAIR': 'Sie teilen ein paar {0}. ',
@@ -107,6 +107,8 @@ const resources = {
   'RULES_BLACKJACK': 'Blackjack zahlt {0}. ',
   'RULES_SURRENDER_OFFERED': 'Aufgeben erlaubt. ',
   'RULES_NO_SURRENDER': 'Aufgeben nicht angeboten. ',
+  'NICE_HIT_OPTIONS': 'Nice hit! |Good one! |Well done! ',
+  'GREAT_HIT_OPTIONS': 'Great hit! |Can\'t ask for better than that. |Sweet! ',
 };
 
 module.exports = {

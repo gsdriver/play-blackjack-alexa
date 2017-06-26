@@ -114,8 +114,8 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
 // Handlers for our skill
 const handlers = {
   'NewSession': function() {
-    // If they don't have a gameState, create one
-    if (!this.attributes['game']) {
+    // If they don't have a game, create one
+    if (!this.attributes.currentGame) {
       gameService.initializeGame(this.attributes);
     }
     this.emit('LaunchRequest');

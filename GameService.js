@@ -44,8 +44,22 @@ module.exports = {
 
     // Get the next possible actions
     setNextActions(game);
-    attributes.game = game;
-    attributes.gameState = getGameJSONResponse(game);
+
+    // For now we only support the standard game
+    attributes.standard = game;
+    attributes.currentGame = 'standard';
+  },
+  // Determines if this is the initial game state or not
+  isDefaultGame: function(attributes) {
+    const game = attributes[attributes.currentGame];
+
+    // We only support one game type for now, but this could be different
+    // if we had different rules by default for different games
+    return ((game.activePlayer == 'none') && (game.bankroll == 5000) && (game.lastBet == 100)
+      && (game.rules.hitSoft17 == false) && (game.rules.surrender == 'late')
+      && (game.rules.double == 'any' && (game.rules.doubleaftersplit == true)
+      && (game.rules.resplitAces == false) && (game.rules.blackjackBonus == 0.5)
+      && (game.rules.numberOfDecks == 1)));
   },
   getRecommendedAction: function(game) {
     // Only make a suggestion if the game is still in play (the player's turn)
@@ -63,7 +77,7 @@ module.exports = {
     }
   },
   userAction: function(attributes, action, value) {
-    const game = attributes.game;
+    const game = attributes[attributes.currentGame];
 
     // Is this a valid action?
     if ((action != 'setrules') && (game.possibleActions.indexOf[action] < 0)) {
@@ -187,8 +201,8 @@ module.exports = {
 
     // Now figure out what the next possible actions are and return
     setNextActions(game);
-    attributes.gameState = getGameJSONResponse(game);
-    return null;
+    updateGame(game);
+    return undefined;
   },
 };
 
@@ -196,45 +210,25 @@ module.exports = {
  * Internal functions
  */
 
-function getGameJSONResponse(game) {
-  // OK, copy over the relevant information into the JSON object that will be returned
-  // BUGBUG - Add version
-  const gameState = {'userID': game.userID,
-        'activePlayer': game.activePlayer,
-        'currentPlayerHand': game.currentPlayerHand,
-        'bankroll': game.bankroll,
-        'possibleActions': game.possibleActions,
-        'dealerHand': {outcome: game.dealerHand.outcome, cards: []},
-        'playerHands': game.playerHands,
-        'lastBet': game.lastBet,
-        'houseRules': game.rules};
+function updateGame(game) {
+  let dealerCards = game.dealerHand.cards;
 
-  // Not copied: version, deck, dealerHand (holecard), specialState
-  // Need to copy over the dealer hand (don't show the hole card if it shouldn't be shown)
-  let i = 0;
   if ((game.activePlayer == 'player') && game.dealerHand.cards.length) {
-    // Pop the 'empty card'
-    gameState.dealerHand.cards.push({'rank': 0, 'suit': 'N'});
-    i = 1;
-  }
-  for (; i < game.dealerHand.cards.length; i++) {
-    const card = {'rank': game.dealerHand.cards[i].rank, 'suit': game.dealerHand.cards[i].suit};
-    gameState.dealerHand.cards.push(card);
+    // Don't total the hole card
+    dealerCards = dealerCards.slice(1);
   }
 
   // Also, set the total for the dealer and player hands
-  const dealerTotal = handTotal(gameState.dealerHand.cards);
-  gameState.dealerHand.total = dealerTotal.total;
-  gameState.dealerHand.soft = dealerTotal.soft;
+  const dealerTotal = handTotal(dealerCards);
+  game.dealerHand.total = dealerTotal.total;
+  game.dealerHand.soft = dealerTotal.soft;
 
-  for (i = 0; i < gameState.playerHands.length; i++) {
+  for (i = 0; i < game.playerHands.length; i++) {
     const playerTotal = handTotal(game.playerHands[i].cards);
 
     game.playerHands[i].total = playerTotal.total;
     game.playerHands[i].soft = playerTotal.soft;
   }
-
-  return gameState;
 }
 
 function deal(game, betAmount) {
