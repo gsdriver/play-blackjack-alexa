@@ -116,9 +116,12 @@ const handlers = {
   'NewSession': function() {
     // If they don't have a game, create one
     if (!this.attributes.currentGame) {
-      gameService.initializeGame(this.attributes);
+      gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
+        this.emit('LaunchRequest');
+      });
+    } else {
+      this.emit('LaunchRequest');
     }
-    this.emit('LaunchRequest');
   },
   // Some intents don't make sense for a new session - so just launch instead
   'LaunchRequest': Launch.handleIntent,

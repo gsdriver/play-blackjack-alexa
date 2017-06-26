@@ -4,50 +4,54 @@
 //
 
 const suggest = require('blackjack-strategy');
+const http = require('http');
 
 const STARTING_BANKROLL = 5000;
 
 module.exports = {
-  initializeGame: function(attributes, userID) {
-    // NOTE: Here is where we would add a call to the service to
-    // retrieve the gameState from Redis.  Once done, we could then
-    // flush the game from there (so a reset doesn't cause us to
-    // read from there again)
+  initializeGame: function(attributes, userID, callback) {
+    // See if they have a legacy game state stored
+    getLegacyGame(userID, (err, savedGame) => {
+      let game = savedGame;
 
-    const game = {version: '1.0.0',
-       userID: userID,
-       deck: {cards: []},
-       dealerHand: {cards: []},
-       playerHands: [],
-       rules: {
-           hitSoft17: false,         // Does dealer hit soft 17
-           surrender: 'late',        // Surrender offered - none, late, or early
-           double: 'any',            // Double rules - none, 10or11, 9or10or11, any
-           doubleaftersplit: true,   // Can double after split - none, 10or11, 9or10or11, any
-           resplitAces: false,       // Can you resplit aces
-           blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
-           numberOfDecks: 1,         // Number of decks in play
-           minBet: 5,                // The minimum bet - not configurable
-           maxBet: 1000,             // The maximum bet - not configurable
-           maxSplitHands: 4,         // Maximum number of hands you can have due to splits
-       },
-       activePlayer: 'none',
-       currentPlayerHand: 0,
-       specialState: null,
-       bankroll: STARTING_BANKROLL,
-       lastBet: 100,
-       possibleActions: [],
-    };
+      if (!game) {
+        game = {version: '1.0.0',
+           userID: userID,
+           deck: {cards: []},
+           dealerHand: {cards: []},
+           playerHands: [],
+           rules: {
+               hitSoft17: false,         // Does dealer hit soft 17
+               surrender: 'late',        // Surrender offered - none, late, or early
+               double: 'any',            // Double rules - none, 10or11, 9or10or11, any
+               doubleaftersplit: true,   // Can double after split - none, 10or11, 9or10or11, any
+               resplitAces: false,       // Can you resplit aces
+               blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
+               numberOfDecks: 1,         // Number of decks in play
+               minBet: 5,                // The minimum bet - not configurable
+               maxBet: 1000,             // The maximum bet - not configurable
+               maxSplitHands: 4,         // Maximum number of hands you can have due to splits
+           },
+           activePlayer: 'none',
+           currentPlayerHand: 0,
+           specialState: null,
+           bankroll: STARTING_BANKROLL,
+           lastBet: 100,
+           possibleActions: [],
+        };
+      }
 
-    // Start by shuffling the deck
-    shuffleDeck(game);
+      // Start by shuffling the deck
+      shuffleDeck(game);
 
-    // Get the next possible actions
-    setNextActions(game);
+      // Get the next possible actions
+      setNextActions(game);
 
-    // For now we only support the standard game
-    attributes.standard = game;
-    attributes.currentGame = 'standard';
+      // For now we only support the standard game
+      attributes.standard = game;
+      attributes.currentGame = 'standard';
+      callback();
+    });
   },
   // Determines if this is the initial game state or not
   isDefaultGame: function(attributes) {
@@ -563,4 +567,28 @@ function handTotal(cards) {
   }
 
   return retval;
+}
+
+function getLegacyGame(userID, callback) {
+  const queryString = 'fullstate?userID=' + userID;
+  http.get(process.env.SERVICEURL + queryString, (res) => {
+    if (res.statusCode == 200) {
+      // Great, we should have a game!
+      let fulltext = '';
+
+      res.on('data', (data) => {
+        fulltext += data;
+      });
+
+      res.on('end', () => {
+        const game = JSON.parse(fulltext);
+        callback(null, game);
+      });
+    } else {
+      // Sorry, there was an error calling the HTTP endpoint
+      callback('Unable to call endpoint', null);
+    }
+  }).on('error', (e) => {
+    callback('Communications error: ' + e.message, null);
+  });
 }
