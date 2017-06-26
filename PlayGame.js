@@ -322,15 +322,38 @@ function readGameResult(game) {
 function readHit(game, locale) {
   const currentHand = game.playerHands[game.currentPlayerHand];
   const cardText = resources.cardRanks(currentHand.cards[currentHand.cards.length - 1]);
+  const cardRank = currentHand.cards[currentHand.cards.length - 1].rank;
   let result;
 
   if (currentHand.total > 21) {
     result = resources.strings.PLAYER_HIT_BUSTED.replace('{0}', cardText);
   } else {
-    const resultFormat = ((currentHand.soft) ? resources.strings.PLAYER_HIT_NOTBUSTED_SOFT
-              : resources.strings.PLAYER_HIT_NOTBUSTED);
+    let formatChoices;
+
+    // May say something different if it's a good hit
+    if (currentHand.soft) {
+      // Only say something if you hit to 21
+      if (currentHand.total == 21) {
+        formatChoices = resources.strings.GREAT_HIT_OPTIONS;
+      } else {
+        formatChoices = resources.strings.PLAYER_HIT_NOTBUSTED_SOFT;
+      }
+    } else {
+      // Good if they hit up to 20 with a card 6 or under,
+      // great if they got to 21 with a card 6 or under
+      if ((currentHand.total == 20) && (cardRank <= 6)) {
+        formatChoices = resources.strings.GOOD_HIT_OPTIONS;
+      } else if ((currentHand.total == 21) && (cardRank <= 6)) {
+        formatChoices = resources.strings.GREAT_HIT_OPTIONS;
+      } else {
+        formatChoices = resources.strings.PLAYER_HIT_NOTBUSTED;
+      }
+    }
+
+    const formatArray = formatChoices.split('|');
+    const resultFormat = formatArray[Math.floor(Math.random() * formatArray.length)];
+
     result = resultFormat.replace('{0}', cardText).replace('{1}', currentHand.total);
-    result += addSpecialText(game, 'hit');
     result += resources.strings.DEALER_SHOWING.replace('{0}', resources.cardRanks(game.dealerHand.cards[1]));
   }
 
@@ -570,56 +593,4 @@ function rulesToText(locale, rules, changeRules) {
   }
 
   return text;
-};
-
-//
-// Adds a little spice to the game by randomly inserting some text
-//
-function addSpecialText(game, action) {
-  let special = '';
-  const currentHand = game.playerHands[game.currentPlayerHand];
-
-  switch (action) {
-    case 'hit':
-      const hitArray = [
-        {original: 12, final: 21, prob: 0.2, options: resources.strings.NICE_HIT_OPTIONS},
-        {original: 13, final: 21, prob: 0.3, options: resources.strings.NICE_HIT_OPTIONS},
-        {original: 14, final: 20, prob: 0.35, options: resources.strings.NICE_HIT_OPTIONS},
-        {original: 15, final: 18, prob: 0.25, options: resources.strings.NICE_HIT_OPTIONS},
-        {original: 15, final: 19, prob: 0.35, options: resources.strings.NICE_HIT_OPTIONS},
-        {original: 16, final: 18, prob: 0.25, options: resources.strings.NICE_HIT_OPTIONS},
-        {original: 16, final: 19, prob: 0.3, options: resources.strings.NICE_HIT_OPTIONS},
-        {original: 14, final: 21, prob: 0.5, options: resources.strings.GREAT_HIT_OPTIONS},
-        {original: 15, final: 20, prob: 0.45, options: resources.strings.GREAT_HIT_OPTIONS},
-        {original: 15, final: 21, prob: 0.6, options: resources.strings.GREAT_HIT_OPTIONS},
-        {original: 16, final: 20, prob: 0.5, options: resources.strings.GREAT_HIT_OPTIONS},
-        {original: 16, final: 21, prob: 0.75, options: resources.strings.GREAT_HIT_OPTIONS},
-      ];
-
-      // If this is a non-soft hit, see if it is a good or great hit
-      if (!currentHand.soft) {
-        // Not exactly accurate, but good enough for this
-        const original = currentHand.total - currentHand.cards[currentHand.cards.length - 1].rank;
-        let i;
-
-        for (i = 0; i < hitArray.length; i++) {
-          if ((hitArray[i].original == original) && (hitArray[i].final == currentHand.total)) {
-            // Candidate - pick a random number to see if we add a string
-            if (Math.random() < hitArray[i].prob) {
-              // OK, we'll say something ... but what?
-              const specialOptions = hitArray[i].options.split('|');
-              special = specialOptions[Math.floor(Math.random() * specialOptions.length)];
-            }
-            break;
-          }
-        }
-      }
-      break;
-
-    default:
-      // Nothing to say
-      break;
-  }
-
-  return special;
 }

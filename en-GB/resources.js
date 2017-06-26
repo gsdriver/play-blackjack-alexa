@@ -76,8 +76,6 @@ const resources = {
   'DEALER_DRAW': ' The dealer drew ',
   'DEALER_CARD_ARTICLE': 'a {0}',
   'PLAYER_HIT_BUSTED': 'You got a {0} and busted. ',
-  'PLAYER_HIT_NOTBUSTED_SOFT': 'You got a {0} for a total of soft {1}. ',
-  'PLAYER_HIT_NOTBUSTED': 'You got a {0} for a total of {1}. ',
   'DEALER_SHOWING': ' The dealer is showing a {0}.',
   'SPLIT_TENS': 'You split tens. ',
   'SPLIT_PAIR': 'You split a pair of {0}. ',
@@ -107,8 +105,10 @@ const resources = {
   'RULES_BLACKJACK': 'Blackjack pays {0}. ',
   'RULES_SURRENDER_OFFERED': 'Surrender allowed. ',
   'RULES_NO_SURRENDER': 'Surrender not offered. ',
-  'NICE_HIT_OPTIONS': 'Nice hit! |Good show! |Well done! ',
-  'GREAT_HIT_OPTIONS': 'Great hit! |Brilliant! |Spot on! ',
+  'PLAYER_HIT_NOTBUSTED_SOFT': 'You got a {0} for a total of soft {1}. |Here\'s a {0} for a total of soft {1}. |I have a {0} for you giving you soft {1}. ',
+  'PLAYER_HIT_NOTBUSTED': 'You got a {0} for a total of {1}. |Here\'s a {0} for a total of {1}. |I have a {0} for you giving you {1}. ',
+  'GOOD_HIT_OPTIONS': 'I have a {0} for you giving you {1}. Not bad! |You got a {0} for a total of {1}. Good hit. |Here\'s a {0} for a total of {1}. ',
+  'GREAT_HIT_OPTIONS': 'Look at this, I have a {0} giving you {1}. |Yes, it\'s a {0} for a total of {1}! |Here\'s a beauty, a {0} for a total of {1}. ',
 };
 
 module.exports = {

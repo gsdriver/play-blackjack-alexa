@@ -76,8 +76,6 @@ const resources = {
   'DEALER_DRAW': ' Der Händler erhält ',
   'DEALER_CARD_ARTICLE': 'eine {0}',
   'PLAYER_HIT_BUSTED': 'Du hast eine {0} und überkaufen. ',
-  'PLAYER_HIT_NOTBUSTED_SOFT': 'Du hast eine {0} für insgesamt weiche {1}. ',
-  'PLAYER_HIT_NOTBUSTED': 'Du hast eine {0} für insgesamt {1}. ',
   'DEALER_SHOWING': ' Der Händler zeigt eine {0}.',
   'SPLIT_TENS': 'Sie teilen Zehner. ',
   'SPLIT_PAIR': 'Sie teilen ein paar {0}. ',
@@ -107,8 +105,10 @@ const resources = {
   'RULES_BLACKJACK': 'Blackjack zahlt {0}. ',
   'RULES_SURRENDER_OFFERED': 'Aufgeben erlaubt. ',
   'RULES_NO_SURRENDER': 'Aufgeben nicht angeboten. ',
-  'NICE_HIT_OPTIONS': 'Nice hit! |Good one! |Well done! ',
-  'GREAT_HIT_OPTIONS': 'Great hit! |Can\'t ask for better than that. |Sweet! ',
+  'PLAYER_HIT_NOTBUSTED_SOFT': 'Du hast eine {0} für insgesamt weiche {1}. ',
+  'PLAYER_HIT_NOTBUSTED': 'Du hast eine {0} für insgesamt {1}. ',
+  'GOOD_HIT_OPTIONS': 'I have a {0} for you giving you {1}. Not bad! |You got a {0} for a total of {1}. Good hit. |Here\'s a {0} for a total of {1}. ',
+  'GREAT_HIT_OPTIONS': 'Look at this, I have a {0} giving you {1}. |Yes, it\'s a {0} for a total of {1}! |Here\'s a beauty, a {0} for a total of {1}. ',
 };
 
 module.exports = {

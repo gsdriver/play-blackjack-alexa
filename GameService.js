@@ -582,6 +582,12 @@ function getLegacyGame(userID, callback) {
 
       res.on('end', () => {
         const game = JSON.parse(fulltext);
+
+        // Make sure the deck is there as a sanity test
+        if (game && (!game.deck || !game.deck.cards)) {
+          console.log('Error: bad game retrieved ' + JSON.stringify(game));
+          game = undefined;
+        }
         callback(null, game);
       });
     } else {
@@ -592,3 +598,23 @@ function getLegacyGame(userID, callback) {
     callback('Communications error: ' + e.message, null);
   });
 }
+
+/*
+function flushGameState(userID, callback) {
+  const queryString = 'flushcache?userID=' + userID;
+
+  http.get(process.env.SERVICEURL + queryString, (res) => {
+    if (res.statusCode == 200) {
+      // Great, I don't really care what the response is
+      callback(null, 'OK');
+    } else {
+      // Sorry, there was an error calling the HTTP endpoint
+      console.log('flushGameState response error: ' + res.statusCode);
+      callback('Unable to call endpoint', null);
+    }
+  }).on('error', (e) => {
+    console.log('flushGameState Communications error: ' + e.message);
+    callback('Communications error: ' + e.message, null);
+  });
+}
+*/
