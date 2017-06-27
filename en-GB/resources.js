@@ -105,10 +105,10 @@ const resources = {
   'RULES_BLACKJACK': 'Blackjack pays {0}. ',
   'RULES_SURRENDER_OFFERED': 'Surrender allowed. ',
   'RULES_NO_SURRENDER': 'Surrender not offered. ',
-  'PLAYER_HIT_NOTBUSTED_SOFT': 'You got a {0} for a total of soft {1}. |Here\'s a {0} for a total of soft {1}. |I have a {0} for you giving you soft {1}. ',
-  'PLAYER_HIT_NOTBUSTED': 'You got a {0} for a total of {1}. |Here\'s a {0} for a total of {1}. |I have a {0} for you giving you {1}. ',
-  'GOOD_HIT_OPTIONS': 'I have a {0} for you giving you {1}. Not bad! |You got a {0} for a total of {1}. Good hit. |Here\'s a {0} for a total of {1}. ',
-  'GREAT_HIT_OPTIONS': 'Look at this, I have a {0} giving you {1}. |Yes, it\'s a {0} for a total of {1}! |Here\'s a beauty, a {0} for a total of {1}. ',
+  'PLAYER_HIT_NOTBUSTED_SOFT': 'You got a {0} for a total of soft {1}. |Here\'s a {0} for a total of soft {1}. |The dealer has a {0} for you giving you soft {1}. ',
+  'PLAYER_HIT_NOTBUSTED': 'You got a {0} for a total of {1}. |Here\'s a {0} for a total of {1}. |The dealer has a {0} for you giving you {1}. ',
+  'GOOD_HIT_OPTIONS': 'The dealer has a {0} for you giving you {1}. Not bad! |You got a {0} for a total of {1}. Good hit. |Here\'s a {0} for a total of {1}. ',
+  'GREAT_HIT_OPTIONS': 'The dealer has a {0} giving you {1}. Brilliant! |Yes, it\'s a {0} for a total of {1}! |Here\'s a good one, a {0} for a total of {1}. ',
 };
 
 module.exports = {
