@@ -50,7 +50,15 @@ module.exports = {
       // For now we only support the standard game
       attributes.standard = game;
       attributes.currentGame = 'standard';
-      callback();
+
+      // Flush the game if we got one
+      if (savedGame) {
+        flushGameState(userID, (err) => {
+          callback();
+        });
+      } else {
+        callback();
+      }
     });
   },
   // Determines if this is the initial game state or not
@@ -581,7 +589,7 @@ function getLegacyGame(userID, callback) {
       });
 
       res.on('end', () => {
-        const game = JSON.parse(fulltext);
+        let game = JSON.parse(fulltext);
 
         // Make sure the deck is there as a sanity test
         if (game && (!game.deck || !game.deck.cards)) {
@@ -599,22 +607,28 @@ function getLegacyGame(userID, callback) {
   });
 }
 
-/*
 function flushGameState(userID, callback) {
   const queryString = 'flushcache?userID=' + userID;
 
   http.get(process.env.SERVICEURL + queryString, (res) => {
+    let err;
+
     if (res.statusCode == 200) {
       // Great, I don't really care what the response is
-      callback(null, 'OK');
+      console.log('Flushed');
     } else {
       // Sorry, there was an error calling the HTTP endpoint
       console.log('flushGameState response error: ' + res.statusCode);
-      callback('Unable to call endpoint', null);
+      err = 'Unable to call endpoint';
+    }
+
+    if (callback) {
+      callback(err);
     }
   }).on('error', (e) => {
     console.log('flushGameState Communications error: ' + e.message);
-    callback('Communications error: ' + e.message, null);
+    if (callback) {
+      callback(e.message);
+    }
   });
 }
-*/

@@ -19,9 +19,10 @@ module.exports = {
     const res = require('../' + this.event.request.locale + '/resources');
 
     // Confirmed - let's reset
-    gameService.initializeGame(this.attributes);
-    this.handler.state = 'NEWGAME';
-    this.emit(':ask', res.strings.RESET_COMPLETED, res.strings.RESET_REPROMPT);
+    gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
+      this.handler.state = 'NEWGAME';
+      this.emit(':ask', res.strings.RESET_COMPLETED, res.strings.RESET_REPROMPT);
+    });
   },
   handleNoReset: function() {
     // Nope, they are not going to reset - so go back to start a new game
