@@ -25,7 +25,7 @@ const resources = {
   'CHANGERULES_NO_RULE_VALUE': 'I\'m sorry, I don\'t understand how to change {0}. Check the Alexa companion app for rules you can change. What else can I help with?',
   'CHANGERULES_NO_RULE_OPTION': 'I\'m sorry, I didn\'t catch how to change {0}. Check the Alexa companion app for rules you can change. What else can I help with?',
   'CHANGERULES_CANT_CHANGE_RULE': 'I\'m sorry, I was unable to change {0} to {1}. Check the Alexa companion app for available rules you can change. What else can I help with?',
-  'CHANGERULES_CARD_TITLE': 'Play Blackjack',
+  'CHANGERULES_CARD_TITLE': 'Blackjack Game',
   'FULL_RULES': 'The full rules are {0}',
   // From Exit.js
   'EXIT_BANKROLL': 'You are leaving with ${0}.',
@@ -35,7 +35,7 @@ const resources = {
   'HELP_CARD_TITLE': 'Blackjack Commands',
   'HELP_CARD_TEXT': 'You can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
   // From Launch.js
-  'LAUNCH_WELCOME': 'Welcome to the Blackjack player. ',
+  'LAUNCH_WELCOME': 'Welcome to Blackjack Game. ',
   'LAUNCH_STARTGAME': 'You can start a blackjack game by saying Bet ... Now, what can I help you with?',
   'LAUNCH_DEFAULTSTATE_TEXT': 'You have ${0}. Say bet to start a new game. ... Now, what can I help you with?',
   'LAUNCH_NONDEFAULTSTATE_TEXT': 'You have ${0}. Say bet to start a new game or reset game to reset to the default rules and bankroll. ... Now, what can I help you with?',
