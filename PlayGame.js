@@ -241,16 +241,13 @@ function tellResult(attributes, locale, action, oldGame) {
       result += readHand(game, locale);
       break;
     case 'hit':
-      // Tell them the new card, the total, and the dealer up card
+    case 'double':
+      // Tell them the new card, the total, and the dealer up card (or what they did)
       result += readHit(game, locale);
       break;
     case 'stand':
       // OK, let's read what the dealer had, what they drew, and what happened
       result += readStand(game, locale);
-      break;
-    case 'double':
-      // Tell them the new card, and what the dealer did
-      result += readDouble(game, locale);
       break;
     case 'insurance':
     case 'noinsurance':
@@ -358,31 +355,9 @@ function readHit(game, locale) {
     const resultFormat = formatArray[Math.floor(Math.random() * formatArray.length)];
 
     result = resultFormat.replace('{0}', cardText).replace('{1}', currentHand.total);
-    result += resources.strings.DEALER_SHOWING.replace('{0}', resources.cardRanks(game.dealerHand.cards[1]));
-  }
-
-  if (game.activePlayer != 'player') {
-    result += readDealerAction(game, locale);
-    result += ' ' + readGameResult(game);
-  }
-
-  return result;
-}
-
-//
-// We read the card that the player got, then the dealer's hand, action, and final outcome
-//
-function readDouble(game, locale) {
-  const currentHand = game.playerHands[game.currentPlayerHand];
-  const cardText = resources.cardRanks(currentHand.cards[currentHand.cards.length - 1]);
-  let result;
-
-  if (currentHand.total > 21) {
-    result = resources.strings.PLAYER_HIT_BUSTED.replace('{0}', cardText);
-  } else {
-    const resultFormat = ((currentHand.soft) ? resources.strings.PLAYER_HIT_NOTBUSTED_SOFT
-              : resources.strings.PLAYER_HIT_NOTBUSTED);
-    result = resultFormat.replace('{0}', cardText).replace('{1}', currentHand.total);
+    if (game.activePlayer === 'player') {
+      result += resources.strings.DEALER_SHOWING.replace('{0}', resources.cardRanks(game.dealerHand.cards[1]));
+    }
   }
 
   if (game.activePlayer != 'player') {
