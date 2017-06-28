@@ -268,6 +268,10 @@ function tellResult(attributes, locale, action, oldGame) {
 
   if ((oldGame.activePlayer == 'player') && (game.activePlayer != 'player')) {
     // OK, game over - so let's give the new total
+    if (!game.high || (game.bankroll > game.high)) {
+      game.high = game.bankroll;
+    }
+
     result += resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll);
   }
 

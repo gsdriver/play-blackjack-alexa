@@ -31,7 +31,10 @@ module.exports = {
       playgame.playBlackjackAction(this.attributes, this.event.request.locale,
         this.event.session.user.userId, action,
         (error, response, speech, reprompt) => {
+        const game = this.attributes[this.attributes.currentGame];
+
         this.attributes['firsthand'] = undefined;
+        game.hands = (game.hands) ? (game.hands + 1) : 1;
         this.handler.state = bjUtils.getState(this.attributes);
         bjUtils.emitResponse(this.emit, this.event.request.locale,
           error, response, speech, reprompt);

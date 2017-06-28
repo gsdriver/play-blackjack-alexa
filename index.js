@@ -117,14 +117,36 @@ const handlers = {
     // If they don't have a game, create one
     if (!this.attributes.currentGame) {
       gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
-        this.emit('LaunchRequest');
+        if (this.event.request.type === 'IntentRequest') {
+          this.emit(this.event.request.intent.name);
+        } else {
+          this.emit('LaunchRequest');
+        }
       });
+    } else if (this.event.request.type === 'IntentRequest') {
+      this.emit(this.event.request.intent.name);
     } else {
       this.emit('LaunchRequest');
     }
   },
   // Some intents don't make sense for a new session - so just launch instead
   'LaunchRequest': Launch.handleIntent,
+  'SuggestIntent': Launch.handleIntent,
+  'ResetIntent': Launch.handleIntent,
+  'ChangeRulesIntent': Launch.handleIntent,
+  'AMAZON.YesIntent': Launch.handleIntent,
+  'AMAZON.NoIntent': Launch.handleIntent,
+  'BettingIntent': Betting.handleIntent,
+  'BlackjackIntent': Blackjack.handleIntent,
+  'RulesIntent': Rules.handleIntent,
+  'AMAZON.RepeatIntent': Repeat.handleIntent,
+  'AMAZON.HelpIntent': Help.handleIntent,
+  'AMAZON.StopIntent': Exit.handleIntent,
+  'AMAZON.CancelIntent': Exit.handleIntent,
+  'SessionEndedRequest': function() {
+    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
+    this.emit(':saveState', true);
+  },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
     this.emit(':ask', res.strings.UNKNOWNINTENT_INGAME, res.strings.UNKNOWNINTENT_INGAME_REPROMPT);
