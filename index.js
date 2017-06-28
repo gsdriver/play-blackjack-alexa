@@ -40,8 +40,20 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
 
 const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'NewSession': function() {
-    this.handler.state = '';
-    this.emitWithState('NewSession');
+    // If they don't have a game, create one
+    if (!this.attributes.currentGame) {
+      gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
+        if (this.event.request.type === 'IntentRequest') {
+          this.emit(this.event.request.intent.name);
+        } else {
+          this.emit('LaunchRequest');
+        }
+      });
+    } else if (this.event.request.type === 'IntentRequest') {
+      this.emit(this.event.request.intent.name);
+    } else {
+      this.emit('LaunchRequest');
+    }
   },
   'LaunchRequest': Launch.handleIntent,
   'BettingIntent': Betting.handleIntent,
@@ -66,8 +78,20 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
 
 const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'NewSession': function() {
-    this.handler.state = '';
-    this.emitWithState('NewSession');
+    // If they don't have a game, create one
+    if (!this.attributes.currentGame) {
+      gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
+        if (this.event.request.type === 'IntentRequest') {
+          this.emit(this.event.request.intent.name);
+        } else {
+          this.emit('LaunchRequest');
+        }
+      });
+    } else if (this.event.request.type === 'IntentRequest') {
+      this.emit(this.event.request.intent.name);
+    } else {
+      this.emit('LaunchRequest');
+    }
   },
   'LaunchRequest': Launch.handleIntent,
   'SuggestIntent': Suggest.handleIntent,
@@ -90,8 +114,20 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
 
 const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'NewSession': function() {
-    this.handler.state = '';
-    this.emitWithState('NewSession');
+    // If they don't have a game, create one
+    if (!this.attributes.currentGame) {
+      gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
+        if (this.event.request.type === 'IntentRequest') {
+          this.emit(this.event.request.intent.name);
+        } else {
+          this.emit('LaunchRequest');
+        }
+      });
+    } else if (this.event.request.type === 'IntentRequest') {
+      this.emit(this.event.request.intent.name);
+    } else {
+      this.emit('LaunchRequest');
+    }
   },
   'LaunchRequest': Launch.handleIntent,
   'BlackjackIntent': Blackjack.handleIntent,
