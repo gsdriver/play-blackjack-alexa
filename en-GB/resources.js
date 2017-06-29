@@ -113,6 +113,14 @@ const resources = {
 
 module.exports = {
   strings: resources,
+  pickRandomOption: function(res) {
+    if (res && resources[res]) {
+      const options = resources[res].split('|');
+      return options[Math.floor(Math.random() * options.length)];
+    } else {
+      return undefined;
+    }
+  },
   getBlackjackAction: function(actionSlot) {
     const actionMapping = {'hit': 'hit', 'take a hit': 'hit', 'hit me': 'hit', 'take one': 'hit',
       'stand': 'stand', 'stay': 'stand', 'done': 'stand',

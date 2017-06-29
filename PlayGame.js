@@ -23,10 +23,7 @@ module.exports = {
       if (suggestText === 'notplayerturn') {
         speech = resource.strings.SUGGEST_TURNOVER;
       } else if (resources.mapActionToSuggestion(suggestText)) {
-        const youShould = resources.strings.SUGGEST_OPTIONS.split('|');
-        const prefix = youShould[Math.floor(Math.random() * youShould.length)];
-
-        speech = prefix.replace('{0}', resources.mapActionToSuggestion(suggestText));
+        speech = resources.pickRandomOption('SUGGEST_OPTIONS').replace('{0}', resources.mapActionToSuggestion(suggestText));
       } else {
         speech = suggestText;
       }
@@ -335,26 +332,23 @@ function readHit(game, locale) {
     if (currentHand.soft) {
       // Only say something if you hit to 21
       if (currentHand.total == 21) {
-        formatChoices = resources.strings.GREAT_HIT_OPTIONS;
+        formatChoices = 'GREAT_HIT_OPTIONS';
       } else {
-        formatChoices = resources.strings.PLAYER_HIT_NOTBUSTED_SOFT;
+        formatChoices = 'PLAYER_HIT_NOTBUSTED_SOFT';
       }
     } else {
       // Good if they hit up to 20 with a card 6 or under,
       // great if they got to 21 with a card 6 or under
       if ((currentHand.total == 20) && (cardRank <= 6)) {
-        formatChoices = resources.strings.GOOD_HIT_OPTIONS;
+        formatChoices = 'GOOD_HIT_OPTIONS';
       } else if ((currentHand.total == 21) && (cardRank <= 6)) {
-        formatChoices = resources.strings.GREAT_HIT_OPTIONS;
+        formatChoices = 'GREAT_HIT_OPTIONS';
       } else {
-        formatChoices = resources.strings.PLAYER_HIT_NOTBUSTED;
+        formatChoices = 'PLAYER_HIT_NOTBUSTED';
       }
     }
 
-    const formatArray = formatChoices.split('|');
-    const resultFormat = formatArray[Math.floor(Math.random() * formatArray.length)];
-
-    result = resultFormat.replace('{0}', cardText).replace('{1}', currentHand.total);
+    result = resources.pickRandomOption(formatChoices).replace('{0}', cardText).replace('{1}', currentHand.total);
     if (game.activePlayer === 'player') {
       result += resources.strings.DEALER_SHOWING.replace('{0}', resources.cardRanks(game.dealerHand.cards[1]));
     }

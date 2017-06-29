@@ -107,12 +107,20 @@ const resources = {
   'RULES_NO_SURRENDER': 'Aufgeben nicht angeboten. ',
   'PLAYER_HIT_NOTBUSTED_SOFT': 'Du hast eine {0} für insgesamt weiche {1}. ',
   'PLAYER_HIT_NOTBUSTED': 'Du hast eine {0} für insgesamt {1}. ',
-  'GOOD_HIT_OPTIONS': 'I have a {0} for you giving you {1}. Not bad! |You got a {0} for a total of {1}. Good hit. |Here\'s a {0} for a total of {1}. ',
-  'GREAT_HIT_OPTIONS': 'Look at this, I have a {0} giving you {1}. |Yes, it\'s a {0} for a total of {1}! |Here\'s a beauty, a {0} for a total of {1}. ',
+  'GOOD_HIT_OPTIONS': 'Du hast eine {0} für insgesamt {1}. ',
+  'GREAT_HIT_OPTIONS': 'Du hast eine {0} für insgesamt {1}. ',
 };
 
 module.exports = {
   strings: resources,
+  pickRandomOption: function(res) {
+    if (res && resources[res]) {
+      const options = resources[res].split('|');
+      return options[Math.floor(Math.random() * options.length)];
+    } else {
+      return undefined;
+    }
+  },
   getBlackjackAction: function(actionSlot) {
     const actionMapping = {'hit': 'hit', 'karte': 'hit', 'carte': 'hit', 'nehmen sie eine karte': 'hit',
       'stand': 'stand', 'stay': 'stand', 'keine karte': 'stand', 'reste': 'stand',
