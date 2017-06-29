@@ -122,7 +122,7 @@ module.exports = {
     }
   },
   getBlackjackAction: function(actionSlot) {
-    const actionMapping = {'hit': 'hit', 'take a hit': 'hit', 'hit me': 'hit', 'take one': 'hit',
+    const actionMapping = {'hit': 'hit', 'take a hit': 'hit', 'hit me': 'hit', 'take one': 'hit', 'take 1': 'hit',
       'stand': 'stand', 'stay': 'stand', 'done': 'stand',
       'surrender': 'surrender', 'give up': 'surrender',
       'double': 'double', 'double down': 'double',
