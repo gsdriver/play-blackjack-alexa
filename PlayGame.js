@@ -67,6 +67,9 @@ module.exports = {
           repromptQuestion = listValidActions(game, locale, 'full');
           speechQuestion += (tellResult(attributes, locale, action.action, oldGame) + ' '
             + listValidActions(game, locale, (playerBlackjack) ? 'full' : 'summary'));
+        } else {
+          // Map this
+          speechError = resources.mapServerError(speechError);
         }
 
         sendUserCallback(attributes, speechError, null, speechQuestion, repromptQuestion, callback);
