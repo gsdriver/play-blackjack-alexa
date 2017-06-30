@@ -177,7 +177,8 @@ module.exports = {
   mapServerError: function(error) {
     const errorMapping = {'bettoosmall': 'Ihre Wette liegt unter dem Mindestwert von €5',
                         'bettoolarge': 'Ihre Wette ist mehr als der Höchstbetrag von €1000',
-                        'betoverbankroll': 'Ihre Wette ist mehr als der Ihre verfügbaren bankroll'};
+                        'betoverbankroll': 'Ihre Wette ist mehr als der Ihre verfügbaren bankroll',
+                        'sidebettoosmall': 'Your bankroll is too low to place the side bet and continue playing'};
     return (errorMapping[error] ? errorMapping[error] : 'Interner Fehler');
   },
   cardRanks: function(card) {
@@ -192,6 +193,8 @@ module.exports = {
     const optionMapping = {'resetbankroll': 'spiel zurücksetzen',
                           'shuffle': 'shuffle',
                           'bet': 'wetten',
+                          'sidebet': 'place side bet',
+                          'nosidebet': 'remove side bet',
                           'hit': 'hit',
                           'stand': 'stay',
                           'double': 'einsatz verdoppeln',

@@ -15,6 +15,7 @@ const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const Reset = require('./intents/Reset');
 const gameService = require('./GameService');
+const bjUtils = require('./BlackjackUtils');
 
 const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
 
@@ -39,26 +40,8 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
 
 const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'NewSession': function() {
-    // Some initiatlization
-    this.attributes.playerLocale = this.event.request.locale;
-    this.attributes.numRounds = (this.attributes.numRounds)
-              ? (this.attributes.numRounds + 1) : 1;
-    this.attributes.firsthand = undefined;
-
-    // If they don't have a game, create one
-    if (!this.attributes.currentGame) {
-      gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
-        if (this.event.request.type === 'IntentRequest') {
-          this.emit(this.event.request.intent.name);
-        } else {
-          this.emit('LaunchRequest');
-        }
-      });
-    } else if (this.event.request.type === 'IntentRequest') {
-      this.emit(this.event.request.intent.name);
-    } else {
-      this.emit('LaunchRequest');
-    }
+    this.handler.state = '';
+    this.emitWithState('NewSession');
   },
   'LaunchRequest': Launch.handleIntent,
   'BettingIntent': Betting.handleIntent,
@@ -84,26 +67,8 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
 
 const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'NewSession': function() {
-    // Some initiatlization
-    this.attributes.playerLocale = this.event.request.locale;
-    this.attributes.numRounds = (this.attributes.numRounds)
-              ? (this.attributes.numRounds + 1) : 1;
-    this.attributes.firsthand = undefined;
-
-    // If they don't have a game, create one
-    if (!this.attributes.currentGame) {
-      gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
-        if (this.event.request.type === 'IntentRequest') {
-          this.emit(this.event.request.intent.name);
-        } else {
-          this.emit('LaunchRequest');
-        }
-      });
-    } else if (this.event.request.type === 'IntentRequest') {
-      this.emit(this.event.request.intent.name);
-    } else {
-      this.emit('LaunchRequest');
-    }
+    this.handler.state = '';
+    this.emitWithState('NewSession');
   },
   'LaunchRequest': Launch.handleIntent,
   'SuggestIntent': Suggest.handleIntent,
@@ -125,26 +90,8 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
 
 const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'NewSession': function() {
-    // Some initiatlization
-    this.attributes.playerLocale = this.event.request.locale;
-    this.attributes.numRounds = (this.attributes.numRounds)
-              ? (this.attributes.numRounds + 1) : 1;
-    this.attributes.firsthand = undefined;
-
-    // If they don't have a game, create one
-    if (!this.attributes.currentGame) {
-      gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
-        if (this.event.request.type === 'IntentRequest') {
-          this.emit(this.event.request.intent.name);
-        } else {
-          this.emit('LaunchRequest');
-        }
-      });
-    } else if (this.event.request.type === 'IntentRequest') {
-      this.emit(this.event.request.intent.name);
-    } else {
-      this.emit('LaunchRequest');
-    }
+    this.handler.state = '';
+    this.emitWithState('NewSession');
   },
   'LaunchRequest': Launch.handleIntent,
   'BlackjackIntent': Blackjack.handleIntent,
@@ -181,10 +128,31 @@ const handlers = {
           this.emit('LaunchRequest');
         }
       });
-    } else if (this.event.request.type === 'IntentRequest') {
-      this.emit(this.event.request.intent.name);
     } else {
-      this.emit('LaunchRequest');
+      // Standard should have progressive; some customers will have this game
+      // without progressive, so set it for them
+      if (this.attributes.currentGame === 'standard') {
+        const game = this.attributes[this.attributes.currentGame];
+
+        if (!game.progressive) {
+          game.progressive = { amount: 5, starting: 2500, jackpotRate: 1.25 };
+
+          // Also stuff sidebet in as a possible action if bet is there
+          if (game.possibleActions &&
+            (game.possibleActions.indexOf('bet') >= 0) &&
+            (game.possibleActions.indexOf('sidebet') < 0)) {
+            game.possibleActions.push('sidebet');
+          }
+        }
+      }
+
+      // Set the state
+      this.handler.state = bjUtils.getState(this.attributes);
+      if (this.event.request.type === 'IntentRequest') {
+        this.emit(this.event.request.intent.name);
+      } else {
+        this.emit('LaunchRequest');
+      }
     }
   },
   // Some intents don't make sense for a new session - so just launch instead

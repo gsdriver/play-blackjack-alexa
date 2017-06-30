@@ -43,9 +43,9 @@ const resources = {
   'HELP_CARD_TEXT': 'You can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
   // From Launch.js
   'LAUNCH_WELCOME': 'Welcome to Blackjack Game. The triple seven progressive jackpot is currently £{0}. ',
-  'LAUNCH_STARTGAME': 'You can start a blackjack game by saying bet or place side bet to bet £1 towards the jackpot ... Now, what can I help you with?',
-  'LAUNCH_DEFAULTSTATE_TEXT': 'You have £{0}. Say bet to start a new game or place side bet to bet £1 toward the jackpot. ... Now, what can I help you with?',
-  'LAUNCH_NONDEFAULTSTATE_TEXT': 'You have £{0}. Say bet to start a new game <break time=\'300ms\'/> place side bet to bet £1 towards the jackpot <break time=\'300ms\'/> or reset game to reset to the default rules and bankroll. ... Now, what can I help you with?',
+  'LAUNCH_STARTGAME': 'You can start a blackjack game by saying bet or place side bet to bet £5 towards the jackpot ... Now, what can I help you with?',
+  'LAUNCH_DEFAULTSTATE_TEXT': 'You have £{0}. Say bet to start a new game or place side bet to bet £5 toward the jackpot. ... Now, what can I help you with?',
+  'LAUNCH_NONDEFAULTSTATE_TEXT': 'You have £{0}. Say bet to start a new game <break time=\'300ms\'/> place side bet to bet £5 towards the jackpot <break time=\'300ms\'/> or reset game to reset to the default rules and bankroll. ... Now, what can I help you with?',
   // From Reset.js
   'RESET_CONFIRM': 'Would you like to reset the game? This will reset your bankroll and rules of the game.',
   'RESET_COMPLETED': 'You have £5000. Say bet to start a new game.',
@@ -174,7 +174,8 @@ module.exports = {
   mapServerError: function(error) {
     const errorMapping = {'bettoosmall': 'Your bet is below the minimum of £5',
                         'bettoolarge': 'Your bet is above the maximum of £1000',
-                        'betoverbankroll': 'Your bet is more than your available bankroll'};
+                        'betoverbankroll': 'Your bet is more than your available bankroll',
+                        'sidebettoosmall': 'Your bankroll is too low to place the side bet and continue playing'};
     return (errorMapping[error] ? errorMapping[error] : 'Internal error');
   },
   cardRanks: function(card) {
@@ -189,6 +190,8 @@ module.exports = {
     const optionMapping = {'resetbankroll': 'reset game',
                           'shuffle': 'shuffle',
                           'bet': 'bet',
+                          'sidebet': 'place side bet',
+                          'nosidebet': 'remove side bet',
                           'hit': 'hit',
                           'stand': 'stand',
                           'double': 'double down',
