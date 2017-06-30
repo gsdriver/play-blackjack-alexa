@@ -4,6 +4,10 @@
 
 'use strict';
 
+const AWS = require('aws-sdk');
+AWS.config.update({region: 'us-east-1'});
+const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+
 module.exports = {
   emitResponse: function(emit, locale, error, response, speech, reprompt) {
     if (error) {
@@ -29,15 +33,49 @@ module.exports = {
       return 'INGAME';
     }
   },
-  prepareToSave: function(attributes, locale) {
-    if (attributes) {
-      attributes['playerLocale'] = locale;
-      if (attributes['numRounds']) {
-        attributes['numRounds']++;
+  getProgressivePayout: function(attributes, callback) {
+    // Read from Dynamodb
+    const STARTING_JACKPOT = 500;
+    const JACKPOT_RATE = 0.25;
+
+    dynamodb.getItem({TableName: 'PlayBlackjack', Key: {userId: {S: 'game-' + attributes.currentGame}}},
+            (err, data) => {
+      if (err || (data.Item === undefined)) {
+        console.log(err);
+        callback((attributes[attributes.currentGame].progressiveJackpot)
+              ? attributes[attributes.currentGame].progressiveJackpot
+              : STARTING_JACKPOT);
       } else {
-        attributes['numRounds'] = 1;
+        let hands;
+
+        if (data.Item.hands && data.Item.hands.N) {
+          hands = parseInt(data.Item.hands.N);
+        } else {
+          hands = 0;
+        }
+
+        callback(Math.floor(STARTING_JACKPOT + (hands * JACKPOT_RATE)));
       }
-      attributes['firsthand'] = undefined;
+    });
+  },
+  incrementProgressive: function(attributes) {
+    const game = attributes[attributes.currentGame];
+
+    if (game.sideBet) {
+      const params = {
+          TableName: 'PlayBlackjack',
+          Key: {userId: {S: 'game-' + attributes.currentGame}},
+          AttributeUpdates: {hands: {
+              Action: 'ADD',
+              Value: {N: game.sideBet.toString()}},
+          }};
+
+      dynamodb.updateItem(params, (err, data) => {
+        if (err) {
+          console.log(err);
+        }
+      });
     }
   },
+
 };

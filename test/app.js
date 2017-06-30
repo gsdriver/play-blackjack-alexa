@@ -14,6 +14,8 @@ function BuildEvent(argv)
     var changeRulesIntent = {"name": "ChangeRulesIntent", "slots": {"ChangeOption": {"name": "ChangeOption", "value": ""}, "Change": {"name": "Change", "value": ""}}};
     var readRulesIntent = {"name": "RulesIntent", "slots": {}};
     var betIntent = {"name": "BettingIntent", "slots": {"Amount": {"name": "Amount", "value": ""}}};
+    var placeSideBetIntent = {"name": "PlaceSideBetIntent", "slots": {}};
+    var removeSideBetIntent = {"name": "RemoveSideBetIntent", "slots": {}};
     var yesIntent = {"name": "AMAZON.YesIntent", "slots": {}};
     var noIntent = {"name": "AMAZON.NoIntent", "slots": {}};
     var resetIntent = {"name": "ResetIntent", "slots": {}};
@@ -109,6 +111,14 @@ function BuildEvent(argv)
     else if (argv[2] == "reset")
     {
         lambda.request.intent = resetIntent;
+    }
+    else if (argv[2] == "placesidebet")
+    {
+        lambda.request.intent = placeSideBetIntent;
+    }
+    else if (argv[2] == "removesidebet")
+    {
+        lambda.request.intent = removeSideBetIntent;
     }
     else if (argv[2] == "yes")
     {

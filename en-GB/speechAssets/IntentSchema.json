@@ -19,6 +19,12 @@
       ]
     },
     {
+      "intent": "PlaceSideBetIntent"
+    },
+    {
+      "intent": "RemoveSideBetIntent"
+    },
+    {
       "intent": "RulesIntent"
     },
     {
