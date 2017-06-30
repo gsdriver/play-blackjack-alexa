@@ -17,6 +17,13 @@ const resources = {
   'CHANGE_CARD_TEXT': 'Sie können die folgenden optionen ändern:\n\n - SCHLÄGT SOFT SIEBZEHN: Ob der händler eine weiche 17 summe treffen wird. Kann AN or AUS sein.\n - AUFGEBEN: Ob eine aufgeben angeboten wird. Kann AN or AUS sein\n - EINSATZ VERDOPPELN: Ob eine einsatz verdoppeln angeboten wird.  Kann AN or AUS sein.\n - VERDOPPLUNG NACH SPLIT: Ob sie nach dem spalten verdoppeln können.  Kann AN or AUS sein.\n - RESPLIT ACES: Ob sie Asse wieder spalten können oder nicht.  Kann AN or AUS sein.\n - ANZAHL DER KARTENDECKS: die anzahl der kartendecks im spiel. Kann EINS, ZWEI, VIER, SECHS oder ACHT sein.\n - ANZAHL DER SPIELHANDS SPLATEN: Die maximale anzahl an spielhands, die sie haben können. Kann EINS, ZWEI, DREI oder VIER sein.\n\nZum beispiel sagen "Ändere anzahl der kartendecks zu zwei" wenn du mit zwei kartendecks spielen möchtest.\nBeachten sie, dass das kartendeck gemischt wird, wenn sie die spielregeln ändern',
   // From Betting.js
   'BAD_BET_FORMAT': 'Nicht wette für {0}',
+  // From SideBet.js
+  'SIDEBET_REPROMPT': 'Say deal to start the game.',
+  'SIDEBET_MINIMUM': 'Your bankroll is too low to place the side bet and continue playing. ',
+  'SIDEBET_PLACED': '${0} side bet placed. The side bet will remain in play until you say remove side bet. ',
+  'SIDEBET_REMOVED': 'Side bet removed. ',
+  'SIDEBET_NOBET': 'You don\'t have a side bet to remove. ',
+  'SIDEBET_INVALID': 'You can\'t change the side bet during the middle of a game. ',
   // From Blackjack.js
   'BLACKJACKINTENT_NO_ACTION': 'Tut mir leid, dass ich diese Aktion nicht fangen. Bitte sagen Sie, was Sie wollen, zu tun auf dieser Seite wie Hit oder stehen. Wie kann ich helfen?',
   'BLACKJACKINTENT_UNKNOWN_ACTION': 'Tut mir leid, ich weiß nicht, wie {0}. Bitte sagen Sie, was Sie wollen, zu tun auf dieser Seite wie Hit oder stehen. Wie kann ich helfen?',

@@ -4,6 +4,7 @@ const Alexa = require('alexa-sdk');
 const Launch = require('./intents/Launch');
 const Blackjack = require('./intents/Blackjack');
 const Betting = require('./intents/Betting');
+const SideBet = require('./intents/SideBet');
 const Suggest = require('./intents/Suggest');
 const Rules = require('./intents/Rules');
 const ChangeRules = require('./intents/ChangeRules');
@@ -13,7 +14,6 @@ const Repeat = require('./intents/Repeat');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const Reset = require('./intents/Reset');
-const bjUtils = require('./BlackjackUtils');
 const gameService = require('./GameService');
 
 const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
@@ -29,7 +29,6 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'SessionEndedRequest': function() {
-    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
     this.emit(':saveState', true);
   },
   'Unhandled': function() {
@@ -40,6 +39,12 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
 
 const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'NewSession': function() {
+    // Some initiatlization
+    this.attributes.playerLocale = this.event.request.locale;
+    this.attributes.numRounds = (this.attributes.numRounds)
+              ? (this.attributes.numRounds + 1) : 1;
+    this.attributes.firsthand = undefined;
+
     // If they don't have a game, create one
     if (!this.attributes.currentGame) {
       gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
@@ -57,6 +62,8 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   },
   'LaunchRequest': Launch.handleIntent,
   'BettingIntent': Betting.handleIntent,
+  'PlaceSideBetIntent': SideBet.handlePlaceIntent,
+  'RemoveSideBetIntent': SideBet.handleRemoveIntent,
   'ResetIntent': Reset.handleIntent,
   'RulesIntent': Rules.handleIntent,
   'ChangeRulesIntent': ChangeRules.handleIntent,
@@ -67,7 +74,6 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'SessionEndedRequest': function() {
-    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
     this.emit(':saveState', true);
   },
   'Unhandled': function() {
@@ -78,6 +84,12 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
 
 const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'NewSession': function() {
+    // Some initiatlization
+    this.attributes.playerLocale = this.event.request.locale;
+    this.attributes.numRounds = (this.attributes.numRounds)
+              ? (this.attributes.numRounds + 1) : 1;
+    this.attributes.firsthand = undefined;
+
     // If they don't have a game, create one
     if (!this.attributes.currentGame) {
       gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
@@ -103,7 +115,6 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'SessionEndedRequest': function() {
-    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
     this.emit(':saveState', true);
   },
   'Unhandled': function() {
@@ -114,6 +125,12 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
 
 const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'NewSession': function() {
+    // Some initiatlization
+    this.attributes.playerLocale = this.event.request.locale;
+    this.attributes.numRounds = (this.attributes.numRounds)
+              ? (this.attributes.numRounds + 1) : 1;
+    this.attributes.firsthand = undefined;
+
     // If they don't have a game, create one
     if (!this.attributes.currentGame) {
       gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
@@ -138,7 +155,6 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'SessionEndedRequest': function() {
-    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
     this.emit(':saveState', true);
   },
   'Unhandled': function() {
@@ -150,6 +166,12 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
 // Handlers for our skill
 const handlers = {
   'NewSession': function() {
+    // Some initiatlization
+    this.attributes.playerLocale = this.event.request.locale;
+    this.attributes.numRounds = (this.attributes.numRounds)
+              ? (this.attributes.numRounds + 1) : 1;
+    this.attributes.firsthand = undefined;
+
     // If they don't have a game, create one
     if (!this.attributes.currentGame) {
       gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
@@ -173,6 +195,8 @@ const handlers = {
   'AMAZON.YesIntent': Launch.handleIntent,
   'AMAZON.NoIntent': Launch.handleIntent,
   'BettingIntent': Betting.handleIntent,
+  'PlaceSideBetIntent': SideBet.handlePlaceIntent,
+  'RemoveSideBetIntent': SideBet.handleRemoveIntent,
   'BlackjackIntent': Blackjack.handleIntent,
   'RulesIntent': Rules.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
@@ -180,7 +204,6 @@ const handlers = {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'SessionEndedRequest': function() {
-    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
     this.emit(':saveState', true);
   },
   'Unhandled': function() {

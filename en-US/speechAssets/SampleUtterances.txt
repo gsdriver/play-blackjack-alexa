@@ -43,6 +43,39 @@ BettingIntent do bet
 BettingIntent do deal
 BettingIntent deal
 BettingIntent bet
+
+PlaceSideBetIntent place side bet
+PlaceSideBetIntent place a side bet
+PlaceSideBetIntent make side bet
+PlaceSideBetIntent make a side bet
+PlaceSideBetIntent do side bet
+PlaceSideBetIntent place progressive bet
+PlaceSideBetIntent place a progressive bet
+PlaceSideBetIntent make progressive bet
+PlaceSideBetIntent make a progressive bet
+PlaceSideBetIntent do progressive bet
+PlaceSideBetIntent place progressive side bet
+PlaceSideBetIntent place a progressive side bet
+PlaceSideBetIntent make progressive side bet
+PlaceSideBetIntent make a progressive side bet
+PlaceSideBetIntent do progressive side bet
+
+RemoveSideBetIntent remove side bet
+RemoveSideBetIntent remove a side bet
+RemoveSideBetIntent take down side bet
+RemoveSideBetIntent take down a side bet
+RemoveSideBetIntent end side bet
+RemoveSideBetIntent remove progressive bet
+RemoveSideBetIntent remove a progressive bet
+RemoveSideBetIntent take down progressive bet
+RemoveSideBetIntent take down a progressive bet
+RemoveSideBetIntent end progressive bet
+RemoveSideBetIntent remove progressive side bet
+RemoveSideBetIntent remove a progressive side bet
+RemoveSideBetIntent take down progressive side bet
+RemoveSideBetIntent take down a progressive side bet
+RemoveSideBetIntent end progressive side bet
+
 RulesIntent read rules
 RulesIntent read the rules
 RulesIntent what are the rules
