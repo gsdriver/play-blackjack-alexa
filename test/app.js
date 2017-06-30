@@ -2,6 +2,10 @@ var mainApp = require('../index');
 
 const attributeFile = 'attributes.txt';
 
+const AWS = require('aws-sdk');
+AWS.config.update({region: 'us-east-1'});
+const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+
 function BuildEvent(argv)
 {
     // Templates that can fill in the intent
@@ -27,7 +31,7 @@ function BuildEvent(argv)
         "user": {
           "userId": "not-amazon",
          },
-         "new": true
+         "new": false
        },
        "request": {
          "type": "IntentRequest",
@@ -147,7 +151,7 @@ myResponse.succeed = function(result) {
     console.log('Card Content: ' + result.response.card.content);
   }
   console.log('The session ' + ((!result.response.shouldEndSession) ? 'stays open.' : 'closes.'));
-  if (result.sessionAttributes) {
+  if (result.sessionAttributes && !process.env.NOLOG) {
     console.log('"attributes": ' + JSON.stringify(result.sessionAttributes));
   }
   if (result.sessionAttributes) {
@@ -166,7 +170,19 @@ myResponse.fail = function(e) {
 }
 
 // Build the event object and call the app
-var event = BuildEvent(process.argv);
-if (event) {
-    mainApp.handler(event, myResponse);
+if ((process.argv.length == 3) && (process.argv[2] == 'clear')) {
+  const fs = require('fs');
+
+  // Clear is a special case - delete this entry from the DB and delete the attributes.txt file
+  dynamodb.deleteItem({TableName: 'PlayBlackjack', Key: { userId: {S: 'not-amazon'}}}, function (error, data) {
+    console.log("Deleted " + error);
+    if (fs.existsSync(attributeFile)) {
+      fs.unlinkSync(attributeFile);
+    }
+  });
+} else {
+  var event = BuildEvent(process.argv);
+  if (event) {
+      mainApp.handler(event, myResponse);
+  }
 }

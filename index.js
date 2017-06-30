@@ -13,12 +13,16 @@ const Repeat = require('./intents/Repeat');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const Reset = require('./intents/Reset');
-const playgame = require('./PlayGame');
 const bjUtils = require('./BlackjackUtils');
+const gameService = require('./GameService');
 
 const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
 
 const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
+  'NewSession': function() {
+    this.handler.state = '';
+    this.emitWithState('NewSession');
+  },
   'LaunchRequest': Reset.handleNoReset,
   'AMAZON.YesIntent': Reset.handleYesReset,
   'AMAZON.NoIntent': Reset.handleNoReset,
@@ -35,6 +39,22 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
 });
 
 const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
+  'NewSession': function() {
+    // If they don't have a game, create one
+    if (!this.attributes.currentGame) {
+      gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
+        if (this.event.request.type === 'IntentRequest') {
+          this.emit(this.event.request.intent.name);
+        } else {
+          this.emit('LaunchRequest');
+        }
+      });
+    } else if (this.event.request.type === 'IntentRequest') {
+      this.emit(this.event.request.intent.name);
+    } else {
+      this.emit('LaunchRequest');
+    }
+  },
   'LaunchRequest': Launch.handleIntent,
   'BettingIntent': Betting.handleIntent,
   'ResetIntent': Reset.handleIntent,
@@ -57,6 +77,22 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
 });
 
 const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
+  'NewSession': function() {
+    // If they don't have a game, create one
+    if (!this.attributes.currentGame) {
+      gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
+        if (this.event.request.type === 'IntentRequest') {
+          this.emit(this.event.request.intent.name);
+        } else {
+          this.emit('LaunchRequest');
+        }
+      });
+    } else if (this.event.request.type === 'IntentRequest') {
+      this.emit(this.event.request.intent.name);
+    } else {
+      this.emit('LaunchRequest');
+    }
+  },
   'LaunchRequest': Launch.handleIntent,
   'SuggestIntent': Suggest.handleIntent,
   'RulesIntent': Rules.handleIntent,
@@ -77,6 +113,22 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
 });
 
 const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
+  'NewSession': function() {
+    // If they don't have a game, create one
+    if (!this.attributes.currentGame) {
+      gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
+        if (this.event.request.type === 'IntentRequest') {
+          this.emit(this.event.request.intent.name);
+        } else {
+          this.emit('LaunchRequest');
+        }
+      });
+    } else if (this.event.request.type === 'IntentRequest') {
+      this.emit(this.event.request.intent.name);
+    } else {
+      this.emit('LaunchRequest');
+    }
+  },
   'LaunchRequest': Launch.handleIntent,
   'BlackjackIntent': Blackjack.handleIntent,
   'SuggestIntent': Suggest.handleIntent,
@@ -98,21 +150,18 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
 // Handlers for our skill
 const handlers = {
   'NewSession': function() {
-    if (this.event.request.type === 'IntentRequest') {
-      // Set the state and route accordingly
-      console.log('New session started: ' + JSON.stringify(this.event.request.intent));
-      playgame.readCurrentHand(undefined, this.event.request.locale,
-        this.event.session.user.userId,
-        (error, response, speech, reprompt, gameState) => {
-        this.attributes['gameState'] = gameState;
-        if (gameState) {
-          this.attributes['firsthand'] = true;
-          this.handler.state = bjUtils.getState(gameState);
+    // If they don't have a game, create one
+    if (!this.attributes.currentGame) {
+      gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
+        if (this.event.request.type === 'IntentRequest') {
+          this.emit(this.event.request.intent.name);
+        } else {
+          this.emit('LaunchRequest');
         }
-        this.emit(this.event.request.intent.name);
       });
+    } else if (this.event.request.type === 'IntentRequest') {
+      this.emit(this.event.request.intent.name);
     } else {
-      console.log('New session started: Launch');
       this.emit('LaunchRequest');
     }
   },
@@ -144,7 +193,7 @@ exports.handler = function(event, context, callback) {
   const AWS = require('aws-sdk');
   AWS.config.update({region: 'us-east-1'});
 
-  if (event) {
+  if (event && !process.env.NOLOG) {
     console.log(JSON.stringify(event));
   }
 

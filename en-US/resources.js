@@ -25,7 +25,7 @@ const resources = {
   'CHANGERULES_NO_RULE_VALUE': 'I\'m sorry, I don\'t understand how to change {0}. Check the Alexa companion app for rules you can change. What else can I help with?',
   'CHANGERULES_NO_RULE_OPTION': 'I\'m sorry, I didn\'t catch how to change {0}. Check the Alexa companion app for rules you can change. What else can I help with?',
   'CHANGERULES_CANT_CHANGE_RULE': 'I\'m sorry, I was unable to change {0} to {1}. Check the Alexa companion app for available rules you can change. What else can I help with?',
-  'CHANGERULES_CARD_TITLE': 'Play Blackjack',
+  'CHANGERULES_CARD_TITLE': 'Blackjack Game',
   'FULL_RULES': 'The full rules are {0}',
   // From Exit.js
   'EXIT_BANKROLL': 'You are leaving with ${0}.',
@@ -35,7 +35,7 @@ const resources = {
   'HELP_CARD_TITLE': 'Blackjack Commands',
   'HELP_CARD_TEXT': 'You can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
   // From Launch.js
-  'LAUNCH_WELCOME': 'Welcome to the Blackjack player. ',
+  'LAUNCH_WELCOME': 'Welcome to Blackjack Game. ',
   'LAUNCH_STARTGAME': 'You can start a blackjack game by saying Bet ... Now, what can I help you with?',
   'LAUNCH_DEFAULTSTATE_TEXT': 'You have ${0}. Say bet to start a new game. ... Now, what can I help you with?',
   'LAUNCH_NONDEFAULTSTATE_TEXT': 'You have ${0}. Say bet to start a new game or reset game to reset to the default rules and bankroll. ... Now, what can I help you with?',
@@ -69,21 +69,18 @@ const resources = {
   'RESULT_AFTER_HIT_NOBUST': 'You got a {0} for a total of {1}. ',
   'RESULT_BANKROLL_RESET': 'Bankroll reset',
   'RESULT_DECK_SHUFFLED': 'Deck shuffled',
-  'DEALER_HOLE_CARD': 'The dealer had a {0} down.',
-  'DEALER_BUSTED': ' The dealer busted.',
-  'DEALER_BLACKJACK': ' The dealer has Blackjack.',
-  'DEALER_TOTAL': ' The dealer had a total of {0}.',
-  'DEALER_DRAW': ' The dealer drew ',
+  'DEALER_HOLE_CARD': 'I have a {0} down.',
+  'DEALER_BUSTED': ' I busted.',
+  'DEALER_BLACKJACK': ' I have Blackjack.',
+  'DEALER_TOTAL': ' I had a total of {0}.',
+  'DEALER_DRAW': ' I drew ',
   'DEALER_CARD_ARTICLE': 'a {0}',
-  'PLAYER_HIT_BUSTED': 'You got a {0} and busted. ',
-  'PLAYER_HIT_NOTBUSTED_SOFT': 'You got a {0} for a total of soft {1}.',
-  'PLAYER_HIT_NOTBUSTED': 'You got a {0} for a total of {1}.',
-  'DEALER_SHOWING': ' The dealer is showing a {0}.',
+  'DEALER_SHOWING': ' I am showing a {0}.',
   'SPLIT_TENS': 'You split tens. ',
   'SPLIT_PAIR': 'You split a pair of {0}. ',
   'SURRENDER_RESULT': 'You surrendered. ',
-  'DEALER_HAD_BLACKJACK': 'The dealer had a blackjack. ',
-  'DEALER_NO_BLACKJACK': 'The dealer didn\'t have a blackjack. ',
+  'DEALER_HAD_BLACKJACK': 'I had a blackjack. ',
+  'DEALER_NO_BLACKJACK': 'I didn\'t have a blackjack. ',
   'READHAND_PLAYER_TOTAL_ACTIVE_BLACKJACK': 'You have {0} for a blackjack. ',
   'READHAND_PLAYER_TOTAL_END_BLACKJACK': 'You had {0} for a blackjack. ',
   'READHAND_PLAYER_BUSTED_SOFT': 'You busted with {0} for a total of soft {1}. ',
@@ -92,8 +89,8 @@ const resources = {
   'READHAND_PLAYER_BUSTED': 'You busted with {0} for a total of {1}.  ',
   'READHAND_PLAYER_TOTAL_ACTIVE': 'You have {0} for a total of {1}.  ',
   'READHAND_PLAYER_TOTAL_END': 'You had {0} for a total of {1}.  ',
-  'READHAND_DEALER_ACTIVE': 'The dealer has a {0} showing.',
-  'READHAND_DEALER_DONE': 'The dealer had a {0} showing. ',
+  'READHAND_DEALER_ACTIVE': 'I have a {0} showing.',
+  'READHAND_DEALER_DONE': 'I had a {0} showing. ',
   'RULES_DECKS': '{0} deck game. ',
   'RULES_BET_RANGE': 'Bet from ${0} to ${1}. ',
   'RULES_HIT_SOFT17': 'Dealer hits on soft 17. ',
@@ -107,12 +104,25 @@ const resources = {
   'RULES_BLACKJACK': 'Blackjack pays {0}. ',
   'RULES_SURRENDER_OFFERED': 'Surrender allowed. ',
   'RULES_NO_SURRENDER': 'Surrender not offered. ',
+  'PLAYER_HIT_BUSTED': 'You got a {0} and busted. ',
+  'PLAYER_HIT_NOTBUSTED_SOFT': 'You got a {0} for a total of soft {1}. |Here\'s a {0} for a total of soft {1}. |I have a {0} for you giving you soft {1}. ',
+  'PLAYER_HIT_NOTBUSTED': 'You got a {0} for a total of {1}. |Here\'s a {0} for a total of {1}. |I have a {0} for you giving you {1}. ',
+  'GOOD_HIT_OPTIONS': 'I have a {0} for you giving you {1}. Not bad! |You got a {0} for a total of {1}. Good hit. |Here\'s a {0} for a total of {1}. ',
+  'GREAT_HIT_OPTIONS': 'Look at this, I have a {0} giving you {1}. |Yes, it\'s a {0} for a total of {1}! |Here\'s a beauty, a {0} for a total of {1}. ',
 };
 
 module.exports = {
   strings: resources,
+  pickRandomOption: function(res) {
+    if (res && resources[res]) {
+      const options = resources[res].split('|');
+      return options[Math.floor(Math.random() * options.length)];
+    } else {
+      return undefined;
+    }
+  },
   getBlackjackAction: function(actionSlot) {
-    const actionMapping = {'hit': 'hit', 'take a hit': 'hit', 'hit me': 'hit', 'take one': 'hit',
+    const actionMapping = {'hit': 'hit', 'take a hit': 'hit', 'hit me': 'hit', 'take one': 'hit', 'take 1': 'hit',
       'stand': 'stand', 'stay': 'stand', 'done': 'stand',
       'surrender': 'surrender', 'give up': 'surrender',
       'double': 'double', 'double down': 'double',
@@ -183,8 +193,8 @@ module.exports = {
   },
   mapOutcome: function(outcome) {
     const outcomeMapping = {'blackjack': 'You win with a Natural Blackjack!',
-               'dealerblackjack': 'The dealer has Blackjack.',
-               'nodealerblackjack': 'The dealer doesn\'t have Blackjack.',
+               'dealerblackjack': 'I have Blackjack.',
+               'nodealerblackjack': 'I don\'t have Blackjack.',
                'win': 'You won!',
                'loss': 'You lost.',
                'push': 'It\'s a tie.',

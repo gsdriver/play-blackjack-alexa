@@ -9,10 +9,10 @@ const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
   handleIntent: function() {
-    playgame.playBlackjackAction(this.attributes['gameState'],
+    playgame.playBlackjackAction(this.attributes,
       this.event.request.locale,
       this.event.session.user.userId, {action: 'suggest'},
-      (error, response, speech, reprompt, gameState) => {
+      (error, response, speech, reprompt) => {
       bjUtils.emitResponse(this.emit, this.event.request.locale, error, response, speech, reprompt);
     });
   },

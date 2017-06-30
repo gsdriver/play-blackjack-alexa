@@ -9,10 +9,9 @@
   "dependencies": {
     "alexa-sdk": "^1.0.9",
     "alexa-speech-utils": "~0.0.4",
-    "requestify": "^0.2.5"
+    "blackjack-strategy": "^1.3.2"
   },
   "devDependencies": {
-    "alexa-conversation": "^0.1.0",
     "del": "^2.2.2",
     "eslint-config-google": "^0.7.1",
     "eslint-html-reporter": "^0.5.2",

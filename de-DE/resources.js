@@ -76,8 +76,6 @@ const resources = {
   'DEALER_DRAW': ' Der Händler erhält ',
   'DEALER_CARD_ARTICLE': 'eine {0}',
   'PLAYER_HIT_BUSTED': 'Du hast eine {0} und überkaufen. ',
-  'PLAYER_HIT_NOTBUSTED_SOFT': 'Du hast eine {0} für insgesamt weiche {1}.',
-  'PLAYER_HIT_NOTBUSTED': 'Du hast eine {0} für insgesamt {1}.',
   'DEALER_SHOWING': ' Der Händler zeigt eine {0}.',
   'SPLIT_TENS': 'Sie teilen Zehner. ',
   'SPLIT_PAIR': 'Sie teilen ein paar {0}. ',
@@ -107,10 +105,22 @@ const resources = {
   'RULES_BLACKJACK': 'Blackjack zahlt {0}. ',
   'RULES_SURRENDER_OFFERED': 'Aufgeben erlaubt. ',
   'RULES_NO_SURRENDER': 'Aufgeben nicht angeboten. ',
+  'PLAYER_HIT_NOTBUSTED_SOFT': 'Du hast eine {0} für insgesamt weiche {1}. ',
+  'PLAYER_HIT_NOTBUSTED': 'Du hast eine {0} für insgesamt {1}. ',
+  'GOOD_HIT_OPTIONS': 'Du hast eine {0} für insgesamt {1}. ',
+  'GREAT_HIT_OPTIONS': 'Du hast eine {0} für insgesamt {1}. ',
 };
 
 module.exports = {
   strings: resources,
+  pickRandomOption: function(res) {
+    if (res && resources[res]) {
+      const options = resources[res].split('|');
+      return options[Math.floor(Math.random() * options.length)];
+    } else {
+      return undefined;
+    }
+  },
   getBlackjackAction: function(actionSlot) {
     const actionMapping = {'hit': 'hit', 'karte': 'hit', 'carte': 'hit', 'nehmen sie eine karte': 'hit',
       'stand': 'stand', 'stay': 'stand', 'keine karte': 'stand', 'reste': 'stand',

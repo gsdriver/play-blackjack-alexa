@@ -23,15 +23,11 @@ module.exports = {
         actionObj.action = actionSlot.value;
       }
 
-      playgame.playBlackjackAction(this.attributes['gameState'],
+      playgame.playBlackjackAction(this.attributes,
           this.event.request.locale,
           this.event.session.user.userId,
-          actionObj,
-          (error, response, speech, reprompt, gameState) => {
-        this.attributes['gameState'] = gameState;
-        if (gameState) {
-          this.handler.state = bjUtils.getState(gameState);
-        }
+          actionObj, (error, response, speech, reprompt) => {
+          this.handler.state = bjUtils.getState(this.attributes);
         bjUtils.emitResponse(this.emit, this.event.request.locale,
           error, response, speech, reprompt);
       });
