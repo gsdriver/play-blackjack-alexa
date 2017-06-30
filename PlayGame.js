@@ -50,29 +50,31 @@ module.exports = {
         const betAmount = (action.amount ? action.amount : game.lastBet);
         const oldGame = JSON.parse(JSON.stringify(game));
 
-        speechError = gameService.userAction(attributes, action.action, betAmount);
-        if (!speechError) {
-          // Special case - give a full read-out if this is a natural blackjack
-          const playerBlackjack = ((game.playerHands.length == 1)
-            && (game.activePlayer == 'player')
-            && (game.playerHands[0].cards.length == 2)
-            && (game.playerHands[0].total == 21));
+        gameService.userAction(attributes, action.action, betAmount, (speechError, jackpot) => {
+          let error;
 
-          // If this was the first hand, or they specified a value, tell them how much they bet
-          if ((action.action === 'bet') && (action.firsthand || (action.amount > 0))) {
-            speechQuestion += resources.strings.YOU_BET_TEXT.replace('{0}', betAmount);
+          if (speechError) {
+            error = resources.mapServerError(speechError);
+          } else {
+            // Special case - give a full read-out if this is a natural blackjack
+            const playerBlackjack = ((game.playerHands.length == 1)
+              && (game.activePlayer == 'player')
+              && (game.playerHands[0].cards.length == 2)
+              && (game.playerHands[0].total == 21));
+
+            // If this was the first hand, or they specified a value, tell them how much they bet
+            if ((action.action === 'bet') && (action.firsthand || (action.amount > 0))) {
+              speechQuestion += resources.strings.YOU_BET_TEXT.replace('{0}', betAmount);
+            }
+
+            // Pose this as a question whether it's the player or dealer's turn
+            repromptQuestion = listValidActions(game, locale, 'full');
+            speechQuestion += (tellResult(attributes, locale, action.action, jackpot, oldGame) + ' '
+              + listValidActions(game, locale, (playerBlackjack) ? 'full' : 'summary'));
           }
 
-          // Pose this as a question whether it's the player or dealer's turn
-          repromptQuestion = listValidActions(game, locale, 'full');
-          speechQuestion += (tellResult(attributes, locale, action.action, oldGame) + ' '
-            + listValidActions(game, locale, (playerBlackjack) ? 'full' : 'summary'));
-        } else {
-          // Map this
-          speechError = resources.mapServerError(speechError);
-        }
-
-        sendUserCallback(attributes, speechError, null, speechQuestion, repromptQuestion, callback);
+          sendUserCallback(attributes, error, null, speechQuestion, repromptQuestion, callback);
+        });
       }
     }
   },
@@ -128,16 +130,17 @@ module.exports = {
     let speech = resources.strings.INTERNAL_ERROR;
 
     // OK, let's post the rule change and get a new game state
-    const error = gameService.userAction(attributes, 'setrules', rules);
-    if (!error) {
-      // Read the new rules
-      speech = rulesToText(locale, game.rules, rules);
-    }
+    gameService.userAction(attributes, 'setrules', rules, (error) => {
+      if (!error) {
+        // Read the new rules
+        speech = rulesToText(locale, game.rules, rules);
+      }
 
-    // If this is shuffle, we'll do the shuffle for them
-    const reprompt = resources.strings.CHANGERULES_REPROMPT;
-    speech += resources.strings.CHANGERULES_CHECKAPP;
-    sendUserCallback(attributes, error, null, speech, reprompt, callback);
+      // If this is shuffle, we'll do the shuffle for them
+      const reprompt = resources.strings.CHANGERULES_REPROMPT;
+      speech += resources.strings.CHANGERULES_CHECKAPP;
+      sendUserCallback(attributes, error, null, speech, reprompt, callback);
+    });
   },
 };
 
@@ -152,13 +155,15 @@ function sendUserCallback(attributes, error, response, speech, reprompt, callbac
   if (game && game.possibleActions) {
     if (game.possibleActions.indexOf('shuffle') > -1) {
       // Simplify things and just shuffle for them
-      gameService.userAction(attributes, 'shuffle', 0);
-      callback(error, response, speech, reprompt);
+      gameService.userAction(attributes, 'shuffle', 0, (err, jackpot) => {
+        callback(error, response, speech, reprompt);
+      });
       return;
     } else if (game.possibleActions.indexOf('resetbankroll') > -1) {
       // Simplify things and just shuffle for them if this is resetbankroll
-      gameService.userAction(attributes, 'resetbankroll', 0);
-      callback(error, response, speech, reprompt);
+      gameService.userAction(attributes, 'resetbankroll', 0, (err, jackpot) => {
+        callback(error, response, speech, reprompt);
+      });
       return;
     }
   }
@@ -206,7 +211,7 @@ function listValidActions(game, locale, type) {
   return result;
 }
 
-function tellResult(attributes, locale, action, oldGame) {
+function tellResult(attributes, locale, action, jackpot, oldGame) {
   let result = '';
   const game = attributes[attributes.currentGame];
 
@@ -244,7 +249,7 @@ function tellResult(attributes, locale, action, oldGame) {
       break;
     case 'sidebet':
       // A side bet was placed
-      result += resources.strings.SIDEBET_PLACED.replace('{0}', game.progressive.amount);
+      result += resources.strings.SIDEBET_PLACED.replace('{0}', game.progressive.bet);
       break;
     case 'nosidebet':
       // A side bet was removed
@@ -272,6 +277,17 @@ function tellResult(attributes, locale, action, oldGame) {
       result += readSurrender(game, locale);
       break;
     }
+
+  if (jackpot) {
+    // Oh, the side bet paid out - let them know
+    if (game.numSevens === 1) {
+       result += resources.strings.SIDEBET_ONESEVEN.replace('{0}', jackpot);
+    } else if (game.numSevens === 2) {
+       result += resources.strings.SIDEBET_TWOSEVENS.replace('{0}', jackpot);
+    } else if (game.numSevens === 3) {
+       result += resources.strings.SIDEBET_PROGRESSIVE.replace('{0}', jackpot);
+    }
+  }
 
   if ((oldGame.activePlayer == 'player') && (game.activePlayer != 'player')) {
     // OK, game over - so let's give the new total

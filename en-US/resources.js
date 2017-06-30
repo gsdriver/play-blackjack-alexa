@@ -36,6 +36,7 @@ const resources = {
   // From Help.js
   'HELP_GENERIC_HELP': 'You can play a game by saying Deal, or you can say exit<break time=\'300ms\'/>Now, what can I help you with?',
   'HELP_CARD_TITLE': 'Blackjack Commands',
+  'HELP_CARD_PROGRESSIVE_TEXT': 'This game features a progressive triple seven jackpot. Place a side bet of $5 by saying PLACE SIDE BET which will stay in effect until you say REMOVE SIDE BET.\nThe side bet pays out $25 if your first card is a seven, $100 if your first two cards are both seven, and the progressive jackpot if your first three cards are seven. The progressive jackpot is based on aggregate play across all users of this skill.\n',
   'HELP_CARD_TEXT': 'You can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
   // From Launch.js
   'LAUNCH_WELCOME': 'Welcome to Blackjack Game. The triple seven progressive jackpot is currently ${0}. ',
@@ -113,6 +114,9 @@ const resources = {
   'PLAYER_HIT_NOTBUSTED': 'You got a {0} for a total of {1}. |Here\'s a {0} for a total of {1}. |I have a {0} for you giving you {1}. ',
   'GOOD_HIT_OPTIONS': 'I have a {0} for you giving you {1}. Not bad! |You got a {0} for a total of {1}. Good hit. |Here\'s a {0} for a total of {1}. ',
   'GREAT_HIT_OPTIONS': 'Look at this, I have a {0} giving you {1}. |Yes, it\'s a {0} for a total of {1}! |Here\'s a beauty, a {0} for a total of {1}. ',
+  'SIDEBET_ONESEVEN': 'Your first card was a seven and your side bet won ${0}. ',
+  'SIDEBET_TWOSEVENS': 'Your first two cards were sevens and your side bet won ${0}. ',
+  'SIDEBET_PROGRESSIVE': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your first three cards were sevens and you won the progressive jackpot of ${0}! ',
 };
 
 module.exports = {

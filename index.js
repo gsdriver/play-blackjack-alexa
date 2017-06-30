@@ -135,7 +135,7 @@ const handlers = {
         const game = this.attributes[this.attributes.currentGame];
 
         if (!game.progressive) {
-          game.progressive = { amount: 5, starting: 2500, jackpotRate: 1.25 };
+          game.progressive = {amount: 5, starting: 2500, jackpotRate: 1.25};
 
           // Also stuff sidebet in as a possible action if bet is there
           if (game.possibleActions &&

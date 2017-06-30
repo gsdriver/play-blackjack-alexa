@@ -79,5 +79,17 @@ module.exports = {
       });
     }
   },
-
+  // Updates DynamoDB to note that the progressive was won!
+  // Note this function does not callback
+  resetProgressive: function(game) {
+    // Write to the DB, and reset the hands played to 0
+    dynamodb.putItem({TableName: 'PlayBlackjack',
+        Item: {userId: {S: 'game-' + game}, hands: {N: '0'}}},
+        (err, data) => {
+      // We don't take a callback, but if there's an error log it
+      if (err) {
+        console.log(err);
+      }
+    });
+  },
 };
