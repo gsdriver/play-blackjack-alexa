@@ -5,6 +5,7 @@
 
 const suggest = require('blackjack-strategy');
 const http = require('http');
+const bjUtils = require('./BlackjackUtils.js');
 
 const STARTING_BANKROLL = 5000;
 
@@ -31,6 +32,11 @@ module.exports = {
                minBet: 5,                // The minimum bet - not configurable
                maxBet: 1000,             // The maximum bet - not configurable
                maxSplitHands: 4,         // Maximum number of hands you can have due to splits
+           },
+           progressive: {
+               bet: 5,                   // Amount of the side bet
+               starting: 2500,           // Starting payout of the side bet
+               jackpotRate: 1.25,        // Amount jackpot goes up with each hand played
            },
            activePlayer: 'none',
            currentPlayerHand: 0,
@@ -127,7 +133,18 @@ module.exports = {
         } else if (value > game.rules.maxBet) {
           return 'bettoolarge';
         }
-        deal(game, value);
+        deal(attributes, value);
+        break;
+
+      case 'sidebet':
+        game.sideBetPlaced = true;
+        game.bankroll -= game.progressive.bet;
+        game.specialState = 'sidebet';
+        break;
+
+      case 'nosidebet':
+        game.sideBetPlaced = false;
+        game.bankroll += game.progressive.bet;
         break;
 
       case 'hit':
@@ -243,7 +260,8 @@ function updateGame(game) {
   }
 }
 
-function deal(game, betAmount) {
+function deal(attributes, betAmount) {
+  const game = attributes[attributes.currentGame];
   const newHand = {bet: 0, busted: false, cards: []};
 
   // Make sure the betAmount is valid
@@ -271,6 +289,11 @@ function deal(game, betAmount) {
   game.activePlayer = 'none';
   game.currentPlayerHand = 0;
   nextHand(game);
+
+  // If there was a side bet placed, increment the progressive count
+  if (game.sideBetPlaced) {
+    bjUtils.incrementProgressive(attributes);
+  }
 }
 
 function shuffleDeck(game) {
@@ -406,8 +429,18 @@ function setNextActions(game) {
       game.possibleActions.push('resetbankroll');
     } else if (game.deck.cards.length > 20) {
       game.possibleActions.push('bet');
+      if (game.progressive
+          && !game.sideBetPlaced
+          && ((game.bankroll - game.progressive.bet) >= game.rules.minBet)) {
+        game.possibleActions.push('sidebet');
+      }
     } else {
       game.possibleActions.push('shuffle');
+    }
+
+    // If they placed a side bet, they can remove it
+    if (game.sideBetPlaced) {
+      game.possibleActions.push('nosidebet');
     }
   }
 }

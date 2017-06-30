@@ -29,12 +29,6 @@ module.exports = {
       // Take the bet
       const action = {action: 'bet', amount: amount, firsthand: this.attributes['firsthand']};
 
-      // If there is a side bet, take that too and update progressive counter
-      if (game.sideBet) {
-        game.bankroll -= game.sideBet;
-        bjUtils.incrementProgressive(this.attributes);
-      }
-
       playgame.playBlackjackAction(this.attributes, this.event.request.locale,
         this.event.session.user.userId, action,
         (error, response, speech, reprompt) => {

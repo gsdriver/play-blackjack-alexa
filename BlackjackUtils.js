@@ -35,28 +35,30 @@ module.exports = {
   },
   getProgressivePayout: function(attributes, callback) {
     // Read from Dynamodb
-    const STARTING_JACKPOT = 500;
-    const JACKPOT_RATE = 0.25;
+    const game = attributes[attributes.currentGame];
 
-    dynamodb.getItem({TableName: 'PlayBlackjack', Key: {userId: {S: 'game-' + attributes.currentGame}}},
-            (err, data) => {
-      if (err || (data.Item === undefined)) {
-        console.log(err);
-        callback((attributes[attributes.currentGame].progressiveJackpot)
-              ? attributes[attributes.currentGame].progressiveJackpot
-              : STARTING_JACKPOT);
-      } else {
-        let hands;
-
-        if (data.Item.hands && data.Item.hands.N) {
-          hands = parseInt(data.Item.hands.N);
+    if (game.progressive) {
+      dynamodb.getItem({TableName: 'PlayBlackjack', Key: {userId: {S: 'game-' + attributes.currentGame}}},
+              (err, data) => {
+        if (err || (data.Item === undefined)) {
+          console.log(err);
+          callback((game.progressiveJackpot) ? game.progressiveJackpot : game.progressive.starting);
         } else {
-          hands = 0;
-        }
+          let hands;
 
-        callback(Math.floor(STARTING_JACKPOT + (hands * JACKPOT_RATE)));
-      }
-    });
+          if (data.Item.hands && data.Item.hands.N) {
+            hands = parseInt(data.Item.hands.N);
+          } else {
+            hands = 0;
+          }
+
+          callback(Math.floor(game.progressive.starting + (hands * game.progressive.jackpotRate)));
+        }
+      });
+    } else {
+      // No progressive jackpot
+      callback(undefined);
+    }
   },
   incrementProgressive: function(attributes) {
     const game = attributes[attributes.currentGame];

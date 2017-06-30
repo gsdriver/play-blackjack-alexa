@@ -18,12 +18,8 @@ const resources = {
   // From Betting.js
   'BAD_BET_FORMAT': 'Unable to place a bet for {0}',
   // From SideBet.js
-  'SIDEBET_REPROMPT': 'Say deal to start the game.',
-  'SIDEBET_MINIMUM': 'Your bankroll is too low to place the side bet and continue playing. ',
   'SIDEBET_PLACED': '${0} side bet placed. The side bet will remain in play until you say remove side bet. ',
   'SIDEBET_REMOVED': 'Side bet removed. ',
-  'SIDEBET_NOBET': 'You don\'t have a side bet to remove. ',
-  'SIDEBET_INVALID': 'You can\'t change the side bet during the middle of a game. ',
   // From Blackjack.js
   'BLACKJACKINTENT_NO_ACTION': 'I\'m sorry, I didn\'t catch that action. Please say what you want to do on this hand like hit or stand. What else can I help with?',
   'BLACKJACKINTENT_UNKNOWN_ACTION': 'I\'m sorry, I don\'t understand how to {0}. Please provide an action like hit or stand. What else can I help with?',
@@ -43,9 +39,9 @@ const resources = {
   'HELP_CARD_TEXT': 'You can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
   // From Launch.js
   'LAUNCH_WELCOME': 'Welcome to Blackjack Game. The triple seven progressive jackpot is currently ${0}. ',
-  'LAUNCH_STARTGAME': 'You can start a blackjack game by saying bet or place side bet to bet $1 towards the jackpot ... Now, what can I help you with?',
-  'LAUNCH_DEFAULTSTATE_TEXT': 'You have ${0}. Say bet to start a new game or place side bet to bet $1 toward the jackpot. ... Now, what can I help you with?',
-  'LAUNCH_NONDEFAULTSTATE_TEXT': 'You have ${0}. Say bet to start a new game <break time=\'300ms\'/> place side bet to bet $1 towards the jackpot <break time=\'300ms\'/> or reset game to reset to the default rules and bankroll. ... Now, what can I help you with?',
+  'LAUNCH_STARTGAME': 'You can start a blackjack game by saying bet or place side bet to bet $5 towards the jackpot ... Now, what can I help you with?',
+  'LAUNCH_DEFAULTSTATE_TEXT': 'You have ${0}. Say bet to start a new game or place side bet to bet $5 toward the jackpot. ... Now, what can I help you with?',
+  'LAUNCH_NONDEFAULTSTATE_TEXT': 'You have ${0}. Say bet to start a new game <break time=\'300ms\'/> place side bet to bet $5 towards the jackpot <break time=\'300ms\'/> or reset game to reset to the default rules and bankroll. ... Now, what can I help you with?',
   // From Reset.js
   'RESET_CONFIRM': 'Would you like to reset the game? This will reset your bankroll and rules of the game.',
   'RESET_COMPLETED': 'You have $5000. Say bet to start a new game.',
@@ -72,6 +68,7 @@ const resources = {
   'ASK_POSSIBLE_ACTIONS': 'Would you like to {0}?',
   'ASK_WHAT_TO_DO': 'What would you like to do?',
   'ASK_PLAY_AGAIN': 'Would you like to play again?',
+  'ASK_SAY_BET': 'Say bet to start the game.',
   'RESULT_AFTER_HIT_BUST': 'You got a {0} and busted. ',
   'RESULT_AFTER_HIT_NOBUST': 'You got a {0} for a total of {1}. ',
   'RESULT_BANKROLL_RESET': 'Bankroll reset',
@@ -174,7 +171,8 @@ module.exports = {
   mapServerError: function(error) {
     const errorMapping = {'bettoosmall': 'Your bet is below the minimum of $5',
                         'bettoolarge': 'Your bet is above the maximum of $1000',
-                        'betoverbankroll': 'Your bet is more than your available bankroll'};
+                        'betoverbankroll': 'Your bet is more than your available bankroll',
+                        'sidebettoosmall': 'Your bankroll is too low to place the side bet and continue playing'};
     return (errorMapping[error] ? errorMapping[error] : 'Internal error');
   },
   cardRanks: function(card) {
@@ -189,6 +187,8 @@ module.exports = {
     const optionMapping = {'resetbankroll': 'reset game',
                           'shuffle': 'shuffle',
                           'bet': 'bet',
+                          'sidebet': 'place side bet',
+                          'nosidebet': 'remove side bet',
                           'hit': 'hit',
                           'stand': 'stand',
                           'double': 'double down',

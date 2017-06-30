@@ -41,7 +41,7 @@ module.exports = {
       if (!game.possibleActions
             || (game.possibleActions.indexOf(action.action) < 0)) {
         // Probably need a way to read out the game state better
-        speechError = resources.strings.INVALID_ACTION.replace('{0}', action.action);
+        speechError = resources.strings.INVALID_ACTION.replace('{0}', resources.mapPlayOption(action.action));
         speechError += readHand(game, locale);
         speechError += ' ' + listValidActions(game, locale, 'full');
         sendUserCallback(attributes, speechError, null, null, null, callback);
@@ -192,6 +192,8 @@ function listValidActions(game, locale, type) {
       // Provide a summary
       if (game.activePlayer == 'player') {
         result = resources.strings.ASK_WHAT_TO_DO;
+      } else if (game.specialState === 'sidebet') {
+        result = resources.strings.ASK_SAY_BET;
       } else {
         result = resources.strings.ASK_PLAY_AGAIN;
       }
@@ -236,6 +238,14 @@ function tellResult(attributes, locale, action, oldGame) {
     case 'bet':
       // A new hand was dealt
       result += readHand(game, locale);
+      break;
+    case 'sidebet':
+      // A side bet was placed
+      result += resources.strings.SIDEBET_PLACED.replace('{0}', game.progressive.amount);
+      break;
+    case 'nosidebet':
+      // A side bet was removed
+      result += resources.strings.SIDEBET_REMOVED;
       break;
     case 'hit':
     case 'double':
