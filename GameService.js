@@ -239,7 +239,6 @@ module.exports = {
           game.numSevens++;
         }
       }
-      console.log('There are ' + game.numSevens + ' sevens');
 
       // If it's the dealer's turn, then we'll play the dealer hand,
       // unless the player already busted

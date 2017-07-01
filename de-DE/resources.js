@@ -45,8 +45,9 @@ const resources = {
   // From Launch.js
   'LAUNCH_WELCOME': 'Willkommen bei den Blackjack Spieler. ',
   'LAUNCH_STARTGAME': 'Sie können ein Spiel starten, indem Sie sagen die wort wetten ... Wie kann ich Ihnen helfen?',
-  'LAUNCH_DEFAULTSTATE_TEXT': 'Sie haben €{0}. Sie sagen wetten um ein neues spiel zu beginnen. ... Wie kann ich Ihnen helfen?',
-  'LAUNCH_NONDEFAULTSTATE_TEXT': 'Sie haben €{0}. Sie sagen wetten sagen um ein neues spiel zu beginnen oder Spiel Zurücksetzen um auf die Standard-Regeln und Bankroll zurücksetzen. ... Wie kann ich Ihnen helfen?',
+  'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet £5 towards the jackpot',
+  'LAUNCH_START_RESET': 'reset game to reset to the default rules and bankroll',
+  'LAUNCH_START_PROMPT': ' <break time=\'300ms\'/>Now, what can I help you with?',
   // From Reset.js
   'RESET_CONFIRM': 'Möchten Sie das Spiel zurücksetzen? Dies wird Ihre Bankroll und Regeln des Spiels zurücksetzen.',
   'RESET_COMPLETED': 'Sie haben € 5000. Sagen wetten, um ein neues Spiel zu beginnen.',

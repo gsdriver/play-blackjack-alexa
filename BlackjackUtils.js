@@ -63,13 +63,13 @@ module.exports = {
   incrementProgressive: function(attributes) {
     const game = attributes[attributes.currentGame];
 
-    if (game.sideBet) {
+    if (game.progressive) {
       const params = {
           TableName: 'PlayBlackjack',
           Key: {userId: {S: 'game-' + attributes.currentGame}},
           AttributeUpdates: {hands: {
               Action: 'ADD',
-              Value: {N: game.sideBet.toString()}},
+              Value: {N: game.progressive.bet.toString()}},
           }};
 
       dynamodb.updateItem(params, (err, data) => {
