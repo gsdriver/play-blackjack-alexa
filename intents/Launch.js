@@ -23,8 +23,6 @@ module.exports = {
       launchSpeech = res.strings.LAUNCH_WELCOME.replace('{0}', jackpot);
       game.progressiveJackpot = jackpot;
 
-      launchSpeech += res.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll);
-
       // Figure out what the current game state is - give them option to reset
       playgame.readCurrentHand(this.attributes, this.event.request.locale, (speech, reprompt) => {
         // Tell them how much money they are starting with
@@ -40,6 +38,7 @@ module.exports = {
             options.push(res.strings.LAUNCH_START_RESET);
           }
 
+          launchSpeech += res.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll);
           launchSpeech += speechUtils.or(options, {pause: '300ms'});
         }
 

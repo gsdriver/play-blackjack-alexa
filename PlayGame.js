@@ -225,9 +225,9 @@ function tellResult(attributes, locale, action, oldGame) {
     if ((oldHand.total > 21) ||
       (oldHand.bet > game.playerHands[game.currentPlayerHand].bet)) {
       if (oldHand.total > 21) {
-        result = resources.strings.RESULT_AFTER_HIT_BUST.replace('{0}', resources.cardRanks(oldHand.cards[oldHand.cards.length - 1]));
+        result = resources.strings.RESULT_AFTER_HIT_BUST.replace('{0}', resources.cardRanks(oldHand.cards[oldHand.cards.length - 1], 'article'));
       } else {
-        result = resources.strings.RESULT_AFTER_HIT_NOBUST.replace('{0}', resources.cardRanks(oldHand.cards[oldHand.cards.length - 1])).replace('{1}', oldHand.total);
+        result = resources.strings.RESULT_AFTER_HIT_NOBUST.replace('{0}', resources.cardRanks(oldHand.cards[oldHand.cards.length - 1], 'article')).replace('{1}', oldHand.total);
       }
 
       // And now preface with the next hand before we tell them what happened
@@ -296,7 +296,7 @@ function tellResult(attributes, locale, action, oldGame) {
 function readDealerAction(game, locale) {
   let result;
 
-  result = resources.strings.DEALER_HOLE_CARD.replace('{0}', resources.cardRanks(game.dealerHand.cards[0]));
+  result = resources.strings.DEALER_HOLE_CARD.replace('{0}', resources.cardRanks(game.dealerHand.cards[0], 'article'));
   if (game.dealerHand.cards.length > 2) {
     result += resources.strings.DEALER_DRAW;
     result += utils.and(game.dealerHand.cards.slice(2).map((x) => resources.cardRanks(x, 'article')), {locale: locale});
@@ -364,7 +364,7 @@ function readGameResult(game) {
  */
 function readHit(game, locale) {
   const currentHand = game.playerHands[game.currentPlayerHand];
-  const cardText = resources.cardRanks(currentHand.cards[currentHand.cards.length - 1]);
+  const cardText = resources.cardRanks(currentHand.cards[currentHand.cards.length - 1], 'article');
   const cardRank = currentHand.cards[currentHand.cards.length - 1].rank;
   let result;
 
@@ -395,7 +395,7 @@ function readHit(game, locale) {
 
     result = resources.pickRandomOption(formatChoices).replace('{0}', cardText).replace('{1}', currentHand.total);
     if (game.activePlayer === 'player') {
-      result += resources.strings.DEALER_SHOWING.replace('{0}', resources.cardRanks(game.dealerHand.cards[1]));
+      result += resources.strings.DEALER_SHOWING.replace('{0}', resources.cardRanks(game.dealerHand.cards[1], 'article'));
     }
   }
 
@@ -524,7 +524,7 @@ function readHand(game, locale) {
     }
   }
 
-  const dealerCardText = resources.cardRanks(game.dealerHand.cards[1]);
+  const dealerCardText = resources.cardRanks(game.dealerHand.cards[1], 'article');
 
   if (game.activePlayer == 'none') {
     // Game over, so read the whole dealer hand

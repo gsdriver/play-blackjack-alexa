@@ -18,12 +18,8 @@ const resources = {
   // From Betting.js
   'BAD_BET_FORMAT': 'Nicht wette für {0}',
   // From SideBet.js
-  'SIDEBET_REPROMPT': 'Say deal to start the game.',
-  'SIDEBET_MINIMUM': 'Your bankroll is too low to place the side bet and continue playing. ',
   'SIDEBET_PLACED': '${0} side bet placed. The side bet will remain in play until you say remove side bet. ',
   'SIDEBET_REMOVED': 'Side bet removed. ',
-  'SIDEBET_NOBET': 'You don\'t have a side bet to remove. ',
-  'SIDEBET_INVALID': 'You can\'t change the side bet during the middle of a game. ',
   // From Blackjack.js
   'BLACKJACKINTENT_NO_ACTION': 'Tut mir leid, dass ich diese Aktion nicht fangen. Bitte sagen Sie, was Sie wollen, zu tun auf dieser Seite wie Hit oder stehen. Wie kann ich helfen?',
   'BLACKJACKINTENT_UNKNOWN_ACTION': 'Tut mir leid, ich weiß nicht, wie {0}. Bitte sagen Sie, was Sie wollen, zu tun auf dieser Seite wie Hit oder stehen. Wie kann ich helfen?',
@@ -74,6 +70,7 @@ const resources = {
   'ASK_POSSIBLE_ACTIONS': 'Sie wollen {0}?',
   'ASK_WHAT_TO_DO': 'Was würdest du gern tun?',
   'ASK_PLAY_AGAIN': 'Würdest du gerne wieder spielen?',
+  'ASK_SAY_BET': 'Say bet to start the game.',
   'RESULT_AFTER_HIT_BUST': 'Du hast eine {0} und überkaufen. ',
   'RESULT_AFTER_HIT_NOBUST': 'Du hast eine {0} für insgesamt {1}. ',
   'RESULT_BANKROLL_RESET': 'Bankroll zurücksetzen',
