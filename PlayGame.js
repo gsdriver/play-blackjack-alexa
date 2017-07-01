@@ -21,7 +21,7 @@ module.exports = {
       const suggestText = gameService.getRecommendedAction(game);
 
       if (suggestText === 'notplayerturn') {
-        speech = resource.strings.SUGGEST_TURNOVER;
+        speech = resources.strings.SUGGEST_TURNOVER;
       } else if (resources.mapActionToSuggestion(suggestText)) {
         speech = resources.pickRandomOption('SUGGEST_OPTIONS').replace('{0}', resources.mapActionToSuggestion(suggestText));
       } else {
