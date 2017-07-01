@@ -147,7 +147,6 @@ module.exports = {
 
       case 'nosidebet':
         game.sideBetPlaced = false;
-        game.bankroll += game.progressive.bet;
         break;
 
       case 'hit':
@@ -251,9 +250,10 @@ module.exports = {
 
         // And the side bet winner
         determineSideBetWinner(attributes, (winAmount) => {
+          game.sideBetWin = winAmount;
           setNextActions(game);
           updateGame(game);
-          callback(error, winAmount);
+          callback(error);
         });
         return;
       }
@@ -313,6 +313,7 @@ function deal(attributes, betAmount) {
   // Clear out the hands
   game.dealerHand.cards = [];
   game.playerHands = [];
+  game.sideBetWin = undefined;
 
   // Now deal the cards
   newHand.cards.push(game.deck.cards.shift());
@@ -572,7 +573,6 @@ function determineSideBetWinner(attributes, callback) {
         break;
       case 3:
         // Pays the progressive!
-        console.log('Progressive winner!');
         bjUtils.getProgressivePayout(attributes, (jackpot) => {
           game.bankroll += jackpot;
           game.progressiveJackpot = game.progressive.starting;

@@ -78,12 +78,11 @@ const resources = {
   'RESULT_AFTER_HIT_NOBUST': 'You got a {0} for a total of {1}. ',
   'RESULT_BANKROLL_RESET': 'Bankroll reset',
   'RESULT_DECK_SHUFFLED': 'Deck shuffled',
-  'DEALER_HOLE_CARD': 'The dealer had a {0} down.',
-  'DEALER_BUSTED': ' The dealer busted.',
-  'DEALER_BLACKJACK': ' The dealer has Blackjack.',
-  'DEALER_TOTAL': ' The dealer had a total of {0}.',
-  'DEALER_DRAW': ' The dealer drew ',
-  'DEALER_CARD_ARTICLE': 'a {0}',
+  'DEALER_HOLE_CARD': 'The dealer had a {0} down',
+  'DEALER_BUSTED': ' and busted.',
+  'DEALER_BLACKJACK': ' and has Blackjack.',
+  'DEALER_TOTAL': ' for a total of {0}.',
+  'DEALER_DRAW': '. The dealer drew ',
   'PLAYER_HIT_BUSTED': 'You got a {0} and busted. ',
   'DEALER_SHOWING': ' The dealer is showing a {0}.',
   'SPLIT_TENS': 'You split tens. ',
@@ -118,9 +117,9 @@ const resources = {
   'PLAYER_HIT_NOTBUSTED': 'You got a {0} for a total of {1}. |Here\'s a {0} for a total of {1}. |The dealer has a {0} for you giving you {1}. ',
   'GOOD_HIT_OPTIONS': 'The dealer has a {0} for you giving you {1}. Not bad! |You got a {0} for a total of {1}. Good hit. |Here\'s a {0} for a total of {1}. ',
   'GREAT_HIT_OPTIONS': 'The dealer has a {0} giving you {1}. Brilliant! |Yes, it\'s a {0} for a total of {1}! |Here\'s a good one, a {0} for a total of {1}. ',
-  'SIDEBET_ONESEVEN': 'Your first card was a seven and your side bet won ${0}. ',
-  'SIDEBET_TWOSEVENS': 'Your first two cards were sevens and your side bet won ${0}. ',
-  'SIDEBET_PROGRESSIVE': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your first three cards were sevens and you won the progressive jackpot of ${0}! ',
+  'SIDEBET_ONESEVEN': 'Your first card was a seven and your side bet won £{0}. ',
+  'SIDEBET_TWOSEVENS': 'Your first two cards were sevens and your side bet won £{0}. ',
+  'SIDEBET_PROGRESSIVE': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your first three cards were sevens and you won the progressive jackpot of £{0}! ',
 };
 
 module.exports = {
@@ -183,9 +182,15 @@ module.exports = {
                         'sidebettoosmall': 'Your bankroll is too low to place the side bet and continue playing'};
     return (errorMapping[error] ? errorMapping[error] : 'Internal error');
   },
-  cardRanks: function(card) {
+  cardRanks: function(card, withArticle) {
     const names = ['none', 'ace', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'jack', 'queen', 'king'];
-    return names[card.rank];
+    const articleNames = ['none', 'an ace', 'a two', 'a three', 'a four', 'a five', 'a six', 'a seven', 'an eight', 'a nine', 'a ten', 'a jack', 'a queen', 'a king'];
+
+    if (withArticle === 'article') {
+      return articleNames[card.rank];
+    } else {
+      return names[card.rank];
+    }
   },
   pluralCardRanks: function(card) {
     const names = ['none', 'aces', 'twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'jacks', 'queens', 'kings'];
@@ -215,6 +220,17 @@ module.exports = {
                'push': 'It\'s a tie.',
                'surrender': 'You surrendered.'};
     return outcomeMapping[outcome];
+  },
+  mapMultipleOutcomes: function(outcome, numHands) {
+    const twoHandMapping = {'win': 'You won both hands!',
+               'loss': 'You lost both hands.',
+               'push': 'Both hands tied.',
+               'surrender': 'You surrendered both hands.'};
+    const multipleHandMapping = {'win': 'You won all your hands!',
+               'loss': 'You lost all your hands.',
+               'push': 'You tied on all your hands.',
+               'surrender': 'You surrendered all your hands.'};
+    return (numHands == 2) ? twoHandMapping[outcome] : multipleHandMapping[outcome];
   },
   mapHandNumber: function(hand) {
     const mapping = ['First hand ', 'Second hand ', 'Third hand ', 'Fourth hand '];

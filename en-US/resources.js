@@ -75,12 +75,11 @@ const resources = {
   'RESULT_AFTER_HIT_NOBUST': 'You got a {0} for a total of {1}. ',
   'RESULT_BANKROLL_RESET': 'Bankroll reset',
   'RESULT_DECK_SHUFFLED': 'Deck shuffled',
-  'DEALER_HOLE_CARD': 'I have a {0} down.',
-  'DEALER_BUSTED': ' I busted.',
-  'DEALER_BLACKJACK': ' I have Blackjack.',
-  'DEALER_TOTAL': ' I had a total of {0}.',
-  'DEALER_DRAW': ' I drew ',
-  'DEALER_CARD_ARTICLE': 'a {0}',
+  'DEALER_HOLE_CARD': 'I have a {0} down',
+  'DEALER_BUSTED': ' and busted.',
+  'DEALER_BLACKJACK': ' and have Blackjack.',
+  'DEALER_TOTAL': ' for a total of {0}.',
+  'DEALER_DRAW': '. I drew ',
   'DEALER_SHOWING': ' I am showing a {0}.',
   'SPLIT_TENS': 'You split tens. ',
   'SPLIT_PAIR': 'You split a pair of {0}. ',
@@ -180,9 +179,15 @@ module.exports = {
                         'sidebettoosmall': 'Your bankroll is too low to place the side bet and continue playing'};
     return (errorMapping[error] ? errorMapping[error] : 'Internal error');
   },
-  cardRanks: function(card) {
+  cardRanks: function(card, withArticle) {
     const names = ['none', 'ace', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'jack', 'queen', 'king'];
-    return names[card.rank];
+    const articleNames = ['none', 'an ace', 'a two', 'a three', 'a four', 'a five', 'a six', 'a seven', 'an eight', 'a nine', 'a ten', 'a jack', 'a queen', 'a king'];
+
+    if (withArticle === 'article') {
+      return articleNames[card.rank];
+    } else {
+      return names[card.rank];
+    }
   },
   pluralCardRanks: function(card) {
     const names = ['none', 'aces', 'twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'jacks', 'queens', 'kings'];
@@ -209,9 +214,20 @@ module.exports = {
                'nodealerblackjack': 'I don\'t have Blackjack.',
                'win': 'You won!',
                'loss': 'You lost.',
-               'push': 'It\'s a tie.',
+               'push': 'It\'s a push.',
                'surrender': 'You surrendered.'};
     return outcomeMapping[outcome];
+  },
+  mapMultipleOutcomes: function(outcome, numHands) {
+    const twoHandMapping = {'win': 'You won both hands!',
+               'loss': 'You lost both hands.',
+               'push': 'Both hands pushed.',
+               'surrender': 'You surrendered both hands.'};
+    const multipleHandMapping = {'win': 'You won all your hands!',
+               'loss': 'You lost all your hands.',
+               'push': 'You pushed on all your hands.',
+               'surrender': 'You surrendered all your hands.'};
+    return (numHands == 2) ? twoHandMapping[outcome] : multipleHandMapping[outcome];
   },
   mapHandNumber: function(hand) {
     const mapping = ['First hand ', 'Second hand ', 'Third hand ', 'Fourth hand '];

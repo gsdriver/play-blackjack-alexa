@@ -69,7 +69,7 @@ module.exports = {
           Key: {userId: {S: 'game-' + attributes.currentGame}},
           AttributeUpdates: {hands: {
               Action: 'ADD',
-              Value: {N: game.progressive.bet.toString()}},
+              Value: {N: '1'}},
           }};
 
       dynamodb.updateItem(params, (err, data) => {
@@ -89,6 +89,19 @@ module.exports = {
       // We don't take a callback, but if there's an error log it
       if (err) {
         console.log(err);
+      } else {
+        // Update number of progressive wins while you're at it
+        dynamodb.updateItem({TableName: 'PlayBlackjack',
+            Key: {userId: {S: 'game-' + game}},
+            AttributeUpdates: {jackpots: {
+                Action: 'ADD',
+                Value: {N: '1'}},
+        }}, (err, data) => {
+          // Again, don't care about the error
+          if (err) {
+            console.log(err);
+          }
+        });
       }
     });
   },

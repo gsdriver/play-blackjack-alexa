@@ -50,7 +50,7 @@ module.exports = {
         const betAmount = (action.amount ? action.amount : game.lastBet);
         const oldGame = JSON.parse(JSON.stringify(game));
 
-        gameService.userAction(attributes, action.action, betAmount, (speechError, jackpot) => {
+        gameService.userAction(attributes, action.action, betAmount, (speechError) => {
           let error;
 
           if (speechError) {
@@ -69,7 +69,7 @@ module.exports = {
 
             // Pose this as a question whether it's the player or dealer's turn
             repromptQuestion = listValidActions(game, locale, 'full');
-            speechQuestion += (tellResult(attributes, locale, action.action, jackpot, oldGame) + ' '
+            speechQuestion += (tellResult(attributes, locale, action.action, oldGame) + ' '
               + listValidActions(game, locale, (playerBlackjack) ? 'full' : 'summary'));
           }
 
@@ -155,13 +155,13 @@ function sendUserCallback(attributes, error, response, speech, reprompt, callbac
   if (game && game.possibleActions) {
     if (game.possibleActions.indexOf('shuffle') > -1) {
       // Simplify things and just shuffle for them
-      gameService.userAction(attributes, 'shuffle', 0, (err, jackpot) => {
+      gameService.userAction(attributes, 'shuffle', 0, (err) => {
         callback(error, response, speech, reprompt);
       });
       return;
     } else if (game.possibleActions.indexOf('resetbankroll') > -1) {
       // Simplify things and just shuffle for them if this is resetbankroll
-      gameService.userAction(attributes, 'resetbankroll', 0, (err, jackpot) => {
+      gameService.userAction(attributes, 'resetbankroll', 0, (err) => {
         callback(error, response, speech, reprompt);
       });
       return;
@@ -211,7 +211,7 @@ function listValidActions(game, locale, type) {
   return result;
 }
 
-function tellResult(attributes, locale, action, jackpot, oldGame) {
+function tellResult(attributes, locale, action, oldGame) {
   let result = '';
   const game = attributes[attributes.currentGame];
 
@@ -278,17 +278,6 @@ function tellResult(attributes, locale, action, jackpot, oldGame) {
       break;
     }
 
-  if (jackpot) {
-    // Oh, the side bet paid out - let them know
-    if (game.numSevens === 1) {
-       result += resources.strings.SIDEBET_ONESEVEN.replace('{0}', jackpot);
-    } else if (game.numSevens === 2) {
-       result += resources.strings.SIDEBET_TWOSEVENS.replace('{0}', jackpot);
-    } else if (game.numSevens === 3) {
-       result += resources.strings.SIDEBET_PROGRESSIVE.replace('{0}', jackpot);
-    }
-  }
-
   if ((oldGame.activePlayer == 'player') && (game.activePlayer != 'player')) {
     // OK, game over - so let's give the new total
     if (!game.high || (game.bankroll > game.high)) {
@@ -310,8 +299,7 @@ function readDealerAction(game, locale) {
   result = resources.strings.DEALER_HOLE_CARD.replace('{0}', resources.cardRanks(game.dealerHand.cards[0]));
   if (game.dealerHand.cards.length > 2) {
     result += resources.strings.DEALER_DRAW;
-    result += utils.and(game.dealerHand.cards.slice(2).map((x) => resources.strings.DEALER_CARD_ARTICLE.replace('{0}', resources.cardRanks(x))), {locale: locale});
-    result += '.';
+    result += utils.and(game.dealerHand.cards.slice(2).map((x) => resources.cardRanks(x, 'article')), {locale: locale});
   }
 
   if (game.dealerHand.total > 21) {
@@ -331,12 +319,40 @@ function readDealerAction(game, locale) {
 function readGameResult(game) {
   let i;
   let outcome = '';
+  let allSame;
 
-  // If multiple hands, say so
-  for (i = 0; i < game.playerHands.length; i++) {
-    outcome += readHandNumber(game, i);
-    outcome += resources.mapOutcome(game.playerHands[i].outcome);
+  // If more than one hand and the outcome is the same, say all hands
+  if (game.playerHands.length > 1) {
+    allSame = true;
+    game.playerHands.map((x) => {
+      if (x.outcome != game.playerHands[0].outcome) {
+        allSame = false;
+      }
+    });
+  }
+
+  if (allSame) {
+    // This means you have multiple hands that all had the same outcome
+    outcome += resources.mapMultipleOutcomes(game.playerHands[0].outcome, game.playerHands.length);
     outcome += ' ';
+  } else {
+    // If multiple hands, say so
+    for (i = 0; i < game.playerHands.length; i++) {
+      outcome += readHandNumber(game, i);
+      outcome += resources.mapOutcome(game.playerHands[i].outcome);
+      outcome += ' ';
+    }
+  }
+
+  if (game.sideBetWin) {
+    // Oh, the side bet paid out - let them know
+    if (game.numSevens === 1) {
+       outcome += resources.strings.SIDEBET_ONESEVEN.replace('{0}', game.sideBetWin);
+    } else if (game.numSevens === 2) {
+       outcome += resources.strings.SIDEBET_TWOSEVENS.replace('{0}', game.sideBetWin);
+    } else if (game.numSevens === 3) {
+       outcome += resources.strings.SIDEBET_PROGRESSIVE.replace('{0}', game.sideBetWin);
+    }
   }
 
   // What was the outcome?

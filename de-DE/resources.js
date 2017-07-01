@@ -219,6 +219,17 @@ module.exports = {
                'surrender': 'Sie übergeben.'};
     return outcomeMapping[outcome];
   },
+  mapMultipleOutcomes: function(outcome, numHands) {
+    const twoHandMapping = {'win': 'You won both hands!',
+               'loss': 'You lost both hands.',
+               'push': 'Both hands pushed.',
+               'surrender': 'You surrendered both hands.'};
+    const multipleHandMapping = {'win': 'You won all your hands!',
+               'loss': 'You lost all your hands.',
+               'push': 'You pushed on all your hands.',
+               'surrender': 'You surrendered all your hands.'};
+    return (numHands == 2) ? twoHandMapping[outcome] : multipleHandMapping[outcome];
+  },
   mapHandNumber: function(hand) {
     const mapping = ['Erste hand ', 'Zweite hand ', 'Dritte hand ', 'Vierte hand '];
     return mapping[hand];
