@@ -34,6 +34,9 @@ module.exports = {
           if (game.possibleActions && (game.possibleActions.indexOf('sidebet') > 0)) {
             options.push(res.strings.LAUNCH_START_PLACE_SIDEBET);
           }
+          if (game.possibleActions && (game.possibleActions.indexOf('nosidebet') > 0)) {
+            options.push(res.strings.LAUNCH_START_REMOVE_SIDEBET);
+          }
           if (!gameService.isDefaultGame(this.attributes)) {
             options.push(res.strings.LAUNCH_START_RESET);
           }

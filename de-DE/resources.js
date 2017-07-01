@@ -42,6 +42,7 @@ const resources = {
   'LAUNCH_WELCOME': 'Willkommen bei den Blackjack Spieler. ',
   'LAUNCH_STARTGAME': 'Sie können ein Spiel starten, indem Sie sagen die wort wetten ... Wie kann ich Ihnen helfen?',
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet £5 towards the jackpot',
+  'LAUNCH_START_REMOVE_SIDEBET': 'remove side bet to remove your side bet',
   'LAUNCH_START_RESET': 'reset game to reset to the default rules and bankroll',
   'LAUNCH_START_PROMPT': ' <break time=\'300ms\'/>Now, what can I help you with?',
   // From Reset.js
@@ -115,6 +116,9 @@ const resources = {
   'PLAYER_HIT_NOTBUSTED': 'Du hast eine {0} für insgesamt {1}. ',
   'GOOD_HIT_OPTIONS': 'Du hast eine {0} für insgesamt {1}. ',
   'GREAT_HIT_OPTIONS': 'Du hast eine {0} für insgesamt {1}. ',
+  'SIDEBET_LOST': 'Your side bet lost. ',
+  'LOST_SINGLEHAND_AND_SIDEBET': 'You lost your hand and your side bet. ',
+  'LOST_MULTIPLEHANDS_AND_SIDEBET': 'You lost all your hands and your side bet. ',
   'SIDEBET_ONESEVEN': 'Your first card was a seven and your side bet won ${0}. ',
   'SIDEBET_TWOSEVENS': 'Your first two cards were sevens and your side bet won ${0}. ',
   'SIDEBET_PROGRESSIVE': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your first three cards were sevens and you won the progressive jackpot of ${0}! ',
@@ -207,13 +211,19 @@ module.exports = {
     return (optionMapping[option] ? optionMapping[option] : option);
   },
   mapOutcome: function(outcome) {
-    const outcomeMapping = {'blackjack': 'Gewinnen Sie mit einem natürlichen Blackjack!',
-               'dealerblackjack': 'Der Händler hat einen Blackjack.',
-               'nodealerblackjack': 'Die Händler haben keinen Blackjack.',
-               'win': 'Sie gewann!',
-               'loss': 'Sie verloren.',
-               'push': 'Es ist eine Krawatte.',
-               'surrender': 'Sie übergeben.'};
+    const outcomeMapping = {'blackjack': 'You win with a Natural Blackjack! ',
+               'win': 'You won! ',
+               'loss': 'You lost. ',
+               'push': 'It\'s a push. ',
+               'surrender': 'You surrendered. '};
+    return outcomeMapping[outcome];
+  },
+  mapOutcomePlusSideBet: function(outcome) {
+    const outcomeMapping = {'blackjack': 'You won your hand with a Natural Blackjack and ',
+               'win': 'You won your hand and ',
+               'loss': 'You lost your hand and ',
+               'push': 'You pushed your hand and ',
+               'surrender': 'You surrendered your hand and '};
     return outcomeMapping[outcome];
   },
   mapMultipleOutcomes: function(outcome, numHands) {

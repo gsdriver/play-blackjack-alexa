@@ -319,39 +319,64 @@ function readDealerAction(game, locale) {
 function readGameResult(game) {
   let i;
   let outcome = '';
-  let allSame;
+  let sideBetResult = '';
 
-  // If more than one hand and the outcome is the same, say all hands
+  // Now read the side bet if placed
+  if (game.sideBetPlaced) {
+    // Oh, the side bet paid out - let them know
+    if (game.numSevens == 0) {
+      sideBetResult += resources.strings.SIDEBET_LOST;
+    } else if (game.numSevens === 1) {
+      sideBetResult += resources.strings.SIDEBET_ONESEVEN.replace('{0}', game.sideBetWin);
+    } else if (game.numSevens === 2) {
+      sideBetResult += resources.strings.SIDEBET_TWOSEVENS.replace('{0}', game.sideBetWin);
+    } else if (game.numSevens === 3) {
+      sideBetResult += resources.strings.SIDEBET_PROGRESSIVE.replace('{0}', game.sideBetWin);
+    }
+  }
+
   if (game.playerHands.length > 1) {
-    allSame = true;
+  // If more than one hand and the outcome is the same, say all hands
+    let allSame = true;
     game.playerHands.map((x) => {
       if (x.outcome != game.playerHands[0].outcome) {
         allSame = false;
       }
     });
-  }
 
-  if (allSame) {
-    // This means you have multiple hands that all had the same outcome
-    outcome += resources.mapMultipleOutcomes(game.playerHands[0].outcome, game.playerHands.length);
-    outcome += ' ';
-  } else {
-    // If multiple hands, say so
-    for (i = 0; i < game.playerHands.length; i++) {
-      outcome += readHandNumber(game, i);
-      outcome += resources.mapOutcome(game.playerHands[i].outcome);
-      outcome += ' ';
+    if (allSame) {
+      // This means you have multiple hands that all had the same outcome
+      // Special case if you lost all of them and the side bet
+      if (game.sideBetPlaced && (game.playerHands[0].outcome === 'loss')
+          && (game.numSevens === 0)) {
+        outcome += resources.strings.LOST_MULTIPLEHANDS_AND_SIDEBET;
+      } else {
+        outcome += resources.mapMultipleOutcomes(game.playerHands[0].outcome,
+            game.playerHands.length);
+        outcome += ' ';
+        outcome += sideBetResult;
+      }
+    } else {
+      // Read each hand
+      for (i = 0; i < game.playerHands.length; i++) {
+        outcome += readHandNumber(game, i);
+        outcome += resources.mapOutcome(game.playerHands[i].outcome);
+      }
+      outcome += sideBetResult;
     }
-  }
-
-  if (game.sideBetWin) {
-    // Oh, the side bet paid out - let them know
-    if (game.numSevens === 1) {
-       outcome += resources.strings.SIDEBET_ONESEVEN.replace('{0}', game.sideBetWin);
-    } else if (game.numSevens === 2) {
-       outcome += resources.strings.SIDEBET_TWOSEVENS.replace('{0}', game.sideBetWin);
-    } else if (game.numSevens === 3) {
-       outcome += resources.strings.SIDEBET_PROGRESSIVE.replace('{0}', game.sideBetWin);
+  } else {
+    // Single hand - how we read depends on whether side bet was placed
+    if (game.sideBetPlaced) {
+      // Special case if you lost the hand and side bet
+      if ((game.playerHands[0].outcome === 'loss') &&
+          (game.numSevens === 0)) {
+        outcome += resources.strings.LOST_SINGLEHAND_AND_SIDEBET;
+      } else {
+        outcome += resources.mapOutcomePlusSideBet(game.playerHands[0].outcome);
+        outcome += sideBetResult;
+      }
+    } else {
+      outcome += resources.mapOutcome(game.playerHands[0].outcome);
     }
   }
 
