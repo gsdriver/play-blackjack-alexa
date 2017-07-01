@@ -246,6 +246,11 @@ function tellResult(attributes, locale, action, oldGame) {
     case 'bet':
       // A new hand was dealt
       result += readHand(game, locale);
+      // If it is not the player's turn (could happen on dealer blackjack)
+      // then read the game result here too
+      if (game.activePlayer != 'player') {
+        result += ' ' + readGameResult(game);
+      }
       break;
     case 'sidebet':
       // A side bet was placed

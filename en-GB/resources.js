@@ -118,9 +118,9 @@ const resources = {
   'SIDEBET_LOST': 'Your side bet lost. ',
   'LOST_SINGLEHAND_AND_SIDEBET': 'You lost your hand and your side bet. ',
   'LOST_MULTIPLEHANDS_AND_SIDEBET': 'You lost all your hands and your side bet. ',
-  'SIDEBET_ONESEVEN': 'Your first card was a seven and your side bet won £{0}. ',
-  'SIDEBET_TWOSEVENS': 'Your first two cards were sevens and your side bet won £{0}. ',
-  'SIDEBET_PROGRESSIVE': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your first three cards were sevens and you won the progressive jackpot of £{0}! ',
+  'SIDEBET_ONESEVEN': 'Your first card was a seven winning £{0} on the side bet. ',
+  'SIDEBET_TWOSEVENS': 'Your first two cards were sevens winning £{0} on the side bet. ',
+  'SIDEBET_PROGRESSIVE': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your first three cards were sevens! You won the progressive jackpot of £{0}! ',
 };
 
 module.exports = {
