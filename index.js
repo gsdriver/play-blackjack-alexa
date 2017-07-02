@@ -117,23 +117,28 @@ const handlers = {
     this.attributes.playerLocale = this.event.request.locale;
     this.attributes.numRounds = (this.attributes.numRounds)
               ? (this.attributes.numRounds + 1) : 1;
-    this.attributes.firsthand = undefined;
+    this.attributes.firsthand = true;
+    this.attributes.readProgressive = undefined;
 
     // If they don't have a game, create one
     if (!this.attributes.currentGame) {
       gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
-        if (this.event.request.type === 'IntentRequest') {
-          this.emit(this.event.request.intent.name);
-        } else {
-          this.emit('LaunchRequest');
-        }
+        // Now read the progressive jackpot amount
+        bjUtils.getProgressivePayout(this.attributes, (jackpot) => {
+          game.progressiveJackpot = jackpot;
+
+          if (this.event.request.type === 'IntentRequest') {
+            this.emit(this.event.request.intent.name);
+          } else {
+            this.emit('LaunchRequest');
+          }
+        });
       });
     } else {
       // Standard should have progressive; some customers will have this game
       // without progressive, so set it for them
+      const game = this.attributes[this.attributes.currentGame];
       if (this.attributes.currentGame === 'standard') {
-        const game = this.attributes[this.attributes.currentGame];
-
         if (!game.progressive) {
           game.progressive = {bet: 5, starting: 2500, jackpotRate: 1.25};
 
@@ -146,13 +151,18 @@ const handlers = {
         }
       }
 
-      // Set the state
-      this.handler.state = bjUtils.getState(this.attributes);
-      if (this.event.request.type === 'IntentRequest') {
-        this.emit(this.event.request.intent.name);
-      } else {
-        this.emit('LaunchRequest');
-      }
+      // Now read the progressive jackpot amount
+      bjUtils.getProgressivePayout(this.attributes, (jackpot) => {
+        game.progressiveJackpot = jackpot;
+
+        // Set the state
+        this.handler.state = bjUtils.getState(this.attributes);
+        if (this.event.request.type === 'IntentRequest') {
+          this.emit(this.event.request.intent.name);
+        } else {
+          this.emit('LaunchRequest');
+        }
+      });
     }
   },
   // Some intents don't make sense for a new session - so just launch instead

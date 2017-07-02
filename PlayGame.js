@@ -249,7 +249,7 @@ function tellResult(attributes, locale, action, oldGame) {
       // If it is not the player's turn (could happen on dealer blackjack)
       // then read the game result here too
       if (game.activePlayer != 'player') {
-        result += ' ' + readGameResult(game);
+        result += ' ' + readGameResult(attributes);
       }
       break;
     case 'sidebet':
@@ -263,23 +263,23 @@ function tellResult(attributes, locale, action, oldGame) {
     case 'hit':
     case 'double':
       // Tell them the new card, the total, and the dealer up card (or what they did)
-      result += readHit(game, locale);
+      result += readHit(attributes, locale);
       break;
     case 'stand':
       // OK, let's read what the dealer had, what they drew, and what happened
-      result += readStand(game, locale);
+      result += readStand(attributes, locale);
       break;
     case 'insurance':
     case 'noinsurance':
       // Say whether the dealer had blackjack, and what the next thing is to do
-      result += readInsurance(game, locale);
+      result += readInsurance(attributes, locale);
       break;
     case 'split':
       // OK, now you have multiple hands - makes reading the game state more interesting
-      result += readSplit(game, locale);
+      result += readSplit(attributes, locale);
       break;
     case 'surrender':
-      result += readSurrender(game, locale);
+      result += readSurrender(attributes, locale);
       break;
     }
 
@@ -321,10 +321,11 @@ function readDealerAction(game, locale) {
 //
 // Read the result of the game
 //
-function readGameResult(game) {
+function readGameResult(attributes) {
   let i;
   let outcome = '';
   let sideBetResult = '';
+  const game = attributes[attributes.currentGame];
 
   // Now read the side bet if placed
   if (game.sideBetPlaced) {
@@ -385,6 +386,18 @@ function readGameResult(game) {
     }
   }
 
+  // Finally, if we haven't yet told them about the progressive jackpot, do it now
+  if (!attributes.readProgressive) {
+    attributes.readProgressive = true;
+    if (game.progressive) {
+      const format = (game.sideBetPlaced)
+            ? resources.strings.READ_JACKPOT_AFTER_LAUNCH
+            : resources.strings.READ_JACKPOT_AFTER_LAUNCH_NOSIDEBET;
+
+      outcome += format.replace('{0}', game.progressiveJackpot);
+    }
+  }
+
   // What was the outcome?
   return outcome;
 }
@@ -392,7 +405,8 @@ function readGameResult(game) {
 /*
  * We will read the new card, the total, and the dealer up card
  */
-function readHit(game, locale) {
+function readHit(attributes, locale) {
+  const game = attributes[attributes.currentGame];
   const currentHand = game.playerHands[game.currentPlayerHand];
   const cardText = resources.cardRanks(currentHand.cards[currentHand.cards.length - 1], 'article');
   const cardRank = currentHand.cards[currentHand.cards.length - 1].rank;
@@ -431,7 +445,7 @@ function readHit(game, locale) {
 
   if (game.activePlayer != 'player') {
     result += readDealerAction(game, locale);
-    result += ' ' + readGameResult(game);
+    result += ' ' + readGameResult(attributes);
   }
 
   return result;
@@ -440,7 +454,8 @@ function readHit(game, locale) {
 //
 // We will read the dealer's hand, action, and what the final outcome was
 //
-function readStand(game, locale) {
+function readStand(attributes, locale) {
+  const game = attributes[attributes.currentGame];
   let result;
 
   // If they are still playing, then read the next hand, otherwise read
@@ -449,7 +464,7 @@ function readStand(game, locale) {
     result = readHand(game, locale);
   } else {
     result = readDealerAction(game, locale);
-    result += ' ' + readGameResult(game);
+    result += ' ' + readGameResult(attributes);
   }
 
   return result;
@@ -458,7 +473,8 @@ function readStand(game, locale) {
 //
 // You split, so now let's read the result
 //
-function readSplit(game, locale) {
+function readSplit(attributes, locale) {
+  const game = attributes[attributes.currentGame];
   let result;
   const pairCard = game.playerHands[game.currentPlayerHand].cards[0];
 
@@ -477,7 +493,8 @@ function readSplit(game, locale) {
 /*
  * You surrendered, so the game is over
  */
-function readSurrender(game, locale) {
+function readSurrender(attributes, locale) {
+  const game = attributes[attributes.currentGame];
   let result = resources.strings.SURRENDER_RESULT;
 
   // Rub it in by saying what the dealer had
@@ -490,13 +507,14 @@ function readSurrender(game, locale) {
  * Say whether the dealer had blackjack - if not, reiterate the current hand,
  * if so then we're done and let them know to bet
  */
-function readInsurance(game, locale) {
+function readInsurance(attributes, locale) {
+  const game = attributes[attributes.currentGame];
   let result;
 
   if (game.dealerHand.outcome == 'dealerblackjack') {
     // Game over
     result = resources.strings.DEALER_HAD_BLACKJACK;
-    result += readGameResult(game);
+    result += readGameResult(attributes);
   } else if (game.dealerHand.outcome == 'nodealerblackjack') {
     // No blackjack - so what do you want to do now?
     result = resources.strings.DEALER_NO_BLACKJACK;

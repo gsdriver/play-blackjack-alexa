@@ -59,6 +59,8 @@ const resources = {
   'INVALID_ACTION': 'Tut mir leid, {0} keine gültige Aktion zu diesem Zeitpunkt ist. ',
   'YOU_BET_TEXT': 'Sie wetten €{0}. ',
   'YOUR_BANKROLL_TEXT': 'Sie haben €{0}. ',
+  'READ_JACKPOT_AFTER_LAUNCH': 'The triple seven progressive jackpot is currently ${0}. ',
+  'READ_JACKPOT_AFTER_LAUNCH_NOSIDEBET': 'The triple seven progressive jackpot is currently ${0}. Say place side bet to place a $5 side bet. ',
   'HELP_TAKE_INSURANCE': 'Sie können sagen ja um Versicherung zu nehmen oder nein abzulehnen.',
   'HELP_INSURANCE_INSUFFICIENT_BANKROLL': 'Sie haben nicht genug Geld um Versicherung zu nehmen - sagen Sie nein um Versicherung abzulehnen.',
   'HELP_YOU_CAN_SAY': 'Man kann sagen {0}.',
