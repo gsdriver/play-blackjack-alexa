@@ -125,7 +125,7 @@ const handlers = {
       gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
         // Now read the progressive jackpot amount
         bjUtils.getProgressivePayout(this.attributes, (jackpot) => {
-          game.progressiveJackpot = jackpot;
+          this.attributes[this.attributes.currentGame].progressiveJackpot = jackpot;
 
           if (this.event.request.type === 'IntentRequest') {
             this.emit(this.event.request.intent.name);

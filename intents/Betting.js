@@ -33,6 +33,7 @@ module.exports = {
         this.event.session.user.userId, action,
         (error, response, speech, reprompt) => {
         this.attributes['firsthand'] = undefined;
+        game.timestamp = Date.now();
         game.hands = (game.hands) ? (game.hands + 1) : 1;
         this.handler.state = bjUtils.getState(this.attributes);
         bjUtils.emitResponse(this.emit, this.event.request.locale,
