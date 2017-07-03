@@ -389,7 +389,7 @@ function readGameResult(attributes) {
   // Finally, if we haven't yet told them about the progressive jackpot, do it now
   if (!attributes.readProgressive) {
     attributes.readProgressive = true;
-    if (game.progressive) {
+    if (game.progressive && game.progressiveJackpot) {
       const format = (game.sideBetPlaced)
             ? resources.strings.READ_JACKPOT_AFTER_LAUNCH
             : resources.strings.READ_JACKPOT_AFTER_LAUNCH_NOSIDEBET;

@@ -40,6 +40,7 @@ const resources = {
   'HELP_CARD_TEXT': 'You can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
   // From Launch.js
   'LAUNCH_WELCOME': 'Welcome to Blackjack Game. The triple seven progressive jackpot is currently ${0}. ',
+  'LAUNCH_WELCOME_NOJACKPOT': 'Welcome to Blackjack Game. ',
   'LAUNCH_START_GAME': 'Say bet to start a new game',
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet $5 towards the jackpot',
   'LAUNCH_START_REMOVE_SIDEBET': 'remove side bet to remove your side bet',

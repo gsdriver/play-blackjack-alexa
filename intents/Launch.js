@@ -16,7 +16,11 @@ module.exports = {
     let launchSpeech;
 
     // Note that this is first hand (so we will say more on the first bet)
-    launchSpeech = res.strings.LAUNCH_WELCOME.replace('{0}', game.progressiveJackpot);
+    if (game.progressiveJackpot) {
+      launchSpeech = res.strings.LAUNCH_WELCOME.replace('{0}', game.progressiveJackpot);
+    } else {
+      launchSpeech = res.strings.LAUNCH_WELCOME_NOJACKPOT;
+    }
     this.attributes.readProgressive = true;
 
     // Figure out what the current game state is - give them option to reset

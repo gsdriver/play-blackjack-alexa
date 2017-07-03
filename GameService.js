@@ -45,6 +45,9 @@ module.exports = {
            lastBet: 100,
            possibleActions: [],
         };
+      } else {
+        // Include progressive details
+        game.progressive = {bet: 5, starting: 2500, jackpotRate: 1.25};
       }
 
       // Start by shuffling the deck
