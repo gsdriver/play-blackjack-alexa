@@ -413,7 +413,7 @@ function readHit(attributes, locale) {
   let result;
 
   if (currentHand.total > 21) {
-    result = resources.strings.PLAYER_HIT_BUSTED.replace('{0}', cardText);
+    result = resources.pickRandomOption('PLAYER_HIT_BUSTED').replace('{0}', cardText);
   } else {
     let formatChoices;
 
