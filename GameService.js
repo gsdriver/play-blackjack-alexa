@@ -580,6 +580,7 @@ function determineSideBetWinner(attributes, callback) {
           game.bankroll += jackpot;
           game.progressiveJackpot = game.progressive.starting;
           bjUtils.resetProgressive(attributes.currentGame);
+          bjUtils.writeJackpotDetails(game.userID, attributes.currentGame, jackpot);
           callback(jackpot);
         });
         break;

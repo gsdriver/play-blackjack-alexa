@@ -7,6 +7,7 @@
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 
 module.exports = {
   emitResponse: function(emit, locale, error, response, speech, reprompt) {
@@ -102,6 +103,20 @@ module.exports = {
             console.log(err);
           }
         });
+      }
+    });
+  },
+  // Write jackpot details to S3
+  writeJackpotDetails: function(userId, game, jackpot) {
+    // It's not the same, so try to write it out
+    const details = {userId: userId, amount: jackpot};
+    const params = {Body: JSON.stringify(details),
+      Bucket: 'garrett-alexa-usage',
+      Key: 'jackpots/blackjack/' + game + '-' + Date.now() + '.txt'};
+
+    s3.putObject(params, (err, data) => {
+      if (err) {
+        console.log(err, err.stack);
       }
     });
   },
