@@ -11,6 +11,7 @@ module.exports = {
   handleIntent: function() {
     let amount = 0;
     const res = require('../' + this.event.request.locale + '/resources');
+    const game = this.attributes[this.attributes.currentGame];
 
     // Curious what language is betting...
     console.log('Bet invoked for ' + this.event.request.locale);
@@ -31,9 +32,8 @@ module.exports = {
       playgame.playBlackjackAction(this.attributes, this.event.request.locale,
         this.event.session.user.userId, action,
         (error, response, speech, reprompt) => {
-        const game = this.attributes[this.attributes.currentGame];
-
         this.attributes['firsthand'] = undefined;
+        game.timestamp = Date.now();
         game.hands = (game.hands) ? (game.hands + 1) : 1;
         this.handler.state = bjUtils.getState(this.attributes);
         bjUtils.emitResponse(this.emit, this.event.request.locale,

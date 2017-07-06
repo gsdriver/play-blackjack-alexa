@@ -5,6 +5,7 @@
 
 const suggest = require('blackjack-strategy');
 const http = require('http');
+const bjUtils = require('./BlackjackUtils.js');
 
 const STARTING_BANKROLL = 5000;
 
@@ -15,6 +16,11 @@ module.exports = {
       let game = savedGame;
 
       if (!game) {
+        if (!attributes.currentGame) {
+          // Ah, brand-new user - let's note that
+          bjUtils.saveNewUser();
+        }
+
         game = {version: '1.0.0',
            userID: userID,
            deck: {cards: []},
@@ -32,6 +38,11 @@ module.exports = {
                maxBet: 1000,             // The maximum bet - not configurable
                maxSplitHands: 4,         // Maximum number of hands you can have due to splits
            },
+           progressive: {
+               bet: 5,                   // Amount of the side bet
+               starting: 2500,           // Starting payout of the side bet
+               jackpotRate: 1.25,        // Amount jackpot goes up with each hand played
+           },
            activePlayer: 'none',
            currentPlayerHand: 0,
            specialState: null,
@@ -39,6 +50,9 @@ module.exports = {
            lastBet: 100,
            possibleActions: [],
         };
+      } else {
+        // Include progressive details
+        game.progressive = {bet: 5, starting: 2500, jackpotRate: 1.25};
       }
 
       // Start by shuffling the deck
@@ -88,13 +102,16 @@ module.exports = {
       return 'notplayerturn';
     }
   },
-  userAction: function(attributes, action, value) {
+  userAction: function(attributes, action, value, callback) {
     const game = attributes[attributes.currentGame];
+    let newCard;
+    let error;
 
     // Is this a valid action?
     if ((action != 'setrules') && (game.possibleActions.indexOf[action] < 0)) {
       // I'm sorry Dave, I can't do that
-      return 'Invalid action';
+      error = 'Invalid action';
+      return;
     }
 
     // OK, take action
@@ -121,18 +138,29 @@ module.exports = {
       case 'bet':
         // Validate the bet and deal the next hand
         if (value < game.rules.minBet) {
-          return 'bettoosmall';
+          error = 'bettoosmall';
         } else if (value > game.bankroll) {
-          return 'betoverbankroll';
+          error = 'betoverbankroll';
         } else if (value > game.rules.maxBet) {
-          return 'bettoolarge';
+          error = 'bettoolarge';
+        } else {
+          deal(attributes, value);
         }
-        deal(game, value);
+        break;
+
+      case 'sidebet':
+        game.sideBetPlaced = true;
+        game.specialState = 'sidebet';
+        break;
+
+      case 'nosidebet':
+        game.sideBetPlaced = false;
         break;
 
       case 'hit':
         // Pop the top card off the deck for the player
-        game.playerHands[game.currentPlayerHand].cards.push(game.deck.cards.shift());
+        newCard = game.deck.cards.shift();
+        game.playerHands[game.currentPlayerHand].cards.push(newCard);
 
         // If they busted, it is the dealer's turn
         if (handTotal(game.playerHands[game.currentPlayerHand].cards).total > 21) {
@@ -175,7 +203,8 @@ module.exports = {
         // For this, we mimick a hit and a stand, and set the special state to doubled
         game.bankroll -= game.playerHands[game.currentPlayerHand].bet;
         game.playerHands[game.currentPlayerHand].bet *= 2;
-        game.playerHands[game.currentPlayerHand].cards.push(game.deck.cards.shift());
+        newCard = game.deck.cards.shift();
+        game.playerHands[game.currentPlayerHand].cards.push(newCard);
         nextHand(game);
         break;
 
@@ -191,7 +220,8 @@ module.exports = {
         newHand.cards.push(game.playerHands[game.currentPlayerHand].cards.shift());
 
         // Pop the top card off the deck back into the current hand
-        game.playerHands[game.currentPlayerHand].cards.push(game.deck.cards.shift());
+        newCard = game.deck.cards.shift();
+        game.playerHands[game.currentPlayerHand].cards.push(newCard);
 
         // And add this to the player's hand.  Whew
         game.playerHands.push(newHand);
@@ -199,22 +229,48 @@ module.exports = {
 
       default:
         // Hmm .. how did this not get caught above?
-        return 'Unknown Action';
+        error = 'Unknown Action';
     }
 
-    // If it's the dealer's turn, then we'll play the dealer hand, unless the player already busted
-    if (game.activePlayer == 'dealer') {
-      playDealerHand(game);
+    if (!error) {
+      // If this the the third card, and the first two cards
+      // were seven and this is a seven, track it
+      if (newCard && (newCard.rank === 7) && (game.numSevens === 2)) {
+        let totalCards = 0;
 
-      for (let i = 0; i < game.playerHands.length; i++) {
-        determineWinner(game, game.playerHands[i]);
+        game.playerHands.map((hand) => {
+          totalCards += hand.cards.length;
+        });
+
+        if (totalCards === 3) {
+          game.numSevens++;
+        }
       }
+
+      // If it's the dealer's turn, then we'll play the dealer hand,
+      // unless the player already busted
+      if (game.activePlayer == 'dealer') {
+        playDealerHand(game);
+
+        for (let i = 0; i < game.playerHands.length; i++) {
+          determineWinner(game, game.playerHands[i]);
+        }
+
+        // And the side bet winner
+        determineSideBetWinner(attributes, (winAmount) => {
+          game.sideBetWin = winAmount;
+          setNextActions(game);
+          updateGame(game);
+          callback(error);
+        });
+        return;
+      }
+
+      setNextActions(game);
+      updateGame(game);
     }
 
-    // Now figure out what the next possible actions are and return
-    setNextActions(game);
-    updateGame(game);
-    return undefined;
+    callback(error);
   },
 };
 
@@ -243,7 +299,8 @@ function updateGame(game) {
   }
 }
 
-function deal(game, betAmount) {
+function deal(attributes, betAmount) {
+  const game = attributes[attributes.currentGame];
   const newHand = {bet: 0, busted: false, cards: []};
 
   // Make sure the betAmount is valid
@@ -251,9 +308,20 @@ function deal(game, betAmount) {
   game.bankroll -= newHand.bet;
   newHand.outcome = 'playing';
 
+  // If they have a side bet, take that money too
+  if (game.sideBetPlaced) {
+    if (game.bankroll < game.progressive.bet) {
+      // You don't have enough money for the side bet - clear it
+      game.sideBetPlaced = false;
+    } else {
+      game.bankroll -= game.progressive.bet;
+    }
+  }
+
   // Clear out the hands
   game.dealerHand.cards = [];
   game.playerHands = [];
+  game.sideBetWin = undefined;
 
   // Now deal the cards
   newHand.cards.push(game.deck.cards.shift());
@@ -261,6 +329,15 @@ function deal(game, betAmount) {
   newHand.cards.push(game.deck.cards.shift());
   game.dealerHand.cards.push(game.deck.cards.shift());
   game.playerHands.push(newHand);
+
+  // Count the sevens!
+  game.numSevens = 0;
+  if (newHand.cards[0].rank === 7) {
+    game.numSevens++;
+    if (newHand.cards[1].rank === 7) {
+      game.numSevens++;
+    }
+  }
 
   // Reset state variables
   game.specialState = null;
@@ -271,6 +348,11 @@ function deal(game, betAmount) {
   game.activePlayer = 'none';
   game.currentPlayerHand = 0;
   nextHand(game);
+
+  // If there was a side bet placed, increment the progressive count
+  if (game.sideBetPlaced) {
+    bjUtils.incrementProgressive(attributes);
+  }
 }
 
 function shuffleDeck(game) {
@@ -406,8 +488,18 @@ function setNextActions(game) {
       game.possibleActions.push('resetbankroll');
     } else if (game.deck.cards.length > 20) {
       game.possibleActions.push('bet');
+      if (game.progressive
+          && !game.sideBetPlaced
+          && ((game.bankroll - game.progressive.bet) >= game.rules.minBet)) {
+        game.possibleActions.push('sidebet');
+      }
     } else {
       game.possibleActions.push('shuffle');
+    }
+
+    // If they placed a side bet, they can remove it
+    if (game.sideBetPlaced) {
+      game.possibleActions.push('nosidebet');
     }
   }
 }
@@ -469,6 +561,43 @@ function playDealerHand(game) {
 
   // We're done with the dealer hand
   nextHand(game);
+}
+
+function determineSideBetWinner(attributes, callback) {
+  // Let's pay the side bet
+  const game = attributes[attributes.currentGame];
+
+  if (game.progressive && game.sideBetPlaced) {
+    switch (game.numSevens) {
+      case 1:
+        // Pays 25 units
+        game.bankroll += 25;
+        callback(25);
+        break;
+      case 2:
+        // Pays 100 units
+        game.bankroll += 100;
+        callback(100);
+        break;
+      case 3:
+        // Pays the progressive!
+        bjUtils.getProgressivePayout(attributes, (jackpot) => {
+          game.bankroll += jackpot;
+          game.progressiveJackpot = game.progressive.starting;
+          bjUtils.resetProgressive(attributes.currentGame);
+          bjUtils.writeJackpotDetails(game.userID, attributes.currentGame, jackpot);
+          callback(jackpot);
+        });
+        break;
+      default:
+        // Sorry, you didn't win
+        callback(0);
+        break;
+    }
+  } else {
+    // No side bet, no winner
+    callback(undefined);
+  }
 }
 
 function determineWinner(game, playerHand) {

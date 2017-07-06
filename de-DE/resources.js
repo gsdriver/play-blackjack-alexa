@@ -17,6 +17,9 @@ const resources = {
   'CHANGE_CARD_TEXT': 'Sie können die folgenden optionen ändern:\n\n - SCHLÄGT SOFT SIEBZEHN: Ob der händler eine weiche 17 summe treffen wird. Kann AN or AUS sein.\n - AUFGEBEN: Ob eine aufgeben angeboten wird. Kann AN or AUS sein\n - EINSATZ VERDOPPELN: Ob eine einsatz verdoppeln angeboten wird.  Kann AN or AUS sein.\n - VERDOPPLUNG NACH SPLIT: Ob sie nach dem spalten verdoppeln können.  Kann AN or AUS sein.\n - RESPLIT ACES: Ob sie Asse wieder spalten können oder nicht.  Kann AN or AUS sein.\n - ANZAHL DER KARTENDECKS: die anzahl der kartendecks im spiel. Kann EINS, ZWEI, VIER, SECHS oder ACHT sein.\n - ANZAHL DER SPIELHANDS SPLATEN: Die maximale anzahl an spielhands, die sie haben können. Kann EINS, ZWEI, DREI oder VIER sein.\n\nZum beispiel sagen "Ändere anzahl der kartendecks zu zwei" wenn du mit zwei kartendecks spielen möchtest.\nBeachten sie, dass das kartendeck gemischt wird, wenn sie die spielregeln ändern',
   // From Betting.js
   'BAD_BET_FORMAT': 'Nicht wette für {0}',
+  // From SideBet.js
+  'SIDEBET_PLACED': '${0} side bet placed. The side bet will remain in play until you say remove side bet. ',
+  'SIDEBET_REMOVED': 'Side bet removed. ',
   // From Blackjack.js
   'BLACKJACKINTENT_NO_ACTION': 'Tut mir leid, dass ich diese Aktion nicht fangen. Bitte sagen Sie, was Sie wollen, zu tun auf dieser Seite wie Hit oder stehen. Wie kann ich helfen?',
   'BLACKJACKINTENT_UNKNOWN_ACTION': 'Tut mir leid, ich weiß nicht, wie {0}. Bitte sagen Sie, was Sie wollen, zu tun auf dieser Seite wie Hit oder stehen. Wie kann ich helfen?',
@@ -33,12 +36,16 @@ const resources = {
   // From Help.js
   'HELP_GENERIC_HELP': 'Sie können ein Spiel spielen, indem Sie sagen wetten, oder Sie können sagen Ausfahrt<break time=\'300ms\'/>Wie kann ich Ihnen helfen?',
   'HELP_CARD_TITLE': 'Blackjack Befehle',
+  'HELP_CARD_PROGRESSIVE_TEXT': 'This game features a progressive triple seven jackpot. Place a side bet of $5 by saying PLACE SIDE BET which will stay in effect until you say REMOVE SIDE BET.\nThe side bet pays out $25 if your first card is a seven, $100 if your first two cards are both seven, and the progressive jackpot if your first three cards are seven. The progressive jackpot is based on aggregate play across all users of this skill.\n',
   'HELP_CARD_TEXT': 'Sie können sagen WETTEN um eine wette zu platzieren. Wenn kein betrag erwähnt wird, wird das spiel die letzte wette verwenden.\nWährend einer Hand, fragen WAS SOLLTE ICH TUN um die grundlegende Strategie Vorschlag zu hören.\nSagen SPIELREGELN ZU LESEN wenn du die regeln hören willst.\nÄNDERE wird die Spielregeln ändern. Sie können die folgenden optionen ändern:\n\n - SCHLÄGT SOFT SIEBZEHN: Ob der händler eine weiche 17 summe treffen wird. Kann AN or AUS sein.\n - AUFGEBEN: Ob eine aufgeben angeboten wird. Kann AN or AUS sein\n - EINSATZ VERDOPPELN: Ob eine einsatz verdoppeln angeboten wird.  Kann AN or AUS sein.\n - VERDOPPLUNG NACH SPLIT: Ob sie nach dem spalten verdoppeln können.  Kann AN or AUS sein.\n - RESPLIT ACES: Ob sie Asse wieder spalten können oder nicht.  Kann AN or AUS sein.\n - ANZAHL DER KARTENDECKS: die anzahl der kartendecks im spiel. Kann EINS, ZWEI, VIER, SECHS oder ACHT sein.\n - ANZAHL DER SPIELHANDS SPLATEN: Die maximale anzahl an spielhands, die sie haben können. Kann EINS, ZWEI, DREI oder VIER sein.\n\nZum beispiel sagen "Ändere anzahl der kartendecks zu zwei" wenn du mit zwei kartendecks spielen möchtest.\nBeachten sie, dass das kartendeck gemischt wird, wenn sie die spielregeln ändern',
   // From Launch.js
   'LAUNCH_WELCOME': 'Willkommen bei den Blackjack Spieler. ',
+  'LAUNCH_WELCOME_NOJACKPOT': 'Willkommen bei den Blackjack Spieler. ',
   'LAUNCH_STARTGAME': 'Sie können ein Spiel starten, indem Sie sagen die wort wetten ... Wie kann ich Ihnen helfen?',
-  'LAUNCH_DEFAULTSTATE_TEXT': 'Sie haben €{0}. Sie sagen wetten um ein neues spiel zu beginnen. ... Wie kann ich Ihnen helfen?',
-  'LAUNCH_NONDEFAULTSTATE_TEXT': 'Sie haben €{0}. Sie sagen wetten sagen um ein neues spiel zu beginnen oder Spiel Zurücksetzen um auf die Standard-Regeln und Bankroll zurücksetzen. ... Wie kann ich Ihnen helfen?',
+  'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet £5 towards the jackpot',
+  'LAUNCH_START_REMOVE_SIDEBET': 'remove side bet to remove your side bet',
+  'LAUNCH_START_RESET': 'reset game to reset to the default rules and bankroll',
+  'LAUNCH_START_PROMPT': ' <break time=\'300ms\'/>Now, what can I help you with?',
   // From Reset.js
   'RESET_CONFIRM': 'Möchten Sie das Spiel zurücksetzen? Dies wird Ihre Bankroll und Regeln des Spiels zurücksetzen.',
   'RESET_COMPLETED': 'Sie haben € 5000. Sagen wetten, um ein neues Spiel zu beginnen.',
@@ -53,6 +60,8 @@ const resources = {
   'INVALID_ACTION': 'Tut mir leid, {0} keine gültige Aktion zu diesem Zeitpunkt ist. ',
   'YOU_BET_TEXT': 'Sie wetten €{0}. ',
   'YOUR_BANKROLL_TEXT': 'Sie haben €{0}. ',
+  'READ_JACKPOT_AFTER_LAUNCH': 'The triple seven progressive jackpot is currently ${0}. ',
+  'READ_JACKPOT_AFTER_LAUNCH_NOSIDEBET': 'The triple seven progressive jackpot is currently ${0}. Say place side bet to place a $5 side bet. ',
   'HELP_TAKE_INSURANCE': 'Sie können sagen ja um Versicherung zu nehmen oder nein abzulehnen.',
   'HELP_INSURANCE_INSUFFICIENT_BANKROLL': 'Sie haben nicht genug Geld um Versicherung zu nehmen - sagen Sie nein um Versicherung abzulehnen.',
   'HELP_YOU_CAN_SAY': 'Man kann sagen {0}.',
@@ -65,6 +74,7 @@ const resources = {
   'ASK_POSSIBLE_ACTIONS': 'Sie wollen {0}?',
   'ASK_WHAT_TO_DO': 'Was würdest du gern tun?',
   'ASK_PLAY_AGAIN': 'Würdest du gerne wieder spielen?',
+  'ASK_SAY_BET': 'Say bet to start the game.',
   'RESULT_AFTER_HIT_BUST': 'Du hast eine {0} und überkaufen. ',
   'RESULT_AFTER_HIT_NOBUST': 'Du hast eine {0} für insgesamt {1}. ',
   'RESULT_BANKROLL_RESET': 'Bankroll zurücksetzen',
@@ -109,6 +119,12 @@ const resources = {
   'PLAYER_HIT_NOTBUSTED': 'Du hast eine {0} für insgesamt {1}. ',
   'GOOD_HIT_OPTIONS': 'Du hast eine {0} für insgesamt {1}. ',
   'GREAT_HIT_OPTIONS': 'Du hast eine {0} für insgesamt {1}. ',
+  'SIDEBET_LOST': 'Your side bet lost. ',
+  'LOST_SINGLEHAND_AND_SIDEBET': 'You lost your hand and your side bet. ',
+  'LOST_MULTIPLEHANDS_AND_SIDEBET': 'You lost all your hands and your side bet. ',
+  'SIDEBET_ONESEVEN': 'Your first card was a seven and your side bet won ${0}. ',
+  'SIDEBET_TWOSEVENS': 'Your first two cards were sevens and your side bet won ${0}. ',
+  'SIDEBET_PROGRESSIVE': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your first three cards were sevens and you won the progressive jackpot of ${0}! ',
 };
 
 module.exports = {
@@ -170,7 +186,8 @@ module.exports = {
   mapServerError: function(error) {
     const errorMapping = {'bettoosmall': 'Ihre Wette liegt unter dem Mindestwert von €5',
                         'bettoolarge': 'Ihre Wette ist mehr als der Höchstbetrag von €1000',
-                        'betoverbankroll': 'Ihre Wette ist mehr als der Ihre verfügbaren bankroll'};
+                        'betoverbankroll': 'Ihre Wette ist mehr als der Ihre verfügbaren bankroll',
+                        'sidebettoosmall': 'Your bankroll is too low to place the side bet and continue playing'};
     return (errorMapping[error] ? errorMapping[error] : 'Interner Fehler');
   },
   cardRanks: function(card) {
@@ -185,6 +202,8 @@ module.exports = {
     const optionMapping = {'resetbankroll': 'spiel zurücksetzen',
                           'shuffle': 'shuffle',
                           'bet': 'wetten',
+                          'sidebet': 'place side bet',
+                          'nosidebet': 'remove side bet',
                           'hit': 'hit',
                           'stand': 'stay',
                           'double': 'einsatz verdoppeln',
@@ -195,14 +214,31 @@ module.exports = {
     return (optionMapping[option] ? optionMapping[option] : option);
   },
   mapOutcome: function(outcome) {
-    const outcomeMapping = {'blackjack': 'Gewinnen Sie mit einem natürlichen Blackjack!',
-               'dealerblackjack': 'Der Händler hat einen Blackjack.',
-               'nodealerblackjack': 'Die Händler haben keinen Blackjack.',
-               'win': 'Sie gewann!',
-               'loss': 'Sie verloren.',
-               'push': 'Es ist eine Krawatte.',
-               'surrender': 'Sie übergeben.'};
+    const outcomeMapping = {'blackjack': 'You win with a Natural Blackjack! ',
+               'win': 'You won! ',
+               'loss': 'You lost. ',
+               'push': 'It\'s a push. ',
+               'surrender': 'You surrendered. '};
     return outcomeMapping[outcome];
+  },
+  mapOutcomePlusSideBet: function(outcome) {
+    const outcomeMapping = {'blackjack': 'You won your hand with a Natural Blackjack and ',
+               'win': 'You won your hand and ',
+               'loss': 'You lost your hand and ',
+               'push': 'You pushed your hand and ',
+               'surrender': 'You surrendered your hand and '};
+    return outcomeMapping[outcome];
+  },
+  mapMultipleOutcomes: function(outcome, numHands) {
+    const twoHandMapping = {'win': 'You won both hands!',
+               'loss': 'You lost both hands.',
+               'push': 'Both hands pushed.',
+               'surrender': 'You surrendered both hands.'};
+    const multipleHandMapping = {'win': 'You won all your hands!',
+               'loss': 'You lost all your hands.',
+               'push': 'You pushed on all your hands.',
+               'surrender': 'You surrendered all your hands.'};
+    return (numHands == 2) ? twoHandMapping[outcome] : multipleHandMapping[outcome];
   },
   mapHandNumber: function(hand) {
     const mapping = ['Erste hand ', 'Zweite hand ', 'Dritte hand ', 'Vierte hand '];

@@ -4,6 +4,7 @@ const Alexa = require('alexa-sdk');
 const Launch = require('./intents/Launch');
 const Blackjack = require('./intents/Blackjack');
 const Betting = require('./intents/Betting');
+const SideBet = require('./intents/SideBet');
 const Suggest = require('./intents/Suggest');
 const Rules = require('./intents/Rules');
 const ChangeRules = require('./intents/ChangeRules');
@@ -13,8 +14,8 @@ const Repeat = require('./intents/Repeat');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const Reset = require('./intents/Reset');
-const bjUtils = require('./BlackjackUtils');
 const gameService = require('./GameService');
+const bjUtils = require('./BlackjackUtils');
 
 const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
 
@@ -29,7 +30,6 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'SessionEndedRequest': function() {
-    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
     this.emit(':saveState', true);
   },
   'Unhandled': function() {
@@ -40,23 +40,13 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
 
 const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'NewSession': function() {
-    // If they don't have a game, create one
-    if (!this.attributes.currentGame) {
-      gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
-        if (this.event.request.type === 'IntentRequest') {
-          this.emit(this.event.request.intent.name);
-        } else {
-          this.emit('LaunchRequest');
-        }
-      });
-    } else if (this.event.request.type === 'IntentRequest') {
-      this.emit(this.event.request.intent.name);
-    } else {
-      this.emit('LaunchRequest');
-    }
+    this.handler.state = '';
+    this.emitWithState('NewSession');
   },
   'LaunchRequest': Launch.handleIntent,
   'BettingIntent': Betting.handleIntent,
+  'PlaceSideBetIntent': SideBet.handlePlaceIntent,
+  'RemoveSideBetIntent': SideBet.handleRemoveIntent,
   'ResetIntent': Reset.handleIntent,
   'RulesIntent': Rules.handleIntent,
   'ChangeRulesIntent': ChangeRules.handleIntent,
@@ -67,7 +57,6 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'SessionEndedRequest': function() {
-    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
     this.emit(':saveState', true);
   },
   'Unhandled': function() {
@@ -78,20 +67,8 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
 
 const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'NewSession': function() {
-    // If they don't have a game, create one
-    if (!this.attributes.currentGame) {
-      gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
-        if (this.event.request.type === 'IntentRequest') {
-          this.emit(this.event.request.intent.name);
-        } else {
-          this.emit('LaunchRequest');
-        }
-      });
-    } else if (this.event.request.type === 'IntentRequest') {
-      this.emit(this.event.request.intent.name);
-    } else {
-      this.emit('LaunchRequest');
-    }
+    this.handler.state = '';
+    this.emitWithState('NewSession');
   },
   'LaunchRequest': Launch.handleIntent,
   'SuggestIntent': Suggest.handleIntent,
@@ -103,7 +80,6 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'SessionEndedRequest': function() {
-    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
     this.emit(':saveState', true);
   },
   'Unhandled': function() {
@@ -114,20 +90,8 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
 
 const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'NewSession': function() {
-    // If they don't have a game, create one
-    if (!this.attributes.currentGame) {
-      gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
-        if (this.event.request.type === 'IntentRequest') {
-          this.emit(this.event.request.intent.name);
-        } else {
-          this.emit('LaunchRequest');
-        }
-      });
-    } else if (this.event.request.type === 'IntentRequest') {
-      this.emit(this.event.request.intent.name);
-    } else {
-      this.emit('LaunchRequest');
-    }
+    this.handler.state = '';
+    this.emitWithState('NewSession');
   },
   'LaunchRequest': Launch.handleIntent,
   'BlackjackIntent': Blackjack.handleIntent,
@@ -138,7 +102,6 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'SessionEndedRequest': function() {
-    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
     this.emit(':saveState', true);
   },
   'Unhandled': function() {
@@ -150,19 +113,56 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
 // Handlers for our skill
 const handlers = {
   'NewSession': function() {
+    // Some initiatlization
+    this.attributes.playerLocale = this.event.request.locale;
+    this.attributes.numRounds = (this.attributes.numRounds)
+              ? (this.attributes.numRounds + 1) : 1;
+    this.attributes.firsthand = true;
+    this.attributes.readProgressive = undefined;
+
     // If they don't have a game, create one
     if (!this.attributes.currentGame) {
       gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
+        // Now read the progressive jackpot amount
+        bjUtils.getProgressivePayout(this.attributes, (jackpot) => {
+          this.attributes[this.attributes.currentGame].progressiveJackpot = jackpot;
+
+          if (this.event.request.type === 'IntentRequest') {
+            this.emit(this.event.request.intent.name);
+          } else {
+            this.emit('LaunchRequest');
+          }
+        });
+      });
+    } else {
+      // Standard should have progressive; some customers will have this game
+      // without progressive, so set it for them
+      const game = this.attributes[this.attributes.currentGame];
+      if (this.attributes.currentGame === 'standard') {
+        if (!game.progressive) {
+          game.progressive = {bet: 5, starting: 2500, jackpotRate: 1.25};
+
+          // Also stuff sidebet in as a possible action if bet is there
+          if (game.possibleActions &&
+            (game.possibleActions.indexOf('bet') >= 0) &&
+            (game.possibleActions.indexOf('sidebet') < 0)) {
+            game.possibleActions.push('sidebet');
+          }
+        }
+      }
+
+      // Now read the progressive jackpot amount
+      bjUtils.getProgressivePayout(this.attributes, (jackpot) => {
+        game.progressiveJackpot = jackpot;
+
+        // Set the state
+        this.handler.state = bjUtils.getState(this.attributes);
         if (this.event.request.type === 'IntentRequest') {
           this.emit(this.event.request.intent.name);
         } else {
           this.emit('LaunchRequest');
         }
       });
-    } else if (this.event.request.type === 'IntentRequest') {
-      this.emit(this.event.request.intent.name);
-    } else {
-      this.emit('LaunchRequest');
     }
   },
   // Some intents don't make sense for a new session - so just launch instead
@@ -173,6 +173,8 @@ const handlers = {
   'AMAZON.YesIntent': Launch.handleIntent,
   'AMAZON.NoIntent': Launch.handleIntent,
   'BettingIntent': Betting.handleIntent,
+  'PlaceSideBetIntent': SideBet.handlePlaceIntent,
+  'RemoveSideBetIntent': SideBet.handleRemoveIntent,
   'BlackjackIntent': Blackjack.handleIntent,
   'RulesIntent': Rules.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
@@ -180,7 +182,6 @@ const handlers = {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'SessionEndedRequest': function() {
-    bjUtils.prepareToSave(this.attributes, this.event.request.locale);
     this.emit(':saveState', true);
   },
   'Unhandled': function() {

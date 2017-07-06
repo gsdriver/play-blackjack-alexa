@@ -5,7 +5,7 @@
       "slots": [
       {
         "name": "Action",
-        "type": "LIST_OF_ACTIONS"
+        "type": "LIST_OF_ACTION"
       }
      ]
     },
@@ -19,6 +19,12 @@
       ]
     },
     {
+      "intent": "PlaceSideBetIntent"
+    },
+    {
+      "intent": "RemoveSideBetIntent"
+    },
+    {
       "intent": "RulesIntent"
     },
     {
@@ -29,7 +35,7 @@
       "slots": [
         {
           "name": "Change",
-          "type": "LIST_OF_RULE_OPTIONS"
+          "type": "LIST_OF_RULES_OPTIONS"
         },
         {
           "name": "ChangeOption",

@@ -5,7 +5,6 @@
 'use strict';
 
 const playgame = require('../PlayGame');
-const bjUtils = require('../BlackjackUtils');
 const ads = require('../ads');
 
 module.exports = {
@@ -19,7 +18,6 @@ module.exports = {
       exitSpeech = res.strings.EXIT_BANKROLL.replace('{0}', game.bankroll) + ' ';
       ads.getAd(this.attributes, 'blackjack', this.event.request.locale, (adText) => {
         exitSpeech += (adText + ' ' + res.strings.EXIT_GOODBYE);
-        bjUtils.prepareToSave(this.attributes, this.event.request.locale);
         this.emit(':tell', exitSpeech);
       });
     });
