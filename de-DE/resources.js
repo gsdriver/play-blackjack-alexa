@@ -33,6 +33,8 @@ const resources = {
   // From Exit.js
   'EXIT_BANKROLL': 'Verlassen Sie mit €{0}.',
   'EXIT_GOODBYE': 'Auf Wiedersehen.',
+  // From HighScore.js
+  'HIGHSCORE_REPROMPT': 'What else can I help you with?',
   // From Help.js
   'HELP_GENERIC_HELP': 'Sie können ein Spiel spielen, indem Sie sagen wetten, oder Sie können sagen Ausfahrt<break time=\'300ms\'/>Wie kann ich Ihnen helfen?',
   'HELP_CARD_TITLE': 'Blackjack Befehle',
@@ -44,6 +46,7 @@ const resources = {
   'LAUNCH_STARTGAME': 'Sie können ein Spiel starten, indem Sie sagen die wort wetten ... Wie kann ich Ihnen helfen?',
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet £5 towards the jackpot',
   'LAUNCH_START_REMOVE_SIDEBET': 'remove side bet to remove your side bet',
+  'LAUNCH_START_HIGH_SCORES': 'read high scores to hear the leader board',
   'LAUNCH_START_RESET': 'reset game to reset to the default rules and bankroll',
   'LAUNCH_START_PROMPT': ' <break time=\'300ms\'/>Now, what can I help you with?',
   // From Reset.js
@@ -65,6 +68,7 @@ const resources = {
   'HELP_TAKE_INSURANCE': 'Sie können sagen ja um Versicherung zu nehmen oder nein abzulehnen.',
   'HELP_INSURANCE_INSUFFICIENT_BANKROLL': 'Sie haben nicht genug Geld um Versicherung zu nehmen - sagen Sie nein um Versicherung abzulehnen.',
   'HELP_YOU_CAN_SAY': 'Man kann sagen {0}.',
+  'HELP_YOU_CAN_SAY_LEADER': 'read high scores',
   'HELP_MORE_OPTIONS': ' Überprüfen Sie die Alexa-Anwendung um weitere Optionen anzuzeigen.<break time=\'300ms\'/> Wie kann ich Ihnen helfen?',
   'INTERNAL_ERROR': 'Entschuldigung, interner Fehler. Was kann ich sonst noch helfen?',
   'CHANGERULES_REPROMPT': 'Wollen sie wetten?',
@@ -125,6 +129,10 @@ const resources = {
   'SIDEBET_ONESEVEN': 'Your first card was a seven and your side bet won ${0}. ',
   'SIDEBET_TWOSEVENS': 'Your first two cards were sevens and your side bet won ${0}. ',
   'SIDEBET_PROGRESSIVE': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your first three cards were sevens and you won the progressive jackpot of ${0}! ',
+  'LEADER_RANKING': 'Your bankroll of ${0} ranks you as <say-as interpret-as="ordinal">{1}</say-as> of {2} players. ',
+  'LEADER_NO_SCORES': 'Sorry, I\'m unable to read the current leader board',
+  'LEADER_FORMAT': '${0}',
+  'LEADER_TOP_SCORES': 'The top {0} bankrolls are ',
 };
 
 module.exports = {

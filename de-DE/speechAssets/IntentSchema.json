@@ -50,6 +50,9 @@
       "intent": "AMAZON.HelpIntent"
     },
     {
+      "intent": "HighScoreIntent"
+    },
+    {
       "intent": "AMAZON.StopIntent"
     },
     {

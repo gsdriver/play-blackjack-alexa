@@ -47,6 +47,9 @@
       "intent": "SuggestIntent"
     },
     {
+      "intent": "HighScoreIntent"
+    },
+    {
       "intent": "AMAZON.HelpIntent"
     },
     {

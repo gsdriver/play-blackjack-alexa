@@ -11,6 +11,7 @@ const ChangeRules = require('./intents/ChangeRules');
 const TakeInsurance = require('./intents/TakeInsurance');
 const DeclineInsurance = require('./intents/DeclineInsurance');
 const Repeat = require('./intents/Repeat');
+const HighScore = require('./intents/HighScore');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const Reset = require('./intents/Reset');
@@ -25,6 +26,7 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
     this.emitWithState('NewSession');
   },
   'LaunchRequest': Reset.handleNoReset,
+  'HighScoreIntent': HighScore.handleIntent,
   'AMAZON.YesIntent': Reset.handleYesReset,
   'AMAZON.NoIntent': Reset.handleNoReset,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -50,6 +52,7 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'ResetIntent': Reset.handleIntent,
   'RulesIntent': Rules.handleIntent,
   'ChangeRulesIntent': ChangeRules.handleIntent,
+  'HighScoreIntent': HighScore.handleIntent,
   'AMAZON.YesIntent': Betting.handleIntent,
   'AMAZON.NoIntent': Exit.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
@@ -73,6 +76,7 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'LaunchRequest': Launch.handleIntent,
   'SuggestIntent': Suggest.handleIntent,
   'RulesIntent': Rules.handleIntent,
+  'HighScoreIntent': HighScore.handleIntent,
   'AMAZON.YesIntent': TakeInsurance.handleIntent,
   'AMAZON.NoIntent': DeclineInsurance.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
@@ -97,6 +101,7 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'BlackjackIntent': Blackjack.handleIntent,
   'SuggestIntent': Suggest.handleIntent,
   'RulesIntent': Rules.handleIntent,
+  'HighScoreIntent': HighScore.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -177,6 +182,7 @@ const handlers = {
   'RemoveSideBetIntent': SideBet.handleRemoveIntent,
   'BlackjackIntent': Blackjack.handleIntent,
   'RulesIntent': Rules.handleIntent,
+  'HighScoreIntent': HighScore.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,

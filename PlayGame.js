@@ -114,9 +114,9 @@ module.exports = {
           result = resources.strings.HELP_INSURANCE_INSUFFICIENT_BANKROLL;
         }
       } else {
-        result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}',
-          utils.or(game.possibleActions.map((x) => resources.mapPlayOption(x)),
-          {locale: locale}));
+        const actions = game.possibleActions.map((x) => resources.mapPlayOption(x));
+        actions.push(resources.strings.HELP_YOU_CAN_SAY_LEADER);
+        result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}', utils.or(actions, {locale: locale}));
       }
     }
 

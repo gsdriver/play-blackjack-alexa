@@ -33,17 +33,20 @@ const resources = {
   // From Exit.js
   'EXIT_BANKROLL': 'You are leaving with £{0}.',
   'EXIT_GOODBYE': 'Goodbye.',
+  // From HighScore.js
+  'HIGHSCORE_REPROMPT': 'What else can I help you with?',
   // From Help.js
-  'HELP_GENERIC_HELP': 'You can play a game by saying Deal, or you can say exit<break time=\'300ms\'/>Now, what can I help you with?',
+  'HELP_GENERIC_HELP': 'You can play a game by saying Deal <break time=\'200ms\'/> or you can say read high scores to hear the leader board. <break time=\'300ms\'/> Now, what can I help you with?',
   'HELP_CARD_TITLE': 'Blackjack Commands',
   'HELP_CARD_PROGRESSIVE_TEXT': 'This game features a progressive triple seven jackpot. Place a side bet of £5 by saying PLACE SIDE BET which will stay in effect until you say REMOVE SIDE BET.\nThe side bet pays out £25 if your first card is a seven, £100 if your first two cards are both seven, and the progressive jackpot if your first three cards are seven. The progressive jackpot is based on aggregate play across all users of this skill.\n',
-  'HELP_CARD_TEXT': 'You can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
+  'HELP_CARD_TEXT': 'You can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet. You can say READ HIGH SCORES to hear the current leader board.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
   // From Launch.js
   'LAUNCH_WELCOME': 'Welcome to Blackjack Game. The triple seven progressive jackpot is currently £{0}. ',
   'LAUNCH_WELCOME_NOJACKPOT': 'Welcome to Blackjack Game. ',
   'LAUNCH_START_GAME': 'Say bet to start a new game',
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet £5 towards the jackpot',
   'LAUNCH_START_REMOVE_SIDEBET': 'remove side bet to remove your side bet',
+  'LAUNCH_START_HIGH_SCORES': 'read high scores to hear the leader board',
   'LAUNCH_START_RESET': 'reset game to reset to the default rules and bankroll',
   'LAUNCH_START_PROMPT': ' <break time=\'300ms\'/>Now, what can I help you with?',
   // From Reset.js
@@ -65,6 +68,7 @@ const resources = {
   'HELP_TAKE_INSURANCE': 'You can say yes to take insurance or no to decline insurance.',
   'HELP_INSURANCE_INSUFFICIENT_BANKROLL': 'You don\'t have enough money to take insurance - say no to decline insurance.',
   'HELP_YOU_CAN_SAY': 'You can say {0}.',
+  'HELP_YOU_CAN_SAY_LEADER': 'read high scores',
   'HELP_MORE_OPTIONS': ' For more options, please check the Alexa companion application.<break time=\'300ms\'/> What can I help you with?',
   'INTERNAL_ERROR': 'Sorry, internal error. What else can I help with?',
   'CHANGERULES_REPROMPT': 'Would you like to bet?',
@@ -124,6 +128,10 @@ const resources = {
   'SIDEBET_ONESEVEN': 'Your first card was a seven winning £{0} on the side bet. ',
   'SIDEBET_TWOSEVENS': 'Your first two cards were sevens winning £{0} on the side bet. ',
   'SIDEBET_PROGRESSIVE': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your first three cards were sevens! You won the progressive jackpot of £{0}! ',
+  'LEADER_RANKING': 'Your bankroll of £{0} ranks you as <say-as interpret-as="ordinal">{1}</say-as> of {2} players. ',
+  'LEADER_NO_SCORES': 'Sorry, I\'m unable to read the current leader board',
+  'LEADER_FORMAT': '£{0}',
+  'LEADER_TOP_SCORES': 'The top {0} bankrolls are ',
 };
 
 module.exports = {

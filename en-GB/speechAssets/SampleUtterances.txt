@@ -123,3 +123,10 @@ ChangeRulesIntent make {Change} {ChangeOption}
 ChangeRulesIntent turn {Change} {ChangeOption}
 ChangeRulesIntent turn {ChangeOption} {Change}
 ChangeRulesIntent {ChangeOption} {Change}
+HighScoreIntent read high scores
+HighScoreIntent tell me high scores
+HighScoreIntent what are the high scores
+HighScoreIntent what is the leader board
+HighScoreIntent read leader board
+HighScoreIntent say high scores
+HighScoreIntent say leader board

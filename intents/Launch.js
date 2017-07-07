@@ -40,6 +40,7 @@ module.exports = {
         if (!gameService.isDefaultGame(this.attributes)) {
           options.push(res.strings.LAUNCH_START_RESET);
         }
+        options.push(res.strings.LAUNCH_START_HIGH_SCORES);
 
         launchSpeech += res.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll);
         launchSpeech += speechUtils.or(options, {pause: '300ms'});

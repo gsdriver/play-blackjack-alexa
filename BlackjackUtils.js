@@ -8,6 +8,7 @@ const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 const s3 = new AWS.S3({apiVersion: '2006-03-01'});
+const speechUtils = require('alexa-speech-utils')();
 
 module.exports = {
   emitResponse: function(emit, locale, error, response, speech, reprompt) {
@@ -136,4 +137,64 @@ module.exports = {
       }
     });
   },
+  readLeaderBoard: function(locale, attributes, callback) {
+    const res = require('./' + locale + '/resources');
+    const game = attributes[attributes.currentGame];
+
+    getTopScoresFromS3(attributes, (err, scores) => {
+      let speech = '';
+
+      // OK, read up to five high scores
+      if (!scores || (scores.length === 0)) {
+        // No scores to read
+        speech = res.strings.LEADER_NO_SCORES;
+      } else {
+        // What is your ranking - assuming you've done a spin
+        if (game.hands > 0) {
+          const ranking = scores.indexOf(game.bankroll) + 1;
+
+          speech += res.strings.LEADER_RANKING
+            .replace('{0}', game.bankroll)
+            .replace('{1}', ranking)
+            .replace('{2}', scores.length);
+        }
+
+        // And what is the leader board?
+        const toRead = (scores.length > 5) ? 5 : scores.length;
+        const topScores = scores.slice(0, toRead).map((x) => res.strings.LEADER_FORMAT.replace('{0}', x));
+        speech += res.strings.LEADER_TOP_SCORES.replace('{0}', toRead);
+        speech += speechUtils.and(topScores, {locale: locale, pause: '300ms'});
+      }
+
+      callback(speech);
+    });
+  },
 };
+
+function getTopScoresFromS3(attributes, callback) {
+  const game = attributes[attributes.currentGame];
+
+  // Read the S3 buckets that has everyone's scores
+  s3.getObject({Bucket: 'garrett-alexa-usage', Key: 'BlackjackScores.txt'}, (err, data) => {
+    if (err) {
+      console.log(err, err.stack);
+      callback(err, null);
+    } else {
+      // Yeah, I can do a binary search (this is sorted), but straight search for now
+      const ranking = JSON.parse(data.Body.toString('ascii'));
+      const scores = ranking.scores;
+
+      if (scores && scores[attributes.currentGame]) {
+        // If their current high score isn't in the list, add it
+        if (scores[attributes.currentGame].indexOf(game.high) < 0) {
+          scores[attributes.currentGame].push(game.high);
+        }
+
+        callback(null, scores[attributes.currentGame].sort((a, b) => (b - a)));
+      } else {
+        console.log('No scores for ' + attributes.currentGame);
+        callback('No scoreset', null);
+      }
+    }
+  });
+}

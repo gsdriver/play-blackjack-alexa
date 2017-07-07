@@ -22,6 +22,7 @@ function BuildEvent(argv)
     var repeatIntent = {"name": "AMAZON.RepeatIntent", "slots": {}};
     var helpIntent = {"name": "AMAZON.HelpIntent", "slots": {}};
     var exitIntent = {"name": "SessionEndedRequest", "slots": {}};
+    var highScore = {'name': 'HighScoreIntent', 'slots': {}};
 
     var lambda = {
        "session": {
@@ -131,6 +132,10 @@ function BuildEvent(argv)
     else if (argv[2] == "repeat")
     {
         lambda.request.intent = repeatIntent;
+    }
+    else if (argv[2] == "highscore")
+    {
+        lambda.request.intent = highScore;
     }
     else if (argv[2] == "exit")
     {
