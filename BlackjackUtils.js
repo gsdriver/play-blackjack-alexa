@@ -137,6 +137,11 @@ module.exports = {
       }
     });
   },
+  getHighScore(attributes, callback) {
+    getTopScoresFromS3(attributes, (err, scores) => {
+      callback(err, (scores) ? scores[0] : undefined);
+    });
+  },
   readLeaderBoard: function(locale, attributes, callback) {
     const res = require('./' + locale + '/resources');
     const game = attributes[attributes.currentGame];
