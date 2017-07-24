@@ -9,7 +9,7 @@ const playgame = require('../PlayGame');
 module.exports = {
   handleIntent: function() {
     // Help is different for tournament play
-    if (this.attributes.currentHand === 'tournament') {
+    if (this.attributes.currentGame === 'tournament') {
       tournament.readHelp(this.emit, this.event.request.locale, this.attributes);
     } else {
       const res = require('../' + this.event.request.locale + '/resources');

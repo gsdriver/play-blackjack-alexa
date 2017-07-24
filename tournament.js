@@ -162,8 +162,8 @@ module.exports = {
   },
   handlePass: function() {
     // Nope, they are not going to join the tournament - we will just pass on to Launch
-    if (this.attributes.currentHand === 'tournament') {
-      this.attributes.currentHand = 'standard';
+    if (this.attributes.currentGame === 'tournament') {
+      this.attributes.currentGame = 'standard';
     }
 
     this.emit('LaunchRequest');

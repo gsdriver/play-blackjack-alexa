@@ -190,9 +190,9 @@ function getTopScoresFromS3(attributes, callback) {
       const scores = ranking.scores;
 
       if (scores && scores[attributes.currentGame]) {
-        // If their current high score isn't in the list, add it
-        if (scores[attributes.currentGame].indexOf(game.high) < 0) {
-          scores[attributes.currentGame].push(game.high);
+        // If their current bankroll isn't in the list, add it
+        if (scores[attributes.currentGame].indexOf(game.bankroll) < 0) {
+          scores[attributes.currentGame].push(game.bankroll);
         }
 
         callback(null, scores[attributes.currentGame].sort((a, b) => (b - a)));
