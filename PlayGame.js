@@ -6,6 +6,7 @@
 
 const utils = require('alexa-speech-utils')();
 const gameService = require('./GameService');
+const tournament = require('./tournament');
 
 let resources;
 
@@ -65,6 +66,28 @@ module.exports = {
             // If this was the first hand, or they specified a value, tell them how much they bet
             if ((action.action === 'bet') && (action.firsthand || (action.amount > 0))) {
               speechQuestion += resources.strings.YOU_BET_TEXT.replace('{0}', betAmount);
+            }
+
+            // If this is tournament mode and the hand is over, special rules apply
+            if (((oldGame.activePlayer == 'player') && (game.activePlayer != 'player'))
+              && (attributes.currentGame === 'tournament')) {
+              // Are they out of hands?
+              if (game.hands >= game.maxHands) {
+                // Whoops, we are done
+                speechQuestion += tellResult(attributes, locale, action.action, oldGame);
+                tournament.outOfHands(locale, attributes, speechQuestion, (response) => {
+                  callback(error, response, null, null);
+                });
+                return;
+              }
+
+              // Are they out of money?
+              if (game.possibleActions.indexOf('resetbankroll') > -1) {
+                // Sorry, you lose
+                speechQuestion += tellResult(attributes, locale, action.action, oldGame);
+                callback(error, tournament.outOfMoney(locale, attributes, speechQuestion), null, null);
+                return;
+              }
             }
 
             // Pose this as a question whether it's the player or dealer's turn
@@ -289,7 +312,13 @@ function tellResult(attributes, locale, action, oldGame) {
       game.high = game.bankroll;
     }
 
-    result += resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll);
+    if (game.maxHands && (game.hands < game.maxHands)) {
+      result += resources.strings.TOURNAMENT_BANKROLL
+          .replace('{0}', game.bankroll)
+          .replace('{1}', (game.maxHands - game.hands));
+    } else {
+      result += resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll);
+    }
   }
 
   return result;

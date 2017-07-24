@@ -23,6 +23,16 @@ module.exports = {
     }
     this.attributes.readProgressive = true;
 
+    if (this.attributes.tournamentResult) {
+      launchSpeech += this.attributes.tournamentResult;
+      this.attributes.tournamentResult = undefined;
+    }
+
+    // Since we aren't in a tournament, make sure current hand isn't set to one
+    if (this.attributes.currentHand === 'tournament') {
+      this.attributes.currentHand = 'standard';
+    }
+
     // Figure out what the current game state is - give them option to reset
     playgame.readCurrentHand(this.attributes, this.event.request.locale, (speech, reprompt) => {
       // Tell them how much money they are starting with

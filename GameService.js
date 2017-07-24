@@ -75,6 +75,38 @@ module.exports = {
       }
     });
   },
+  initializeTournamentGame : function(attributes, userId) {
+    attributes['tournament'] = {version: '1.0.0',
+       userID: userId,
+       deck: {cards: []},
+       dealerHand: {cards: []},
+       playerHands: [],
+       rules: {
+           hitSoft17: true,          // Does dealer hit soft 17
+           surrender: 'none',        // Surrender offered - none, late, or early
+           double: 'any',            // Double rules - none, 10or11, 9or10or11, any
+           doubleaftersplit: true,   // Can double after split - none, 10or11, 9or10or11, any
+           resplitAces: false,       // Can you resplit aces
+           blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
+           numberOfDecks: 4,         // Number of decks in play
+           minBet: 5,                // The minimum bet - not configurable
+           maxBet: 1000,             // The maximum bet - not configurable
+           maxSplitHands: 4,         // Maximum number of hands you can have due to splits
+       },
+       activePlayer: 'none',
+       currentPlayerHand: 0,
+       specialState: null,
+       bankroll: 5000,
+       lastBet: 100,
+       maxHands: 100,
+       possibleActions: [],
+       timestamp: Date.now(),
+    };
+
+    shuffleDeck(attributes['tournament']);
+    setNextActions(attributes['tournament']);
+    attributes.currentGame = 'tournament';
+  },
   // Determines if this is the initial game state or not
   isDefaultGame: function(attributes) {
     const game = attributes[attributes.currentGame];

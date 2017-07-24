@@ -10,10 +10,20 @@ module.exports = {
   handleIntent: function() {
     // We will ask them if they want to reset
     const res = require('../' + this.event.request.locale + '/resources');
-    const speech = res.strings.RESET_CONFIRM;
+    let speech;
+    let reprompt;
+    const game = this.attributes[this.attributes.currentGame];
 
-    this.handler.state = 'CONFIRMRESET';
-    this.emit(':ask', speech, speech);
+    if (game.canReset) {
+      speech = res.strings.RESET_CONFIRM;
+      reprompt = res.strings.RESET_CONFIRM;
+      this.handler.state = 'CONFIRMRESET';
+    } else {
+      speech = res.strings.TOURNAMENT_NORESET;
+      reprompt = res.strings.TOURNAMENT_INVALIDACTION_REPROMPT;
+    }
+
+    this.emit(':ask', speech, reprompt);
   },
   handleYesReset: function() {
     const res = require('../' + this.event.request.locale + '/resources');
