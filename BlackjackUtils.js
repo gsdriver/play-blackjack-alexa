@@ -35,6 +35,23 @@ module.exports = {
       return 'INGAME';
     }
   },
+  readBankroll: function(locale, attributes) {
+    const res = require('./' + locale + '/resources');
+    const game = attributes[attributes.currentGame];
+    let text;
+
+    if (attributes.trophy) {
+      if (attributes.trophy > 1) {
+        text = res.strings.READ_BANKROLL_WITH_TROPHIES.replace('{0}', game.bankroll).replace('{1}', attributes.trophy);
+      } else {
+        text = res.strings.READ_BANKROLL_WITH_TROPHY.replace('{0}', game.bankroll);
+      }
+    } else {
+      text = res.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll);
+    }
+
+    return text;
+  },
   getProgressivePayout: function(attributes, callback) {
     // Read from Dynamodb
     const game = attributes[attributes.currentGame];

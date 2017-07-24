@@ -52,7 +52,7 @@ module.exports = {
         }
         options.push(res.strings.LAUNCH_START_HIGH_SCORES);
 
-        launchSpeech += res.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll);
+        launchSpeech += bjUtils.readBankroll(this.event.request.locale, this.attributes);
         launchSpeech += speechUtils.or(options, {pause: '300ms'});
       }
 

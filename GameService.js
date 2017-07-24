@@ -75,7 +75,7 @@ module.exports = {
       }
     });
   },
-  initializeTournamentGame : function(attributes, userId) {
+  initializeTournamentGame: function(attributes, userId) {
     attributes['tournament'] = {version: '1.0.0',
        userID: userId,
        deck: {cards: []},
@@ -98,7 +98,7 @@ module.exports = {
        specialState: null,
        bankroll: 5000,
        lastBet: 100,
-       maxHands: 100,
+       maxHands: 5,
        possibleActions: [],
        timestamp: Date.now(),
     };
