@@ -75,9 +75,8 @@ module.exports = {
               if (game.hands >= game.maxHands) {
                 // Whoops, we are done
                 speechQuestion += tellResult(attributes, locale, action.action, oldGame);
-                tournament.outOfHands(locale, attributes, speechQuestion, (response) => {
-                  callback(error, response, null, null);
-                });
+                const response = tournament.outOfHands(locale, attributes, speechQuestion);
+                callback(error, response, null, null);
                 return;
               }
 

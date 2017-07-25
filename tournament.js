@@ -110,11 +110,8 @@ module.exports = {
     let response = speech;
 
     response += res.strings.TOURNAMENT_OUTOFHANDS;
-    readStanding(locale, attributes, (standing) => {
-      response += standing;
-      attributes['tournament'].finished = true;
-      callback(response);
-    });
+    attributes['tournament'].finished = true;
+    return response;
   },
   readHelp: function(emit, locale, attributes) {
     const res = require('./' + locale + '/resources');
