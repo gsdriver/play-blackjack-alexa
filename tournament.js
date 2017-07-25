@@ -176,9 +176,6 @@ module.exports = {
 function isTournamentActive() {
   let active = false;
 
-  active = (process.env.TOURNAMENT) ? true : false;
-
-/*
   if (process.env.TOURNAMENT) {
     // Active on Tuesdays PST (Day=2)
     // We actually start the tournament at 9 PM Monday PST
@@ -189,7 +186,7 @@ function isTournamentActive() {
     active = (((d.getDay() == 1) && (d.getHours() >= 21))
             || (d.getDay() == 2));
   }
-*/
+
   return active;
 }
 
