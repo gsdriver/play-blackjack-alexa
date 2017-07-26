@@ -47,11 +47,11 @@ module.exports = {
             if (game.bankroll >= result.highScore) {
               // Congratulations, you won!
               attributes.trophy = (attributes.trophy) ? (attributes.trophy + 1) : 1;
-              attributes.currentGame = 'standard';
               speech = res.strings.TOURNAMENT_WINNER.replace('{0}', game.bankroll);
             } else {
               speech = res.strings.TOURNAMENT_LOSER.replace('{0}', result.highScore).replace('{1}', game.bankroll);
             }
+            attributes.currentGame = 'standard';
             attributes['tournament'] = undefined;
           }
 

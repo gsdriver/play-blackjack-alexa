@@ -12,8 +12,13 @@ const speechUtils = require('alexa-speech-utils')();
 module.exports = {
   handleIntent: function() {
     const res = require('../' + this.event.request.locale + '/resources');
-    const game = this.attributes[this.attributes.currentGame];
     let launchSpeech;
+
+    // Since we aren't in a tournament, make sure current hand isn't set to one
+    if (this.attributes.currentGame === 'tournament') {
+      this.attributes.currentGame = 'standard';
+    }
+    const game = this.attributes[this.attributes.currentGame];
 
     // Note that this is first hand (so we will say more on the first bet)
     if (game.progressiveJackpot) {
@@ -26,11 +31,6 @@ module.exports = {
     if (this.attributes.tournamentResult) {
       launchSpeech += this.attributes.tournamentResult;
       this.attributes.tournamentResult = undefined;
-    }
-
-    // Since we aren't in a tournament, make sure current hand isn't set to one
-    if (this.attributes.currentGame === 'tournament') {
-      this.attributes.currentGame = 'standard';
     }
 
     // Figure out what the current game state is - give them option to reset
