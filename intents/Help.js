@@ -5,6 +5,7 @@
 'use strict';
 
 const playgame = require('../PlayGame');
+const tournament = require('../tournament');
 
 module.exports = {
   handleIntent: function() {

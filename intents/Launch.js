@@ -29,7 +29,7 @@ module.exports = {
     this.attributes.readProgressive = true;
 
     if (this.attributes.tournamentResult) {
-      launchSpeech += this.attributes.tournamentResult;
+      launchSpeech = this.attributes.tournamentResult + launchSpeech;
       this.attributes.tournamentResult = undefined;
     }
 

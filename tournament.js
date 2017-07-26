@@ -9,7 +9,6 @@
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const s3 = new AWS.S3({apiVersion: '2006-03-01'});
-const playgame = require('./PlayGame');
 const bjUtils = require('./BlackjackUtils');
 const gameService = require('./GameService');
 
@@ -116,11 +115,11 @@ module.exports = {
   readHelp: function(emit, locale, attributes) {
     const res = require('./' + locale + '/resources');
     let speech;
-    const reprompt = playgame.getContextualHelp(attributes, locale);
     const game = attributes['tournament'];
+    const reprompt = res.strings.ERROR_REPROMPT;
 
     speech = res.strings.TOURNAMENT_HELP;
-    speech += res.strings.TOURNAMENT_BANKROLL.replace('{0}', game.bankroll).replace('{1}', game.maxHands - game.hands);
+    speech += res.strings.TOURNAMENT_BANKROLL.replace('{0}', game.bankroll).replace('{1}', game.maxHands - (game.hands ? game.hands : 0));
     readStanding(locale, attributes, (standing) => {
       speech += standing;
       speech += reprompt;

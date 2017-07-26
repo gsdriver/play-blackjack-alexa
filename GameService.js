@@ -96,9 +96,9 @@ module.exports = {
        activePlayer: 'none',
        currentPlayerHand: 0,
        specialState: null,
-       bankroll: 5000,
+       bankroll: 25000,
        lastBet: 100,
-       maxHands: 5,
+       maxHands: 100,
        possibleActions: [],
        timestamp: Date.now(),
     };
