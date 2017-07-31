@@ -98,9 +98,10 @@ module.exports = {
       });
     }
   },
-  // Updates DynamoDB to note that the progressive was won!
-  // Note this function does not callback
-  resetProgressive: function(game) {
+  // Updates DynamoDB and S3 to note the jackpot win
+  updateProgressiveJackpot: function(userId, game, jackpot, callback) {
+    let callsToComplete = 3;
+
     // Write to the DB, and reset the hands played to 0
     dynamodb.putItem({TableName: 'PlayBlackjack',
         Item: {userId: {S: 'game-' + game}, hands: {N: '0'}}},
@@ -108,25 +109,25 @@ module.exports = {
       // We don't take a callback, but if there's an error log it
       if (err) {
         console.log(err);
-      } else {
-        // Update number of progressive wins while you're at it
-        dynamodb.updateItem({TableName: 'PlayBlackjack',
-            Key: {userId: {S: 'game-' + game}},
-            AttributeUpdates: {jackpots: {
-                Action: 'ADD',
-                Value: {N: '1'}},
-        }}, (err, data) => {
-          // Again, don't care about the error
-          if (err) {
-            console.log(err);
-          }
-        });
       }
+      complete();
     });
-  },
-  // Write jackpot details to S3
-  writeJackpotDetails: function(userId, game, jackpot) {
-    // It's not the same, so try to write it out
+
+    // Update number of progressive wins while you're at it
+    dynamodb.updateItem({TableName: 'PlayBlackjack',
+        Key: {userId: {S: 'game-' + game}},
+        AttributeUpdates: {jackpots: {
+            Action: 'ADD',
+            Value: {N: '1'}},
+    }}, (err, data) => {
+      // Again, don't care about the error
+      if (err) {
+        console.log(err);
+      }
+      complete();
+    });
+
+    // And write this jackpot out to S3
     const details = {userId: userId, amount: jackpot};
     const params = {Body: JSON.stringify(details),
       Bucket: 'garrett-alexa-usage',
@@ -136,7 +137,16 @@ module.exports = {
       if (err) {
         console.log(err, err.stack);
       }
+      complete();
     });
+
+    // This function keeps track of when we've completed all calls
+    function complete() {
+      callsToComplete--;
+      if (callsToComplete === 0) {
+        callback();
+      }
+    }
   },
   saveNewUser: function() {
     // Brand new player - let's log this in our DB (async call)

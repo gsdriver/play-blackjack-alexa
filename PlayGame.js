@@ -84,7 +84,8 @@ module.exports = {
               if (game.possibleActions.indexOf('resetbankroll') > -1) {
                 // Sorry, you lose
                 speechQuestion += tellResult(attributes, locale, action.action, oldGame);
-                callback(error, tournament.outOfMoney(locale, attributes, speechQuestion), null, null);
+                callback(error,
+                    tournament.outOfMoney(locale, attributes, speechQuestion), null, null);
                 return;
               }
             }
