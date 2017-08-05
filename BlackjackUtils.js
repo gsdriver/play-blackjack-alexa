@@ -35,6 +35,23 @@ module.exports = {
       return 'INGAME';
     }
   },
+  readBankroll: function(locale, attributes) {
+    const res = require('./' + locale + '/resources');
+    const game = attributes[attributes.currentGame];
+    let text;
+
+    if (attributes.trophy) {
+      if (attributes.trophy > 1) {
+        text = res.strings.READ_BANKROLL_WITH_TROPHIES.replace('{0}', game.bankroll).replace('{1}', attributes.trophy);
+      } else {
+        text = res.strings.READ_BANKROLL_WITH_TROPHY.replace('{0}', game.bankroll);
+      }
+    } else {
+      text = res.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll);
+    }
+
+    return text;
+  },
   getProgressivePayout: function(attributes, callback) {
     // Read from Dynamodb
     const game = attributes[attributes.currentGame];
@@ -81,9 +98,10 @@ module.exports = {
       });
     }
   },
-  // Updates DynamoDB to note that the progressive was won!
-  // Note this function does not callback
-  resetProgressive: function(game) {
+  // Updates DynamoDB and S3 to note the jackpot win
+  updateProgressiveJackpot: function(userId, game, jackpot, callback) {
+    let callsToComplete = 3;
+
     // Write to the DB, and reset the hands played to 0
     dynamodb.putItem({TableName: 'PlayBlackjack',
         Item: {userId: {S: 'game-' + game}, hands: {N: '0'}}},
@@ -91,25 +109,25 @@ module.exports = {
       // We don't take a callback, but if there's an error log it
       if (err) {
         console.log(err);
-      } else {
-        // Update number of progressive wins while you're at it
-        dynamodb.updateItem({TableName: 'PlayBlackjack',
-            Key: {userId: {S: 'game-' + game}},
-            AttributeUpdates: {jackpots: {
-                Action: 'ADD',
-                Value: {N: '1'}},
-        }}, (err, data) => {
-          // Again, don't care about the error
-          if (err) {
-            console.log(err);
-          }
-        });
       }
+      complete();
     });
-  },
-  // Write jackpot details to S3
-  writeJackpotDetails: function(userId, game, jackpot) {
-    // It's not the same, so try to write it out
+
+    // Update number of progressive wins while you're at it
+    dynamodb.updateItem({TableName: 'PlayBlackjack',
+        Key: {userId: {S: 'game-' + game}},
+        AttributeUpdates: {jackpots: {
+            Action: 'ADD',
+            Value: {N: '1'}},
+    }}, (err, data) => {
+      // Again, don't care about the error
+      if (err) {
+        console.log(err);
+      }
+      complete();
+    });
+
+    // And write this jackpot out to S3
     const details = {userId: userId, amount: jackpot};
     const params = {Body: JSON.stringify(details),
       Bucket: 'garrett-alexa-usage',
@@ -119,7 +137,16 @@ module.exports = {
       if (err) {
         console.log(err, err.stack);
       }
+      complete();
     });
+
+    // This function keeps track of when we've completed all calls
+    function complete() {
+      callsToComplete--;
+      if (callsToComplete === 0) {
+        callback();
+      }
+    }
   },
   saveNewUser: function() {
     // Brand new player - let's log this in our DB (async call)
@@ -135,6 +162,11 @@ module.exports = {
       if (err) {
         console.log(err);
       }
+    });
+  },
+  getHighScore(attributes, callback) {
+    getTopScoresFromS3(attributes, (err, scores) => {
+      callback(err, (scores) ? scores[0] : undefined);
     });
   },
   readLeaderBoard: function(locale, attributes, callback) {
@@ -185,9 +217,9 @@ function getTopScoresFromS3(attributes, callback) {
       const scores = ranking.scores;
 
       if (scores && scores[attributes.currentGame]) {
-        // If their current high score isn't in the list, add it
-        if (scores[attributes.currentGame].indexOf(game.high) < 0) {
-          scores[attributes.currentGame].push(game.high);
+        // If their current bankroll isn't in the list, add it
+        if (scores[attributes.currentGame].indexOf(game.bankroll) < 0) {
+          scores[attributes.currentGame].push(game.bankroll);
         }
 
         callback(null, scores[attributes.currentGame].sort((a, b) => (b - a)));

@@ -15,7 +15,10 @@ module.exports = {
     let ruleError;
     const res = require('../' + this.event.request.locale + '/resources');
 
-    if (!changeSlot) {
+    if (!this.attributes[this.attributes.currentGame].canReset) {
+      // Sorry, you can't reset this or change the rules
+      ruleError = res.strings.TOURNAMENT_NOCHANGERULES;
+    } else if (!changeSlot) {
       ruleError = res.strings.CHANGERULES_NO_RULE;
     } else if (!changeSlot.value) {
       ruleError = res.strings.CHANGERULES_NO_RULE_VALUE.replace('{0}', changeSlot.value);
@@ -61,7 +64,9 @@ module.exports = {
           cardText += '\n';
         }
 
-        cardText += res.strings.CHANGE_CARD_TEXT;
+        if (this.attributes[this.attributes.currentGame].canReset) {
+          cardText += res.strings.CHANGE_CARD_TEXT;
+        }
         this.emit(':askWithCard', ruleError, res.strings.ERROR_REPROMPT, res.strings.CHANGERULES_CARD_TITLE, cardText);
       });
     }

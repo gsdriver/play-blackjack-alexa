@@ -6,6 +6,7 @@
 
 const playgame = require('../PlayGame');
 const ads = require('../ads');
+const tournament = require('../tournament');
 
 module.exports = {
   handleIntent: function() {
@@ -17,6 +18,7 @@ module.exports = {
       // Tell them how much money they are leaving with
       exitSpeech = res.strings.EXIT_BANKROLL.replace('{0}', game.bankroll) + ' ';
       ads.getAd(this.attributes, 'blackjack', this.event.request.locale, (adText) => {
+        exitSpeech += tournament.getReminderText(this.event.request.locale);
         exitSpeech += (adText + ' ' + res.strings.EXIT_GOODBYE);
         this.emit(':tell', exitSpeech);
       });

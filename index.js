@@ -17,6 +17,7 @@ const Exit = require('./intents/Exit');
 const Reset = require('./intents/Reset');
 const gameService = require('./GameService');
 const bjUtils = require('./BlackjackUtils');
+const tournament = require('./tournament');
 
 const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
 
@@ -115,60 +116,51 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   },
 });
 
+// These states are only accessible during tournament play
+const joinHandlers = Alexa.CreateStateHandler('JOINTOURNAMENT', {
+  'NewSession': function() {
+    this.handler.state = '';
+    this.emitWithState('NewSession');
+  },
+  'LaunchRequest': tournament.handlePass,
+  'AMAZON.YesIntent': tournament.handleJoin,
+  'AMAZON.NoIntent': tournament.handlePass,
+  'AMAZON.StopIntent': Exit.handleIntent,
+  'AMAZON.CancelIntent': tournament.handlePass,
+  'SessionEndedRequest': function() {
+    this.emit(':saveState', true);
+  },
+  'Unhandled': function() {
+    const res = require('./' + this.event.request.locale + '/resources');
+    this.emit(':ask', res.strings.UNKNOWNINTENT_RESET, res.strings.UNKNOWNINTENT_RESET_REPROMPT);
+  },
+});
+
 // Handlers for our skill
 const handlers = {
   'NewSession': function() {
-    // Some initiatlization
-    this.attributes.playerLocale = this.event.request.locale;
-    this.attributes.numRounds = (this.attributes.numRounds)
-              ? (this.attributes.numRounds + 1) : 1;
-    this.attributes.firsthand = true;
-    this.attributes.readProgressive = undefined;
-
-    // If they don't have a game, create one
-    if (!this.attributes.currentGame) {
-      gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
-        // Now read the progressive jackpot amount
-        bjUtils.getProgressivePayout(this.attributes, (jackpot) => {
-          this.attributes[this.attributes.currentGame].progressiveJackpot = jackpot;
-
+    initialize(this.attributes, this.event.request.locale, this.event.session.user.userId, () => {
+      tournament.getTournamentComplete(this.event.request.locale, this.attributes, (result) => {
+        // If there is an active tournament, go to the start tournament state
+        if (tournament.canEnterTournament(this.attributes)) {
+          // Great, enter the tournament!
+          this.handler.state = 'JOINTOURNAMENT';
+          tournament.promptToEnter(this.event.request.locale,
+              this.attributes, (speech, reprompt) => {
+            this.emit(':ask', result + speech, reprompt);
+          });
+        } else {
+          if (result && (result.length > 0)) {
+            this.attributes.tournamentResult = result;
+          }
           if (this.event.request.type === 'IntentRequest') {
             this.emit(this.event.request.intent.name);
           } else {
             this.emit('LaunchRequest');
           }
-        });
-      });
-    } else {
-      // Standard should have progressive; some customers will have this game
-      // without progressive, so set it for them
-      const game = this.attributes[this.attributes.currentGame];
-      if (this.attributes.currentGame === 'standard') {
-        if (!game.progressive) {
-          game.progressive = {bet: 5, starting: 2500, jackpotRate: 1.25};
-
-          // Also stuff sidebet in as a possible action if bet is there
-          if (game.possibleActions &&
-            (game.possibleActions.indexOf('bet') >= 0) &&
-            (game.possibleActions.indexOf('sidebet') < 0)) {
-            game.possibleActions.push('sidebet');
-          }
-        }
-      }
-
-      // Now read the progressive jackpot amount
-      bjUtils.getProgressivePayout(this.attributes, (jackpot) => {
-        game.progressiveJackpot = jackpot;
-
-        // Set the state
-        this.handler.state = bjUtils.getState(this.attributes);
-        if (this.event.request.type === 'IntentRequest') {
-          this.emit(this.event.request.intent.name);
-        } else {
-          this.emit('LaunchRequest');
         }
       });
-    }
+    });
   },
   // Some intents don't make sense for a new session - so just launch instead
   'LaunchRequest': Launch.handleIntent,
@@ -209,6 +201,52 @@ exports.handler = function(event, context, callback) {
   alexa.appId = APP_ID;
   alexa.dynamoDBTableName = 'PlayBlackjack';
   alexa.registerHandlers(handlers, resetHandlers, newGameHandlers,
-    insuranceHandlers, inGameHandlers);
+    insuranceHandlers, joinHandlers, inGameHandlers);
   alexa.execute();
 };
+
+function initialize(attributes, locale, userId, callback) {
+  // Some initiatlization
+  attributes.playerLocale = locale;
+  attributes.numRounds = (attributes.numRounds)
+            ? (attributes.numRounds + 1) : 1;
+  attributes.firsthand = true;
+  attributes.readProgressive = undefined;
+
+  // If they don't have a game, create one
+  if (!attributes.currentGame) {
+    gameService.initializeGame(attributes, userId, () => {
+      // Now read the progressive jackpot amount
+      bjUtils.getProgressivePayout(attributes, (jackpot) => {
+        attributes[attributes.currentGame].progressiveJackpot = jackpot;
+        callback();
+      });
+    });
+  } else {
+    // Standard should have progressive; some customers will have this game
+    // without progressive, so set it for them
+    const game = attributes[attributes.currentGame];
+    if (attributes.currentGame === 'standard') {
+      if (!game.progressive) {
+        game.progressive = {bet: 5, starting: 2500, jackpotRate: 1.25};
+
+        // Also stuff sidebet in as a possible action if bet is there
+        if (game.possibleActions &&
+          (game.possibleActions.indexOf('bet') >= 0) &&
+          (game.possibleActions.indexOf('sidebet') < 0)) {
+          game.possibleActions.push('sidebet');
+        }
+      }
+    }
+
+    // Now read the progressive jackpot amount
+    if (game.progressive) {
+      bjUtils.getProgressivePayout(attributes, (jackpot) => {
+        game.progressiveJackpot = jackpot;
+        callback();
+      });
+    } else {
+      callback();
+    }
+  }
+}
