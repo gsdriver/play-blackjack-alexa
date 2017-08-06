@@ -123,7 +123,10 @@ module.exports = {
     readStanding(locale, attributes, (standing) => {
       speech += standing;
       speech += reprompt;
-      emit(':askWithCard', speech, reprompt, res.strings.HELP_CARD_TITLE, res.strings.TOURNAMENT_HELP_CARD_TEXT.replace('{0}', game.maxHands));
+      bjUtils.emitResponse(emit, locale, null, null,
+              speech, reprompt,
+              res.strings.HELP_CARD_TITLE,
+              res.strings.TOURNAMENT_HELP_CARD_TEXT.replace('{0}', game.maxHands));
     });
   },
   handleJoin: function() {
@@ -143,7 +146,7 @@ module.exports = {
             .replace('{0}', this.attributes['tournament'].bankroll)
             .replace('{1}', this.attributes['tournament'].maxHands);
       speech += reprompt;
-      this.emit(':ask', speech, reprompt);
+      bjUtils.emitResponse(this.emit, this.event.request.locale, null, null, speech, reprompt);
     } else {
       speech = res.strings.TOURNAMENT_WELCOME_BACK.replace('{0}', game.maxHands - game.hands);
       readStanding(this.event.request.locale, this.attributes, (standing) => {
@@ -152,7 +155,7 @@ module.exports = {
         }
 
         speech += reprompt;
-        this.emit(':ask', speech, reprompt);
+        bjUtils.emitResponse(this.emit, this.event.request.locale, null, null, speech, reprompt);
       });
     }
   },

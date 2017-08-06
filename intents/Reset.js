@@ -5,6 +5,7 @@
 'use strict';
 
 const gameService = require('../GameService');
+const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
   handleIntent: function() {
@@ -23,7 +24,8 @@ module.exports = {
       reprompt = res.strings.TOURNAMENT_INVALIDACTION_REPROMPT;
     }
 
-    this.emit(':ask', speech, reprompt);
+    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+            speech, reprompt);
   },
   handleYesReset: function() {
     const res = require('../' + this.event.request.locale + '/resources');
@@ -31,7 +33,8 @@ module.exports = {
     // Confirmed - let's reset
     gameService.initializeGame(this.attributes, this.event.session.user.userId, () => {
       this.handler.state = 'NEWGAME';
-      this.emit(':ask', res.strings.RESET_COMPLETED, res.strings.RESET_REPROMPT);
+      bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+              res.strings.RESET_COMPLETED, res.strings.RESET_REPROMPT);
     });
   },
   handleNoReset: function() {
@@ -39,6 +42,7 @@ module.exports = {
     const res = require('../' + this.event.request.locale + '/resources');
 
     this.handler.state = 'NEWGAME';
-    this.emit(':ask', res.strings.RESET_ABORTED, res.strings.RESET_REPROMPT);
+    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+            res.strings.RESET_ABORTED, res.strings.RESET_REPROMPT);
   },
 };

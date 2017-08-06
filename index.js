@@ -37,7 +37,8 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
-    this.emit(':ask', res.strings.UNKNOWNINTENT_RESET, res.strings.UNKNOWNINTENT_RESET_REPROMPT);
+    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+            res.strings.UNKNOWNINTENT_RESET, res.strings.UNKNOWNINTENT_RESET_REPROMPT);
   },
 });
 
@@ -65,7 +66,8 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
-    this.emit(':ask', res.strings.UNKNOWNINTENT_NEWGAME, res.strings.UNKNOWNINTENT_NEWGAME_REPROMPT);
+    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+            res.strings.UNKNOWNINTENT_NEWGAME, res.strings.UNKNOWNINTENT_NEWGAME_REPROMPT);
   },
 });
 
@@ -89,7 +91,8 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
-    this.emit(':ask', res.strings.UNKNOWNINTENT_INSURANCE, res.strings.UNKNOWNINTENT_INSURANCE_REPROMPT);
+    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+            res.strings.UNKNOWNINTENT_INSURANCE, res.strings.UNKNOWNINTENT_INSURANCE_REPROMPT);
   },
 });
 
@@ -112,7 +115,8 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
-    this.emit(':ask', res.strings.UNKNOWNINTENT_INGAME, res.strings.UNKNOWNINTENT_INGAME_REPROMPT);
+    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+            res.strings.UNKNOWNINTENT_INGAME, res.strings.UNKNOWNINTENT_INGAME_REPROMPT);
   },
 });
 
@@ -132,7 +136,8 @@ const joinHandlers = Alexa.CreateStateHandler('JOINTOURNAMENT', {
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
-    this.emit(':ask', res.strings.UNKNOWNINTENT_RESET, res.strings.UNKNOWNINTENT_RESET_REPROMPT);
+    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+            res.strings.UNKNOWNINTENT_RESET, res.strings.UNKNOWNINTENT_RESET_REPROMPT);
   },
 });
 
@@ -147,7 +152,8 @@ const handlers = {
           this.handler.state = 'JOINTOURNAMENT';
           tournament.promptToEnter(this.event.request.locale,
               this.attributes, (speech, reprompt) => {
-            this.emit(':ask', result + speech, reprompt);
+            bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+                    result + speech, reprompt);
           });
         } else {
           if (result && (result.length > 0)) {
@@ -184,7 +190,8 @@ const handlers = {
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
-    this.emit(':ask', res.strings.UNKNOWNINTENT_INGAME, res.strings.UNKNOWNINTENT_INGAME_REPROMPT);
+    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+            res.strings.UNKNOWNINTENT_INGAME, res.strings.UNKNOWNINTENT_INGAME_REPROMPT);
   },
 };
 
@@ -192,10 +199,7 @@ exports.handler = function(event, context, callback) {
   const AWS = require('aws-sdk');
   AWS.config.update({region: 'us-east-1'});
 
-  if (event && !process.env.NOLOG) {
-    console.log(JSON.stringify(event));
-  }
-
+  bjUtils.setEvent(event);
   const alexa = Alexa.handler(event, context);
 
   alexa.appId = APP_ID;
@@ -237,6 +241,9 @@ function initialize(attributes, locale, userId, callback) {
           game.possibleActions.push('sidebet');
         }
       }
+
+      // You should also be able to reset the standard game
+      game.canReset = true;
     }
 
     // Now read the progressive jackpot amount

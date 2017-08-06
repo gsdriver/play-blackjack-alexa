@@ -6,6 +6,7 @@
 
 const playgame = require('../PlayGame');
 const tournament = require('../tournament');
+const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
   handleIntent: function() {
@@ -19,7 +20,8 @@ module.exports = {
         speech = res.strings.HELP_GENERIC_HELP;
       }
 
-      this.emit(':askWithCard', speech, speech, res.strings.HELP_CARD_TITLE,
+      bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+          speech, speech, res.strings.HELP_CARD_TITLE,
           res.strings.HELP_CARD_PROGRESSIVE_TEXT + res.strings.HELP_CARD_TEXT);
     }
   },

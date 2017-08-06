@@ -49,6 +49,7 @@ module.exports = {
            bankroll: STARTING_BANKROLL,
            lastBet: 100,
            possibleActions: [],
+           canReset: true,
         };
       } else {
         // Include progressive details

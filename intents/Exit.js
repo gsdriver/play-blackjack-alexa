@@ -7,6 +7,7 @@
 const playgame = require('../PlayGame');
 const ads = require('../ads');
 const tournament = require('../tournament');
+const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
   handleIntent: function() {
@@ -20,7 +21,7 @@ module.exports = {
       ads.getAd(this.attributes, 'blackjack', this.event.request.locale, (adText) => {
         exitSpeech += tournament.getReminderText(this.event.request.locale);
         exitSpeech += (adText + ' ' + res.strings.EXIT_GOODBYE);
-        this.emit(':tell', exitSpeech);
+        bjUtils.emitResponse(this.emit, this.event.request.locale, null, exitSpeech);
       });
     });
   },

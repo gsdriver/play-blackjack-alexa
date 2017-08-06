@@ -43,7 +43,9 @@ module.exports = {
                 cardText = res.strings.FULL_RULES.replace('{0}', readSpeech);
               }
 
-              this.emit(':askWithCard', speech, res.strings.ERROR_REPROMPT, res.strings.CHANGERULES_CARD_TITLE, cardText);
+              bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+                      speech, res.strings.ERROR_REPROMPT,
+                      res.strings.CHANGERULES_CARD_TITLE, cardText);
             });
           } else {
             bjUtils.emitResponse(this.emit, this.event.request.locale,
@@ -67,7 +69,9 @@ module.exports = {
         if (this.attributes[this.attributes.currentGame].canReset) {
           cardText += res.strings.CHANGE_CARD_TEXT;
         }
-        this.emit(':askWithCard', ruleError, res.strings.ERROR_REPROMPT, res.strings.CHANGERULES_CARD_TITLE, cardText);
+        bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+                ruleError, res.strings.ERROR_REPROMPT,
+                res.strings.CHANGERULES_CARD_TITLE, cardText);
       });
     }
   },
