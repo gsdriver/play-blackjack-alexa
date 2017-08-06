@@ -8,7 +8,7 @@ const resources = {
   'UNKNOWNINTENT_RESET_REPROMPT': 'Try saying Yes or No.',
   'UNKNOWNINTENT_NEWGAME': 'Sorry, I didn\'t get that. Try saying Bet.',
   'UNKNOWNINTENT_NEWGAME_REPROMPT': 'Try saying Bet.',
-  'UNKNOWNINTENT_INSURANCE_RESET': 'Sorry, I didn\'t get that. Try saying Yes or No.',
+  'UNKNOWNINTENT_INSURANCE': 'Sorry, I didn\'t get that. Try saying Yes or No.',
   'UNKNOWNINTENT_INSURANCE_REPROMPT': 'Try saying Yes or No.',
   'UNKNOWNINTENT_INGAME': 'Sorry, I didn\'t get that. Try saying Repeat to hear the current status.',
   'UNKNOWNINTENT_INGAME_REPROMPT': 'Try saying Repeat.',
