@@ -5,6 +5,7 @@ const attributeFile = 'attributes.txt';
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+const USERID = 'not-amazon2';
 
 function BuildEvent(argv)
 {
@@ -32,7 +33,7 @@ function BuildEvent(argv)
          },
          "attributes": {},
         "user": {
-          "userId": "not-amazon",
+          "userId": USERID,
          },
          "new": false
        },
@@ -54,7 +55,7 @@ function BuildEvent(argv)
          },
          "attributes": {},
          "user": {
-            "userId": "not-amazon",
+            "userId": USERID,
          },
          "new": true
        },
@@ -189,7 +190,7 @@ if ((process.argv.length == 3) && (process.argv[2] == 'clear')) {
   const fs = require('fs');
 
   // Clear is a special case - delete this entry from the DB and delete the attributes.txt file
-  dynamodb.deleteItem({TableName: 'PlayBlackjack', Key: { userId: {S: 'not-amazon'}}}, function (error, data) {
+  dynamodb.deleteItem({TableName: 'PlayBlackjack', Key: { userId: {S: USERID}}}, function (error, data) {
     console.log("Deleted " + error);
     if (fs.existsSync(attributeFile)) {
       fs.unlinkSync(attributeFile);

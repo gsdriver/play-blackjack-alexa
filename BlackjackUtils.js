@@ -9,6 +9,7 @@ AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 const speechUtils = require('alexa-speech-utils')();
+const logger = require('alexa-logger');
 
 // Global session ID
 let globalEvent;
@@ -18,10 +19,9 @@ module.exports = {
     // Save to S3 if environment variable is set
     if (process.env.SAVELOG) {
       const result = (error) ? error : ((response) ? response : speech);
-      const params = {Body: JSON.stringify({event: globalEvent, response: result}),
-        Bucket: 'garrett-alexa-usage',
-        Key: 'logs/blackjack/' + Date.now() + '.txt'};
-      s3.putObject(params, (err, data) => {
+      logger.saveLog(globalEvent, result,
+        {bucket: 'garrett-alexa-logs', keyPrefix: 'blackjack/', fullLog: true},
+        (err) => {
         if (err) {
           console.log(err, err.stack);
         }
@@ -237,7 +237,7 @@ function getTopScoresFromS3(attributes, callback) {
   const game = attributes[attributes.currentGame];
 
   // Read the S3 buckets that has everyone's scores
-  s3.getObject({Bucket: 'garrett-alexa-usage', Key: 'BlackjackScores.txt'}, (err, data) => {
+  s3.getObject({Bucket: 'garrett-alexa-usage', Key: 'BlackjackScores2.txt'}, (err, data) => {
     if (err) {
       console.log(err, err.stack);
       callback(err, null);
@@ -247,12 +247,14 @@ function getTopScoresFromS3(attributes, callback) {
       const scores = ranking.scores;
 
       if (scores && scores[attributes.currentGame]) {
+        const bankrolls = scores[attributes.currentGame].map((a) => a.bankroll);
+
         // If their current bankroll isn't in the list, add it
-        if (scores[attributes.currentGame].indexOf(game.bankroll) < 0) {
-          scores[attributes.currentGame].push(game.bankroll);
+        if (bankrolls.indexOf(game.bankroll) < 0) {
+          bankrolls.push(game.bankroll);
         }
 
-        callback(null, scores[attributes.currentGame].sort((a, b) => (b - a)));
+        callback(null, bankrolls.sort((a, b) => (b - a)));
       } else {
         console.log('No scores for ' + attributes.currentGame);
         callback('No scoreset', null);
