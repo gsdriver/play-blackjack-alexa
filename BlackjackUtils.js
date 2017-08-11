@@ -216,7 +216,8 @@ module.exports = {
       } else {
         // What is your ranking - assuming you've done a spin
         if (game.hands > 0) {
-          const ranking = scores.indexOf(game.bankroll) + 1;
+          const bankrolls = scores.map((a) => a.bankroll);
+          const ranking = bankrolls.indexOf(game.bankroll) + 1;
 
           speech += res.strings.LEADER_RANKING
             .replace('{0}', game.bankroll)
