@@ -273,7 +273,6 @@ module.exports = {
   },
 };
 
-
 function getTopScoresFromS3(attributes, callback) {
   const game = attributes[attributes.currentGame];
 
