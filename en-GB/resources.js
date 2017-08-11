@@ -136,6 +136,7 @@ const resources = {
   'LEADER_NO_SCORES': 'Sorry, I\'m unable to read the current leader board',
   'LEADER_FORMAT': '£{0}',
   'LEADER_FORMAT_NAME': '{0} with £{1}',
+  'LEADER_TOP_SCORES': 'The top {0} bankrolls are ',
   // From Tournament.js
   'TOURNAMENT_NOCHANGERULES': 'Sorry, you can\'t change the rules during tournament play. ',
   'TOURNAMENT_NORESET': 'Sorry, you can\'t reset your bankroll during tournament play. What else can I help you with?',
