@@ -15,11 +15,12 @@ const logger = require('alexa-logger');
 let globalEvent;
 
 module.exports = {
-  emitResponse: function(emit, locale, error, response, speech, reprompt, cardTitle, cardText) {
+  emitResponse: function(emit, locale, error, response, speech,
+                        reprompt, cardTitle, cardText, linQ) {
     // Save to S3 if environment variable is set
     if (process.env.SAVELOG) {
-      const result = (error) ? error : ((response) ? response : speech);
-      logger.saveLog(globalEvent, result,
+      const result = ((linQ) ? linQ : (error) ? error : ((response) ? response : speech));
+        logger.saveLog(globalEvent, result,
         {bucket: 'garrett-alexa-logs', keyPrefix: 'blackjack/', fullLog: true},
         (err) => {
         if (err) {
@@ -44,6 +45,8 @@ module.exports = {
         emit(':tell', response);
       } else if (cardTitle) {
         emit(':askWithCard', speech, reprompt, cardTitle, cardText);
+      } else if (linQ) {
+        emit(':askWithLinkAccountCard', linQ);
       } else {
         emit(':ask', speech, reprompt);
       }
@@ -232,6 +235,7 @@ module.exports = {
     });
   },
 };
+
 
 function getTopScoresFromS3(attributes, callback) {
   const game = attributes[attributes.currentGame];

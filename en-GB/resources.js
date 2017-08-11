@@ -45,12 +45,14 @@ const resources = {
   // From Launch.js
   'LAUNCH_WELCOME': 'Welcome to Blackjack Game. The triple seven progressive jackpot is currently £{0}. ',
   'LAUNCH_WELCOME_NOJACKPOT': 'Welcome to Blackjack Game. ',
+  'LAUNCH_WELCOME_NAME': 'Welcome back {0}. The triple seven progressive jackpot is currently £{1}. ',
+  'LAUNCH_WELCOME_NAME_NOJACKPOT': 'Welcome back {0}. ',
   'LAUNCH_START_GAME': 'Say bet to start a new game',
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet £5 towards the jackpot',
   'LAUNCH_START_REMOVE_SIDEBET': 'remove side bet to remove your side bet',
   'LAUNCH_START_HIGH_SCORES': 'read high scores to hear the leader board',
   'LAUNCH_START_RESET': 'reset game to reset to the default rules and bankroll',
-  'LAUNCH_START_PROMPT': ' <break time=\'300ms\'/>Now, what can I help you with?',
+  'LAUNCH_REGISTER': ' <break time=\'300ms\'/>If you would like to register to have your name on the leader board and receive product notifications please visit the Alexa companion app.',
   // From Reset.js
   'RESET_CONFIRM': 'Would you like to reset the game? This will reset your bankroll and rules of the game.',
   'RESET_COMPLETED': 'You have £5000. Say bet to start a new game.',
