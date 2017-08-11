@@ -20,6 +20,7 @@ const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
+const FB = require('facebook-node');
 
 const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
 
@@ -146,7 +147,7 @@ const joinHandlers = Alexa.CreateStateHandler('JOINTOURNAMENT', {
 // Handlers for our skill
 const handlers = {
   'NewSession': function() {
-    initialize(this.attributes, this.event.request.locale, this.event.session.user.userId, () => {
+    initialize(this.attributes, this.event, () => {
       tournament.getTournamentComplete(this.event.request.locale, this.attributes, (result) => {
         // If there is an active tournament, go to the start tournament state
         if (tournament.canEnterTournament(this.attributes)) {
@@ -227,51 +228,73 @@ exports.handler = function(event, context, callback) {
   }
 };
 
-function initialize(attributes, locale, userId, callback) {
-  // Some initiatlization
-  attributes.playerLocale = locale;
-  attributes.numRounds = (attributes.numRounds)
-            ? (attributes.numRounds + 1) : 1;
-  attributes.firsthand = true;
-  attributes.readProgressive = undefined;
+function initialize(attributes, event, callback) {
+  // If we have an access token but no name, let's get it
+  if (event.session.user.accessToken && !attributes.facebookID) {
+    FB.setAccessToken(event.session.user.accessToken);
 
-  // If they don't have a game, create one
-  if (!attributes.currentGame) {
-    gameService.initializeGame(attributes, userId, () => {
-      // Now read the progressive jackpot amount
-      bjUtils.getProgressivePayout(attributes, (jackpot) => {
-        attributes[attributes.currentGame].progressiveJackpot = jackpot;
-        callback();
-      });
-    });
-  } else {
-    // Standard should have progressive; some customers will have this game
-    // without progressive, so set it for them
-    const game = attributes[attributes.currentGame];
-    if (attributes.currentGame === 'standard') {
-      if (!game.progressive) {
-        game.progressive = {bet: 5, starting: 2500, jackpotRate: 1.25};
-
-        // Also stuff sidebet in as a possible action if bet is there
-        if (game.possibleActions &&
-          (game.possibleActions.indexOf('bet') >= 0) &&
-          (game.possibleActions.indexOf('sidebet') < 0)) {
-          game.possibleActions.push('sidebet');
+    FB.api('/me', {fields: ['id', 'first_name']}, (res) => {
+      if (res) {
+        if (res.first_name) {
+          attributes.firstName = res.first_name;
+        }
+        if (res.id) {
+          attributes.facebookID = res.id;
         }
       }
 
-      // You should also be able to reset the standard game
-      game.canReset = true;
-    }
+      initializeAfterName(attributes, event, callback);
+    });
+  } else {
+    initializeAfterName(attributes, event, callback);
+  }
 
-    // Now read the progressive jackpot amount
-    if (game.progressive) {
-      bjUtils.getProgressivePayout(attributes, (jackpot) => {
-        game.progressiveJackpot = jackpot;
-        callback();
+  function initializeAfterName(attributes, event, callback) {
+    // Some initiatlization
+    attributes.playerLocale = event.request.locale;
+    attributes.numRounds = (attributes.numRounds)
+              ? (attributes.numRounds + 1) : 1;
+    attributes.firsthand = true;
+    attributes.readProgressive = undefined;
+
+    // If they don't have a game, create one
+    if (!attributes.currentGame) {
+      gameService.initializeGame(attributes, event.session.user.userId, () => {
+        // Now read the progressive jackpot amount
+        bjUtils.getProgressivePayout(attributes, (jackpot) => {
+          attributes[attributes.currentGame].progressiveJackpot = jackpot;
+          callback();
+        });
       });
     } else {
-      callback();
+      // Standard should have progressive; some customers will have this game
+      // without progressive, so set it for them
+      const game = attributes[attributes.currentGame];
+      if (attributes.currentGame === 'standard') {
+        if (!game.progressive) {
+          game.progressive = {bet: 5, starting: 2500, jackpotRate: 1.25};
+
+          // Also stuff sidebet in as a possible action if bet is there
+          if (game.possibleActions &&
+            (game.possibleActions.indexOf('bet') >= 0) &&
+            (game.possibleActions.indexOf('sidebet') < 0)) {
+            game.possibleActions.push('sidebet');
+          }
+        }
+
+        // You should also be able to reset the standard game
+        game.canReset = true;
+      }
+
+      // Now read the progressive jackpot amount
+      if (game.progressive) {
+        bjUtils.getProgressivePayout(attributes, (jackpot) => {
+          game.progressiveJackpot = jackpot;
+          callback();
+        });
+      } else {
+        callback();
+      }
     }
   }
 }
