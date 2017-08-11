@@ -66,6 +66,8 @@ module.exports = {
         emit(':tell', response);
       } else if (cardTitle) {
         emit(':askWithCard', speech, reprompt, cardTitle, cardText);
+      } else if (linQ) {
+        emit(':askWithLinkAccountCard', linQ);
       } else {
         emit(':ask', speech, reprompt);
       }
@@ -254,6 +256,7 @@ module.exports = {
     });
   },
 };
+
 
 function getTopScoresFromS3(attributes, callback) {
   const game = attributes[attributes.currentGame];

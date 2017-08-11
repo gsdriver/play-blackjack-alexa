@@ -13,6 +13,7 @@ module.exports = {
   handleIntent: function() {
     const res = require('../' + this.event.request.locale + '/resources');
     let launchSpeech;
+    let linQ;
 
     // Since we aren't in a tournament, make sure current hand isn't set to one
     if (this.attributes.currentGame === 'tournament') {
@@ -21,10 +22,21 @@ module.exports = {
     const game = this.attributes[this.attributes.currentGame];
 
     // Note that this is first hand (so we will say more on the first bet)
-    if (game.progressiveJackpot) {
-      launchSpeech = res.strings.LAUNCH_WELCOME.replace('{0}', game.progressiveJackpot);
+    if (this.attributes.firstName) {
+      if (game.progressiveJackpot) {
+        launchSpeech = res.strings.LAUNCH_WELCOME_NAME
+            .replace('{0}', this.attributes.firstName)
+            .replace('{1}', game.progressiveJackpot);
+      } else {
+        launchSpeech = res.strings.LAUNCH_WELCOME_NAME_NOJACKPOT
+            .replace('{0}', this.attributes.firstName);
+      }
     } else {
-      launchSpeech = res.strings.LAUNCH_WELCOME_NOJACKPOT;
+      if (game.progressiveJackpot) {
+        launchSpeech = res.strings.LAUNCH_WELCOME.replace('{0}', game.progressiveJackpot);
+      } else {
+        launchSpeech = res.strings.LAUNCH_WELCOME_NOJACKPOT;
+      }
     }
     this.attributes.readProgressive = true;
 
@@ -56,9 +68,20 @@ module.exports = {
         launchSpeech += speechUtils.or(options, {pause: '300ms'});
       }
 
+      // Finally if they aren't registered users, tell them about that option
+      if (!this.event.session.user.accessToken) {
+        launchSpeech += res.strings.LAUNCH_REGISTER;
+        linQ = launchSpeech;
+      }
+
       this.handler.state = bjUtils.getState(this.attributes);
-      bjUtils.emitResponse(this.emit, this.event.request.locale,
-            null, null, launchSpeech, reprompt);
+      if (linQ) {
+        bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+              null, null, null, null, linQ);
+      } else {
+        bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+              launchSpeech, reprompt);
+      }
     });
   },
 };
