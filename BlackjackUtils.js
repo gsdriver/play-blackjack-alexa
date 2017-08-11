@@ -226,7 +226,15 @@ module.exports = {
 
         // And what is the leader board?
         const toRead = (scores.length > 5) ? 5 : scores.length;
-        const topScores = scores.slice(0, toRead).map((x) => res.strings.LEADER_FORMAT.replace('{0}', x));
+        const topScores = scores.slice(0, toRead).map((x) => {
+          if (x.name) {
+            return res.strings.LEADER_FORMAT_NAME
+                .replace('{0}', x.name)
+                .replace('{1}', x.bankroll);
+          } else {
+            return res.strings.LEADER_FORMAT.replace('{0}', x.bankroll);
+          }
+        });
         speech += res.strings.LEADER_TOP_SCORES.replace('{0}', toRead);
         speech += speechUtils.and(topScores, {locale: locale, pause: '300ms'});
       }
@@ -235,7 +243,6 @@ module.exports = {
     });
   },
 };
-
 
 function getTopScoresFromS3(attributes, callback) {
   const game = attributes[attributes.currentGame];
@@ -255,10 +262,13 @@ function getTopScoresFromS3(attributes, callback) {
 
         // If their current bankroll isn't in the list, add it
         if (bankrolls.indexOf(game.bankroll) < 0) {
-          bankrolls.push(game.bankroll);
+          scores[attributes.currentGame].push({
+            name: attributes.firstName,
+            bankroll: game.bankroll,
+          });
         }
 
-        callback(null, bankrolls.sort((a, b) => (b - a)));
+        callback(null, scores[attributes.currentGame].sort((a, b) => (b.bankroll - a.bankroll)));
       } else {
         console.log('No scores for ' + attributes.currentGame);
         callback('No scoreset', null);

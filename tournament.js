@@ -202,10 +202,15 @@ function readStanding(locale, attributes, callback) {
       let speech = '';
 
       if (high) {
-        if (game.bankroll >= high) {
+        if (game.bankroll >= high.bankroll) {
           speech = res.strings.TOURNAMENT_STANDING_FIRST;
+        } else if (high.name) {
+          speech = res.strings.TOURNAMENT_STANDING_TOGO_NAME
+              .replace('{0}', high.name)
+              .replace('{1}', high.bankroll);
         } else {
-          speech = res.strings.TOURNAMENT_STANDING_TOGO.replace('{0}', high);
+          speech = res.strings.TOURNAMENT_STANDING_TOGO
+              .replace('{0}', high.bankroll);
         }
       }
 
