@@ -15,7 +15,8 @@ const logger = require('alexa-logger');
 let globalEvent;
 
 module.exports = {
-  emitResponse: function(emit, locale, error, response, speech, reprompt, cardTitle, cardText) {
+  emitResponse: function(emit, locale, error, response, speech,
+                        reprompt, cardTitle, cardText, linQ) {
     let numCalls = 0;
 
     // Save to S3 if environment variable is set
@@ -69,7 +70,11 @@ module.exports = {
       } else if (cardTitle) {
         emit(':askWithCard', speech, reprompt, cardTitle, cardText);
       } else if (linQ) {
+<<<<<<< HEAD
         emit(':askWithLinkAccountCard', linQ, reprompt);
+=======
+        emit(':askWithLinkAccountCard', linQ);
+>>>>>>> Add account registration
       } else {
         emit(':ask', speech, reprompt);
       }
@@ -267,6 +272,7 @@ module.exports = {
     });
   },
 };
+
 
 function getTopScoresFromS3(attributes, callback) {
   const game = attributes[attributes.currentGame];
