@@ -69,7 +69,9 @@ module.exports = {
       }
 
       // Finally if they aren't registered users, tell them about that option
-      if (!this.event.session.user.accessToken) {
+      // Only available for US players
+      if (!this.event.session.user.accessToken &&
+          (this.event.request.locale === 'en-US')) {
         launchSpeech += res.strings.LAUNCH_REGISTER;
         linQ = launchSpeech;
       }
