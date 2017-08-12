@@ -17,15 +17,13 @@ let globalEvent;
 module.exports = {
   emitResponse: function(emit, locale, error, response, speech,
                         reprompt, cardTitle, cardText, linQ) {
-    let numCalls = 0;
-
     // Save to S3 if environment variable is set
     let numCalls = 0;
 
     if (process.env.SAVELOG) {
       numCalls++;
       const result = ((linQ) ? linQ : (error) ? error : ((response) ? response : speech));
-      logger.saveLog(globalEvent, result,
+        logger.saveLog(globalEvent, result,
         {bucket: 'garrett-alexa-logs', keyPrefix: 'blackjack/', fullLog: true},
         (err) => {
         if (err) {
