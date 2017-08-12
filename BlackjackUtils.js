@@ -18,7 +18,10 @@ module.exports = {
   emitResponse: function(emit, locale, error, response, speech,
                         reprompt, cardTitle, cardText, linQ) {
     // Save to S3 if environment variable is set
+    let numCalls = 0;
+
     if (process.env.SAVELOG) {
+      numCalls++;
       const result = ((linQ) ? linQ : (error) ? error : ((response) ? response : speech));
         logger.saveLog(globalEvent, result,
         {bucket: 'garrett-alexa-logs', keyPrefix: 'blackjack/', fullLog: true},
@@ -26,9 +29,28 @@ module.exports = {
         if (err) {
           console.log(err, err.stack);
         }
-        emitResult();
+
+        if (--numCalls === 0) {
+          emitResult();
+        }
       });
-    } else {
+    }
+
+    if (response) {
+      // Save state
+      numCalls++;
+      const doc = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
+      doc.put({TableName: 'PlayBlackjack',
+          Item: {userId: globalEvent.session.user.userId,
+                mapAttr: globalEvent.session.attributes}},
+          (err, data) => {
+        if (--numCalls === 0) {
+          emitResult();
+        }
+      });
+    }
+
+    if (!numCalls) {
       emitResult();
     }
 
@@ -42,14 +64,7 @@ module.exports = {
         console.log('Speech error: ' + error);
         emit(':ask', error, res.ERROR_REPROMPT);
       } else if (response) {
-        // Save state first
-        const doc = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
-        doc.put({TableName: 'PlayBlackjack',
-            Item: {userId: globalEvent.session.user.userId,
-                  mapAttr: globalEvent.session.attributes}},
-            (err, data) => {
-          emit(':tell', response);
-        });
+        emit(':tell', response);
       } else if (cardTitle) {
         emit(':askWithCard', speech, reprompt, cardTitle, cardText);
       } else if (linQ) {
