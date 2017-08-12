@@ -66,14 +66,7 @@ module.exports = {
         console.log('Speech error: ' + error);
         emit(':ask', error, res.ERROR_REPROMPT);
       } else if (response) {
-        // Save state first
-        const doc = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
-        doc.put({TableName: 'PlayBlackjack',
-            Item: {userId: globalEvent.session.user.userId,
-                  mapAttr: globalEvent.session.attributes}},
-            (err, data) => {
-          emit(':tell', response);
-        });
+        emit(':tell', response);
       } else if (cardTitle) {
         emit(':askWithCard', speech, reprompt, cardTitle, cardText);
       } else if (linQ) {
