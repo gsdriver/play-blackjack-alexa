@@ -73,14 +73,6 @@ module.exports = {
         launchSpeech += speechUtils.or(options, {pause: '300ms'});
       }
 
-      // Finally if they aren't registered users, tell them about that option
-      // Only available for US players
-      if (!this.event.session.user.accessToken &&
-          (this.event.request.locale === 'en-US')) {
-        launchSpeech += res.strings.LAUNCH_REGISTER;
-        linQ = launchSpeech;
-      }
-
       this.handler.state = bjUtils.getState(this.attributes);
       if (linQ) {
         bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
