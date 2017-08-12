@@ -51,7 +51,6 @@ const resources = {
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet £5 towards the jackpot',
   'LAUNCH_START_REMOVE_SIDEBET': 'remove side bet to remove your side bet',
   'LAUNCH_START_HIGH_SCORES': 'read high scores to hear the leader board',
-  'LAUNCH_START_RESET': 'reset game to reset to the default rules and bankroll',
   // From Reset.js
   'RESET_CONFIRM': 'Would you like to reset the game? This will reset your bankroll and rules of the game.',
   'RESET_COMPLETED': 'You have £5000. Say bet to start a new game.',
