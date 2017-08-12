@@ -19,10 +19,12 @@ module.exports = {
     let numCalls = 0;
 
     // Save to S3 if environment variable is set
+    let numCalls = 0;
+
     if (process.env.SAVELOG) {
       numCalls++;
-      const result = (error) ? error : ((response) ? response : speech);
-      logger.saveLog(globalEvent, result,
+      const result = ((linQ) ? linQ : (error) ? error : ((response) ? response : speech));
+        logger.saveLog(globalEvent, result,
         {bucket: 'garrett-alexa-logs', keyPrefix: 'blackjack/', fullLog: true},
         (err) => {
         if (err) {
@@ -63,14 +65,7 @@ module.exports = {
         console.log('Speech error: ' + error);
         emit(':ask', error, res.ERROR_REPROMPT);
       } else if (response) {
-        // Save state first
-        const doc = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
-        doc.put({TableName: 'PlayBlackjack',
-            Item: {userId: globalEvent.session.user.userId,
-                  mapAttr: globalEvent.session.attributes}},
-            (err, data) => {
-          emit(':tell', response);
-        });
+        emit(':tell', response);
       } else if (cardTitle) {
         emit(':askWithCard', speech, reprompt, cardTitle, cardText);
       } else if (linQ) {
