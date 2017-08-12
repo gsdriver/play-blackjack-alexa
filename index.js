@@ -18,6 +18,8 @@ const Reset = require('./intents/Reset');
 const gameService = require('./GameService');
 const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
+const AWS = require('aws-sdk');
+AWS.config.update({region: 'us-east-1'});
 
 const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
 
@@ -33,7 +35,7 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'SessionEndedRequest': function() {
-    this.emit(':saveState', true);
+    saveState(this.event.session.user.userId, this.attributes);
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
@@ -62,7 +64,7 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'SessionEndedRequest': function() {
-    this.emit(':saveState', true);
+    saveState(this.event.session.user.userId, this.attributes);
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
@@ -87,7 +89,7 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'SessionEndedRequest': function() {
-    this.emit(':saveState', true);
+    saveState(this.event.session.user.userId, this.attributes);
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
@@ -111,7 +113,7 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'SessionEndedRequest': function() {
-    this.emit(':saveState', true);
+    saveState(this.event.session.user.userId, this.attributes);
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
@@ -132,7 +134,7 @@ const joinHandlers = Alexa.CreateStateHandler('JOINTOURNAMENT', {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': tournament.handlePass,
   'SessionEndedRequest': function() {
-    this.emit(':saveState', true);
+    saveState(this.event.session.user.userId, this.attributes);
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
@@ -186,7 +188,7 @@ const handlers = {
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'SessionEndedRequest': function() {
-    this.emit(':saveState', true);
+    saveState(this.event.session.user.userId, this.attributes);
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
@@ -196,17 +198,33 @@ const handlers = {
 };
 
 exports.handler = function(event, context, callback) {
-  const AWS = require('aws-sdk');
-  AWS.config.update({region: 'us-east-1'});
-
-  bjUtils.setEvent(event);
   const alexa = Alexa.handler(event, context);
 
   alexa.appId = APP_ID;
-  alexa.dynamoDBTableName = 'PlayBlackjack';
-  alexa.registerHandlers(handlers, resetHandlers, newGameHandlers,
-    insuranceHandlers, joinHandlers, inGameHandlers);
-  alexa.execute();
+  if (!event.session.sessionId || event.session['new']) {
+    const doc = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
+    doc.get({TableName: 'PlayBlackjack',
+            ConsistentRead: true,
+            Key: {userId: event.session.user.userId}},
+            (err, data) => {
+      if (err || (data.Item === undefined)) {
+        console.log('Error reading attributes ' + err);
+      } else {
+        Object.assign(event.session.attributes, data.Item.mapAttr);
+      }
+
+      execute();
+    });
+  } else {
+    execute();
+  }
+
+  function execute() {
+    bjUtils.setEvent(event);
+    alexa.registerHandlers(handlers, resetHandlers, newGameHandlers,
+      insuranceHandlers, joinHandlers, inGameHandlers);
+    alexa.execute();
+  }
 };
 
 function initialize(attributes, locale, userId, callback) {
@@ -256,4 +274,13 @@ function initialize(attributes, locale, userId, callback) {
       callback();
     }
   }
+}
+
+function saveState(userId, attributes) {
+  const doc = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
+  doc.put({TableName: 'PlayBlackjack',
+      Item: {userId: userId, mapAttr: attributes}},
+      (err, data) => {
+    console.log('Saved');
+  });
 }
