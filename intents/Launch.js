@@ -6,7 +6,6 @@
 
 const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
-const gameService = require('../GameService');
 const speechUtils = require('alexa-speech-utils')();
 
 module.exports = {
@@ -59,27 +58,25 @@ module.exports = {
         if (game.possibleActions && (game.possibleActions.indexOf('nosidebet') > 0)) {
           options.push(res.strings.LAUNCH_START_REMOVE_SIDEBET);
         }
-        if (!gameService.isDefaultGame(this.attributes)) {
-          options.push(res.strings.LAUNCH_START_RESET);
-        }
         options.push(res.strings.LAUNCH_START_HIGH_SCORES);
 
         launchSpeech += bjUtils.readBankroll(this.event.request.locale, this.attributes);
-        launchSpeech += speechUtils.or(options, {pause: '300ms'});
-      }
 
-      // Finally if they aren't registered users, tell them about that option
-      // Only available for US players
-      if (!this.event.session.user.accessToken &&
-          (this.event.request.locale === 'en-US')) {
-        launchSpeech += res.strings.LAUNCH_REGISTER;
-        linQ = launchSpeech;
+        // If they aren't registered users, tell them about that option
+        // Only available for US players
+        if (!this.event.session.user.accessToken &&
+            (this.event.request.locale === 'en-US')) {
+          launchSpeech += res.strings.LAUNCH_REGISTER;
+          linQ = true;
+        }
+
+        launchSpeech += speechUtils.or(options, {pause: '300ms'});
       }
 
       this.handler.state = bjUtils.getState(this.attributes);
       if (linQ) {
         bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
-              null, null, null, null, linQ);
+              null, reprompt, null, null, launchSpeech);
       } else {
         bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
               launchSpeech, reprompt);

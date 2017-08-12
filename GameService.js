@@ -103,18 +103,6 @@ module.exports = {
     setNextActions(attributes['tournament']);
     attributes.currentGame = 'tournament';
   },
-  // Determines if this is the initial game state or not
-  isDefaultGame: function(attributes) {
-    const game = attributes[attributes.currentGame];
-
-    // We only support one game type for now, but this could be different
-    // if we had different rules by default for different games
-    return ((game.activePlayer == 'none') && (game.bankroll == 5000) && (game.lastBet == 100)
-      && (game.rules.hitSoft17 == false) && (game.rules.surrender == 'late')
-      && (game.rules.double == 'any' && (game.rules.doubleaftersplit == true)
-      && (game.rules.resplitAces == false) && (game.rules.blackjackBonus == 0.5)
-      && (game.rules.numberOfDecks == 1)));
-  },
   getRecommendedAction: function(game) {
     // Only make a suggestion if the game is still in play (the player's turn)
     if (game.activePlayer == 'player') {
