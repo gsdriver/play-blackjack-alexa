@@ -21,6 +21,8 @@ const tournament = require('./tournament');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const FB = require('facebook-node');
+const AWS = require('aws-sdk');
+AWS.config.update({region: 'us-east-1'});
 
 const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
 
