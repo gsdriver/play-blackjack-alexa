@@ -208,6 +208,11 @@ exports.handler = function(event, context, callback) {
             Key: {userId: event.session.user.userId}},
             (err, data) => {
       if (err || (data.Item === undefined)) {
+        if (err) {
+          console.log('Error reading attributes ' + err);
+        } else {
+          bjUtils.saveNewUser();
+        }
         console.log('Error reading attributes ' + err);
       } else {
         Object.assign(event.session.attributes, data.Item.mapAttr);

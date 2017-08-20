@@ -16,11 +16,6 @@ module.exports = {
       let game = savedGame;
 
       if (!game) {
-        if (!attributes.currentGame) {
-          // Ah, brand-new user - let's note that
-          bjUtils.saveNewUser();
-        }
-
         game = {version: '1.0.0',
            userID: userID,
            deck: {cards: []},
