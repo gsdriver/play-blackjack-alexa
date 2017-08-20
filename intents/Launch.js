@@ -63,9 +63,7 @@ module.exports = {
         launchSpeech += bjUtils.readBankroll(this.event.request.locale, this.attributes);
 
         // If they aren't registered users, tell them about that option
-        // Only available for US players
-        if (!this.event.session.user.accessToken &&
-            (this.event.request.locale === 'en-US')) {
+        if (!this.event.session.user.accessToken) {
           launchSpeech += res.strings.LAUNCH_REGISTER;
           linQ = true;
         }
