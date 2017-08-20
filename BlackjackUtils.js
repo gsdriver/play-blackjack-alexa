@@ -17,8 +17,6 @@ let globalEvent;
 module.exports = {
   emitResponse: function(emit, locale, error, response, speech,
                         reprompt, cardTitle, cardText, linQ) {
-    let numCalls = 0;
-
     // Save to S3 if environment variable is set
     let numCalls = 0;
 

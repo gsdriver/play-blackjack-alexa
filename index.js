@@ -18,6 +18,7 @@ const Reset = require('./intents/Reset');
 const gameService = require('./GameService');
 const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
+const FB = require('facebook-node');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const FB = require('facebook-node');
