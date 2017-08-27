@@ -4,72 +4,52 @@
 //
 
 const suggest = require('blackjack-strategy');
-const http = require('http');
 const bjUtils = require('./BlackjackUtils.js');
 
 const STARTING_BANKROLL = 5000;
 
 module.exports = {
-  initializeGame: function(attributes, userID, callback) {
-    // See if they have a legacy game state stored
-    getLegacyGame(userID, (err, savedGame) => {
-      let game = savedGame;
+  initializeGame: function(attributes, userID) {
+    const game = {version: '1.0.0',
+       userID: userID,
+       deck: {cards: []},
+       dealerHand: {cards: []},
+       playerHands: [],
+       rules: {
+           hitSoft17: false,         // Does dealer hit soft 17
+           surrender: 'late',        // Surrender offered - none, late, or early
+           double: 'any',            // Double rules - none, 10or11, 9or10or11, any
+           doubleaftersplit: true,   // Can double after split - none, 10or11, 9or10or11, any
+           resplitAces: false,       // Can you resplit aces
+           blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
+           numberOfDecks: 1,         // Number of decks in play
+           minBet: 5,                // The minimum bet - not configurable
+           maxBet: 1000,             // The maximum bet - not configurable
+           maxSplitHands: 4,         // Maximum number of hands you can have due to splits
+       },
+       progressive: {
+           bet: 5,                   // Amount of the side bet
+           starting: 2500,           // Starting payout of the side bet
+           jackpotRate: 1.25,        // Amount jackpot goes up with each hand played
+       },
+       activePlayer: 'none',
+       currentPlayerHand: 0,
+       specialState: null,
+       bankroll: STARTING_BANKROLL,
+       lastBet: 100,
+       possibleActions: [],
+       canReset: true,
+    };
 
-      if (!game) {
-        game = {version: '1.0.0',
-           userID: userID,
-           deck: {cards: []},
-           dealerHand: {cards: []},
-           playerHands: [],
-           rules: {
-               hitSoft17: false,         // Does dealer hit soft 17
-               surrender: 'late',        // Surrender offered - none, late, or early
-               double: 'any',            // Double rules - none, 10or11, 9or10or11, any
-               doubleaftersplit: true,   // Can double after split - none, 10or11, 9or10or11, any
-               resplitAces: false,       // Can you resplit aces
-               blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
-               numberOfDecks: 1,         // Number of decks in play
-               minBet: 5,                // The minimum bet - not configurable
-               maxBet: 1000,             // The maximum bet - not configurable
-               maxSplitHands: 4,         // Maximum number of hands you can have due to splits
-           },
-           progressive: {
-               bet: 5,                   // Amount of the side bet
-               starting: 2500,           // Starting payout of the side bet
-               jackpotRate: 1.25,        // Amount jackpot goes up with each hand played
-           },
-           activePlayer: 'none',
-           currentPlayerHand: 0,
-           specialState: null,
-           bankroll: STARTING_BANKROLL,
-           lastBet: 100,
-           possibleActions: [],
-           canReset: true,
-        };
-      } else {
-        // Include progressive details
-        game.progressive = {bet: 5, starting: 2500, jackpotRate: 1.25};
-      }
+    // Start by shuffling the deck
+    shuffleDeck(game);
 
-      // Start by shuffling the deck
-      shuffleDeck(game);
+    // Get the next possible actions
+    setNextActions(game);
 
-      // Get the next possible actions
-      setNextActions(game);
-
-      // For now we only support the standard game
-      attributes.standard = game;
-      attributes.currentGame = 'standard';
-
-      // Flush the game if we got one
-      if (savedGame) {
-        flushGameState(userID, (err) => {
-          callback();
-        });
-      } else {
-        callback();
-      }
-    });
+    // For now we only support the standard game
+    attributes.standard = game;
+    attributes.currentGame = 'standard';
   },
   initializeTournamentGame: function(attributes, userId) {
     attributes['tournament'] = {version: '1.0.0',
@@ -734,58 +714,3 @@ function handTotal(cards) {
   return retval;
 }
 
-function getLegacyGame(userID, callback) {
-  const queryString = 'fullstate?userID=' + userID;
-  http.get(process.env.SERVICEURL + queryString, (res) => {
-    if (res.statusCode == 200) {
-      // Great, we should have a game!
-      let fulltext = '';
-
-      res.on('data', (data) => {
-        fulltext += data;
-      });
-
-      res.on('end', () => {
-        let game = JSON.parse(fulltext);
-
-        // Make sure the deck is there as a sanity test
-        if (game && (!game.deck || !game.deck.cards)) {
-          console.log('Error: bad game retrieved ' + JSON.stringify(game));
-          game = undefined;
-        }
-        callback(null, game);
-      });
-    } else {
-      // Sorry, there was an error calling the HTTP endpoint
-      callback('Unable to call endpoint', null);
-    }
-  }).on('error', (e) => {
-    callback('Communications error: ' + e.message, null);
-  });
-}
-
-function flushGameState(userID, callback) {
-  const queryString = 'flushcache?userID=' + userID;
-
-  http.get(process.env.SERVICEURL + queryString, (res) => {
-    let err;
-
-    if (res.statusCode == 200) {
-      // Great, I don't really care what the response is
-      console.log('Flushed');
-    } else {
-      // Sorry, there was an error calling the HTTP endpoint
-      console.log('flushGameState response error: ' + res.statusCode);
-      err = 'Unable to call endpoint';
-    }
-
-    if (callback) {
-      callback(err);
-    }
-  }).on('error', (e) => {
-    console.log('flushGameState Communications error: ' + e.message);
-    if (callback) {
-      callback(e.message);
-    }
-  });
-}

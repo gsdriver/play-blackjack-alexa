@@ -18,6 +18,7 @@ const Reset = require('./intents/Reset');
 const gameService = require('./GameService');
 const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
+const request = require('request');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 
@@ -211,9 +212,9 @@ exports.handler = function(event, context, callback) {
         if (err) {
           console.log('Error reading attributes ' + err);
         } else {
-          bjUtils.saveNewUser();
+          request.post({url: process.env.SERVICEURL + 'blackjack/newUser'}, (err, res, body) => {
+          });
         }
-        console.log('Error reading attributes ' + err);
       } else {
         Object.assign(event.session.attributes, data.Item.mapAttr);
       }
@@ -242,12 +243,12 @@ function initialize(attributes, locale, userId, callback) {
 
   // If they don't have a game, create one
   if (!attributes.currentGame) {
-    gameService.initializeGame(attributes, userId, () => {
-      // Now read the progressive jackpot amount
-      bjUtils.getProgressivePayout(attributes, (jackpot) => {
-        attributes[attributes.currentGame].progressiveJackpot = jackpot;
-        callback();
-      });
+    gameService.initializeGame(attributes, userId);
+
+    // Now read the progressive jackpot amount
+    bjUtils.getProgressivePayout(attributes, (jackpot) => {
+      attributes[attributes.currentGame].progressiveJackpot = jackpot;
+      callback();
     });
   } else {
     // Standard should have progressive; some customers will have this game
