@@ -5,6 +5,7 @@
 
 const suggest = require('blackjack-strategy');
 const bjUtils = require('./BlackjackUtils.js');
+const request = require('request');
 
 const STARTING_BANKROLL = 5000;
 
@@ -590,11 +591,21 @@ function determineSideBetWinner(attributes, callback) {
       case 3:
         // Pays the progressive!
         bjUtils.getProgressivePayout(attributes, (jackpot) => {
+          const params = {
+            url: process.env.SERVICEURL + 'blackjack/updateJackpot',
+            formData: {
+              jackpot: jackpot,
+              game: attributes.currentGame,
+              userId: game.userID,
+              resetProgressive: 'true',
+            },
+          };
+          request.post(params, (err, res, body) => {
+          });
+
           game.bankroll += jackpot;
           game.progressiveJackpot = game.progressive.starting;
-          bjUtils.updateProgressiveJackpot(game.userID, attributes.currentGame, jackpot, () => {
-            callback(jackpot);
-          });
+          callback(jackpot);
         });
         break;
       default:
