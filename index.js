@@ -283,10 +283,21 @@ function initialize(attributes, locale, userId, callback) {
 }
 
 function saveState(userId, attributes) {
-  const doc = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
-  doc.put({TableName: 'PlayBlackjack',
-      Item: {userId: userId, mapAttr: attributes}},
-      (err, data) => {
-    console.log('Saved');
+  const formData = {};
+
+  formData.savedb = JSON.stringify({
+    userId: userId,
+    attributes: attributes,
+  });
+
+  const params = {
+    url: process.env.SERVICEURL + 'blackjack/saveState',
+    formData: formData,
+  };
+
+  request.post(params, (err, res, body) => {
+    if (err) {
+      console.log(err);
+    }
   });
 }
