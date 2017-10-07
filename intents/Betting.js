@@ -34,6 +34,13 @@ module.exports = {
         (error, response, speech, reprompt) => {
         if (!error) {
           this.attributes['firsthand'] = undefined;
+          if (game.timestamp) {
+            const lastPlay = new Date(game.timestamp);
+            const now = new Date(Date.now());
+            game.firstDailyHand = (lastPlay.getDate() != now.getDate());
+          } else {
+            game.firstDailyHand = true;
+          }
           game.timestamp = Date.now();
           game.hands = (game.hands) ? (game.hands + 1) : 1;
         }

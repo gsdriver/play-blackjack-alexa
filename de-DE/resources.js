@@ -42,6 +42,7 @@ const resources = {
   'HELP_CARD_TITLE': 'Blackjack Befehle',
   'HELP_CARD_PROGRESSIVE_TEXT': 'This game features a progressive triple seven jackpot. Place a side bet of $5 by saying PLACE SIDE BET which will stay in effect until you say REMOVE SIDE BET.\nThe side bet pays out $25 if your first card is a seven, $100 if your first two cards are both seven, and the progressive jackpot if your first three cards are seven. The progressive jackpot is based on aggregate play across all users of this skill.\n',
   'HELP_CARD_TEXT': 'Sie können sagen WETTEN um eine wette zu platzieren. Wenn kein betrag erwähnt wird, wird das spiel die letzte wette verwenden.\nWährend einer Hand, fragen WAS SOLLTE ICH TUN um die grundlegende Strategie Vorschlag zu hören.\nSagen SPIELREGELN ZU LESEN wenn du die regeln hören willst.\nÄNDERE wird die Spielregeln ändern. Sie können die folgenden optionen ändern:\n\n - SCHLÄGT SOFT SIEBZEHN: Ob der händler eine weiche 17 summe treffen wird. Kann AN or AUS sein.\n - AUFGEBEN: Ob eine aufgeben angeboten wird. Kann AN or AUS sein\n - EINSATZ VERDOPPELN: Ob eine einsatz verdoppeln angeboten wird.  Kann AN or AUS sein.\n - VERDOPPLUNG NACH SPLIT: Ob sie nach dem spalten verdoppeln können.  Kann AN or AUS sein.\n - RESPLIT ACES: Ob sie Asse wieder spalten können oder nicht.  Kann AN or AUS sein.\n - ANZAHL DER KARTENDECKS: die anzahl der kartendecks im spiel. Kann EINS, ZWEI, VIER, SECHS oder ACHT sein.\n - ANZAHL DER SPIELHANDS SPLATEN: Die maximale anzahl an spielhands, die sie haben können. Kann EINS, ZWEI, DREI oder VIER sein.\n\nZum beispiel sagen "Ändere anzahl der kartendecks zu zwei" wenn du mit zwei kartendecks spielen möchtest.\nBeachten sie, dass das kartendeck gemischt wird, wenn sie die spielregeln ändern',
+  'HELP_ACHIEVEMENT_POINTS': 'You earn 100 achievement points for every tournament win <break time=\'200ms\'/> 10 points each day you play <break time=\'200ms\'/> 5 points for a natural winning blackjack <break time=\'200ms\'/> and N points for each streak of N winning hands more than one. ',
   // From Launch.js
   'LAUNCH_WELCOME': 'Willkommen bei den Blackjack Spieler. ',
   'LAUNCH_WELCOME_NOJACKPOT': 'Willkommen bei den Blackjack Spieler. ',
@@ -128,6 +129,7 @@ const resources = {
   'SIDEBET_LOST': 'Your side bet lost. ',
   'LOST_SINGLEHAND_AND_SIDEBET': 'You lost your hand and your side bet. ',
   'LOST_MULTIPLEHANDS_AND_SIDEBET': 'You lost all your hands and your side bet. ',
+  'WINNING_STREAK': 'That\'s {0} wins in a row! ',
   'SIDEBET_ONESEVEN': 'Your first card was a seven and your side bet won ${0}. ',
   'SIDEBET_TWOSEVENS': 'Your first two cards were sevens and your side bet won ${0}. ',
   'SIDEBET_PROGRESSIVE': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your first three cards were sevens and you won the progressive jackpot of ${0}! ',

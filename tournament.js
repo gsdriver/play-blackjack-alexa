@@ -45,7 +45,12 @@ module.exports = {
           if (result) {
             if (game.bankroll >= result.highScore) {
               // Congratulations, you won!
-              attributes.trophy = (attributes.trophy) ? (attributes.trophy + 1) : 1;
+              if (!attributes.achievements) {
+                attributes.achievements = {trophy: 1};
+              } else {
+                attributes.achievements.trophy = (attributes.achievements.trophy)
+                    ? (attributes.achievements.trophy + 1) : 1;
+              }
               speech = res.strings.TOURNAMENT_WINNER.replace('{0}', game.bankroll);
             } else {
               speech = res.strings.TOURNAMENT_LOSER.replace('{0}', result.highScore).replace('{1}', game.bankroll);

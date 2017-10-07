@@ -83,9 +83,9 @@ module.exports = {
     const game = attributes[attributes.currentGame];
     let text;
 
-    if (attributes.trophy) {
-      if (attributes.trophy > 1) {
-        text = res.strings.READ_BANKROLL_WITH_TROPHIES.replace('{0}', game.bankroll).replace('{1}', attributes.trophy);
+    if (attributes.achievements && attributes.achievements.trophy) {
+      if (attributes.achievements.trophy > 1) {
+        text = res.strings.READ_BANKROLL_WITH_TROPHIES.replace('{0}', game.bankroll).replace('{1}', attributes.achievements.trophy);
       } else {
         text = res.strings.READ_BANKROLL_WITH_TROPHY.replace('{0}', game.bankroll);
       }
@@ -184,7 +184,7 @@ function getTopScoresFromS3(attributes, callback) {
   const game = attributes[attributes.currentGame];
 
   // Read the S3 buckets that has everyone's scores
-  s3.getObject({Bucket: 'garrett-alexa-usage', Key: 'BlackjackScores2.txt'}, (err, data) => {
+  s3.getObject({Bucket: 'garrett-alexa-usage', Key: 'BlackjackScores.txt'}, (err, data) => {
     if (err) {
       console.log(err, err.stack);
       callback(err, null);

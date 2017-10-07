@@ -5,7 +5,7 @@ const attributeFile = 'attributes.txt';
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
-const USERID = 'not-amazon2';
+const USERID = 'not-amazon';
 
 function BuildEvent(argv)
 {

@@ -415,6 +415,18 @@ function readGameResult(attributes) {
     }
   }
 
+  // Is there a winning streak?
+  let winner = true;
+  game.playerHands.map((x) => {
+    if (x.outcome !== 'win') {
+      winner = false;
+    }
+  });
+  game.winningStreak = (winner) ? ((game.winningStreak) ? (game.winningStreak + 1) : 1) : 0;
+  if (game.winningStreak > 1) {
+    outcome += resources.strings.WINNING_STREAK.replace('{0}', game.winningStreak);
+  }
+
   // Finally, if we haven't yet told them about the progressive jackpot, do it now
   if (!attributes.readProgressive) {
     attributes.readProgressive = true;
@@ -425,6 +437,29 @@ function readGameResult(attributes) {
 
       outcome += format.replace('{0}', game.progressiveJackpot);
     }
+  }
+
+  // Update achievements
+  if (!attributes.achievements) {
+    attributes.achievements = {};
+  }
+  // 10 points if this is the first play of the day
+  if (game.firstDailyHand) {
+    attributes.achievements.daysPlayed = (attributes.achievements.daysPlayed)
+          ? (attributes.achievements.daysPlayed + 1) : 1;
+  }
+  // 5 points for a natural blackjack
+  if ((game.playerHands.length === 1)
+      && (game.playerHands[0].cards.length === 2)
+      && (game.playerHands[0].total === 21)) {
+    attributes.achievements.naturals = (attributes.achievements.naturals)
+          ? (attributes.achievements.naturals + 1) : 1;
+  }
+  // N points for a streak of wins (N > 1)
+  if (game.winningStreak > 1) {
+    attributes.achievements.streakScore = (attributes.achievements.streakScore)
+        ? (attributes.achievements.streakScore + game.winningStreak)
+        : game.winningStreak;
   }
 
   // What was the outcome?
