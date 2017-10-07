@@ -15,8 +15,7 @@ const resources = {
   // From BlackjackUtils.js
   'ERROR_REPROMPT': 'Wie kann ich helfen?',
   'CHANGE_CARD_TEXT': 'Sie können die folgenden optionen ändern:\n\n - SCHLÄGT SOFT SIEBZEHN: Ob der händler eine weiche 17 summe treffen wird. Kann AN or AUS sein.\n - AUFGEBEN: Ob eine aufgeben angeboten wird. Kann AN or AUS sein\n - EINSATZ VERDOPPELN: Ob eine einsatz verdoppeln angeboten wird.  Kann AN or AUS sein.\n - VERDOPPLUNG NACH SPLIT: Ob sie nach dem spalten verdoppeln können.  Kann AN or AUS sein.\n - RESPLIT ACES: Ob sie Asse wieder spalten können oder nicht.  Kann AN or AUS sein.\n - ANZAHL DER KARTENDECKS: die anzahl der kartendecks im spiel. Kann EINS, ZWEI, VIER, SECHS oder ACHT sein.\n - ANZAHL DER SPIELHANDS SPLATEN: Die maximale anzahl an spielhands, die sie haben können. Kann EINS, ZWEI, DREI oder VIER sein.\n\nZum beispiel sagen "Ändere anzahl der kartendecks zu zwei" wenn du mit zwei kartendecks spielen möchtest.\nBeachten sie, dass das kartendeck gemischt wird, wenn sie die spielregeln ändern',
-  'READ_BANKROLL_WITH_TROPHY': 'You have ${0} and 1 tournament trophy. ',
-  'READ_BANKROLL_WITH_TROPHIES': 'You have ${0} and {1} tournament trophies. ',
+  'READ_BANKROLL_WITH_ACHIEVEMENT': 'You have ${0} and {1} achievement points. ',
   // From Betting.js
   'BAD_BET_FORMAT': 'Nicht wette für {0}',
   // From SideBet.js
@@ -133,10 +132,10 @@ const resources = {
   'SIDEBET_ONESEVEN': 'Your first card was a seven and your side bet won ${0}. ',
   'SIDEBET_TWOSEVENS': 'Your first two cards were sevens and your side bet won ${0}. ',
   'SIDEBET_PROGRESSIVE': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your first three cards were sevens and you won the progressive jackpot of ${0}! ',
-  'LEADER_RANKING': 'Your bankroll of ${0} ranks you as <say-as interpret-as="ordinal">{1}</say-as> of {2} players. ',
+  'LEADER_RANKING': 'You have {0} achievement points ranking you as <say-as interpret-as="ordinal">{1}</say-as> of {2} players. ',
   'LEADER_NO_SCORES': 'Sorry, I\'m unable to read the current leader board',
-  'LEADER_FORMAT': '${0}',
-  'LEADER_TOP_SCORES': 'The top {0} bankrolls are ',
+  'LEADER_TOP_SCORES': 'The top {0} achievement scores are ',
+  'LEADER_ACHIEVEMENT_HELP': ' <break time=\'300ms\'/> Ask for help to hear how you earn achievement points',
   // From Tournament.js
   'TOURNAMENT_NOCHANGERULES': 'Sorry, you can\'t change the rules during tournament play. ',
   'TOURNAMENT_NORESET': 'Sorry, you can\'t reset your bankroll during tournament play. What else can I help you with?',

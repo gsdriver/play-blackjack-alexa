@@ -15,8 +15,7 @@ const resources = {
   // From BlackjackUtils.js
   'ERROR_REPROMPT': 'What else can I help with?',
   'CHANGE_CARD_TEXT': 'You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
-  'READ_BANKROLL_WITH_TROPHY': 'You have £{0} and 1 tournament trophy. ',
-  'READ_BANKROLL_WITH_TROPHIES': 'You have £{0} and {1} tournament trophies. ',
+  'READ_BANKROLL_WITH_ACHIEVEMENT': 'You have £{0} and {1} achievement points. ',
   // From Betting.js
   'BAD_BET_FORMAT': 'Unable to place a bet for {0}',
   // From SideBet.js
@@ -132,10 +131,10 @@ const resources = {
   'SIDEBET_ONESEVEN': 'Your first card was a seven winning £{0} on the side bet. ',
   'SIDEBET_TWOSEVENS': 'Your first two cards were sevens winning £{0} on the side bet. ',
   'SIDEBET_PROGRESSIVE': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your first three cards were sevens! You won the progressive jackpot of £{0}! ',
-  'LEADER_RANKING': 'Your bankroll of £{0} ranks you as <say-as interpret-as="ordinal">{1}</say-as> of {2} players. ',
+  'LEADER_RANKING': 'You have {0} achievement points ranking you as <say-as interpret-as="ordinal">{1}</say-as> of {2} players. ',
   'LEADER_NO_SCORES': 'Sorry, I\'m unable to read the current leader board',
-  'LEADER_FORMAT': '£{0}',
-  'LEADER_TOP_SCORES': 'The top {0} bankrolls are ',
+  'LEADER_TOP_SCORES': 'The top {0} achievement scores are ',
+  'LEADER_ACHIEVEMENT_HELP': ' <break time=\'300ms\'/> Ask for help to hear how you earn achievement points',
   // From Tournament.js
   'TOURNAMENT_NOCHANGERULES': 'Sorry, you can\'t change the rules during tournament play. ',
   'TOURNAMENT_NORESET': 'Sorry, you can\'t reset your bankroll during tournament play. What else can I help you with?',

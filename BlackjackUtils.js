@@ -82,13 +82,10 @@ module.exports = {
     const res = require('./' + locale + '/resources');
     const game = attributes[attributes.currentGame];
     let text;
+    const achievementScore = getAchievementScore(attributes.achievements);
 
-    if (attributes.achievements && attributes.achievements.trophy) {
-      if (attributes.achievements.trophy > 1) {
-        text = res.strings.READ_BANKROLL_WITH_TROPHIES.replace('{0}', game.bankroll).replace('{1}', attributes.achievements.trophy);
-      } else {
-        text = res.strings.READ_BANKROLL_WITH_TROPHY.replace('{0}', game.bankroll);
-      }
+    if (achievementScore) {
+      text = res.strings.READ_BANKROLL_WITH_ACHIEVEMENT.replace('{0}', game.bankroll).replace('{1}', achievementScore);
     } else {
       text = res.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll);
     }
@@ -142,15 +139,14 @@ module.exports = {
     }
   },
   getHighScore(attributes, callback) {
-    getTopScoresFromS3(attributes, (err, scores) => {
+    getTopScoresFromS3(attributes, 'bankroll', (err, scores) => {
       callback(err, (scores) ? scores[0] : undefined);
     });
   },
   readLeaderBoard: function(locale, attributes, callback) {
     const res = require('./' + locale + '/resources');
-    const game = attributes[attributes.currentGame];
 
-    getTopScoresFromS3(attributes, (err, scores) => {
+    getTopScoresFromS3(attributes, 'achievementScore', (err, scores) => {
       let speech = '';
 
       // OK, read up to five high scores
@@ -158,21 +154,23 @@ module.exports = {
         // No scores to read
         speech = res.strings.LEADER_NO_SCORES;
       } else {
-        // What is your ranking - assuming you've done a spin
-        if (game.hands > 0) {
-          const ranking = scores.indexOf(game.bankroll) + 1;
+        // What is your ranking - assuming you have achievements
+        const achievementScore = getAchievementScore(attributes.achievements);
+        if (achievementScore > 0) {
+          const ranking = scores.indexOf(achievementScore) + 1;
 
           speech += res.strings.LEADER_RANKING
-            .replace('{0}', game.bankroll)
+            .replace('{0}', achievementScore)
             .replace('{1}', ranking)
             .replace('{2}', scores.length);
         }
 
         // And what is the leader board?
         const toRead = (scores.length > 5) ? 5 : scores.length;
-        const topScores = scores.slice(0, toRead).map((x) => res.strings.LEADER_FORMAT.replace('{0}', x));
+        const topScores = scores.slice(0, toRead);
         speech += res.strings.LEADER_TOP_SCORES.replace('{0}', toRead);
         speech += speechUtils.and(topScores, {locale: locale, pause: '300ms'});
+        speech += res.strings.LEADER_ACHIEVEMENT_HELP;
       }
 
       callback(speech);
@@ -180,7 +178,7 @@ module.exports = {
   },
 };
 
-function getTopScoresFromS3(attributes, callback) {
+function getTopScoresFromS3(attributes, scoreType, callback) {
   const game = attributes[attributes.currentGame];
 
   // Read the S3 buckets that has everyone's scores
@@ -192,20 +190,43 @@ function getTopScoresFromS3(attributes, callback) {
       // Yeah, I can do a binary search (this is sorted), but straight search for now
       const ranking = JSON.parse(data.Body.toString('ascii'));
       const scores = ranking.scores;
+      const myScore = (scoreType === 'achievementScore') ?
+              getAchievementScore(attributes.achievements) : game[scoreType];
 
       if (scores && scores[attributes.currentGame]) {
-        const bankrolls = scores[attributes.currentGame].map((a) => a.bankroll);
+        const mappedScores = scores[attributes.currentGame].map((a) => a[scoreType]);
 
-        // If their current bankroll isn't in the list, add it
-        if (bankrolls.indexOf(game.bankroll) < 0) {
-          bankrolls.push(game.bankroll);
+        // If their current achievement score isn't in the list, add it
+        if (mappedScores.indexOf(myScore) < 0) {
+          mappedScores.push(myScore);
         }
 
-        callback(null, bankrolls.sort((a, b) => (b - a)));
+        callback(null, mappedScores.sort((a, b) => (b - a)));
       } else {
         console.log('No scores for ' + attributes.currentGame);
         callback('No scoreset', null);
       }
     }
   });
+}
+
+function getAchievementScore(achievements) {
+  let achievementScore = 0;
+
+  if (achievements) {
+    if (achievements.trophy) {
+      achievementScore += 100 * achievements.trophy;
+    }
+    if (achievements.daysPlayed) {
+      achievementScore += 10 * achievements.daysPlayed;
+    }
+    if (achievements.naturals) {
+      achievementScore += 5 * achievements.naturals;
+    }
+    if (achievements.streakScore) {
+      achievementScore += achievements.streakScore;
+    }
+  }
+
+  return achievementScore;
 }

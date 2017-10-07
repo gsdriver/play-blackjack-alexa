@@ -19,10 +19,13 @@ module.exports = {
       if (!speech) {
         speech = res.strings.HELP_GENERIC_HELP;
       }
+      speech = res.strings.HELP_ACHIEVEMENT_POINTS + speech;
 
       bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
           speech, speech, res.strings.HELP_CARD_TITLE,
-          res.strings.HELP_CARD_PROGRESSIVE_TEXT + res.strings.HELP_CARD_TEXT);
+          res.strings.HELP_CARD_PROGRESSIVE_TEXT +
+          res.strings.HELP_ACHIEVEMENT_CARD_TEXT +
+          res.strings.HELP_CARD_TEXT);
     }
   },
 };
