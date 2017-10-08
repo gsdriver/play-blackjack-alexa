@@ -30,8 +30,10 @@ module.exports = {
   handleYesReset: function() {
     const res = require('../' + this.event.request.locale + '/resources');
 
-    // Confirmed - let's reset
+    // Confirmed - let's reset but preserve the timestamp
+    const timestamp = this.attributes[this.attributes.currentGame].timestamp;
     gameService.initializeGame(this.attributes, this.event.session.user.userId);
+    this.attributes[this.attributes.currentGame].timestamp = timestamp;
     this.handler.state = 'NEWGAME';
     bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
             res.strings.RESET_COMPLETED, res.strings.RESET_REPROMPT);
