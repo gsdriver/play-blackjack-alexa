@@ -127,13 +127,18 @@ const resources = {
   'SIDEBET_LOST': 'Your side bet lost. ',
   'LOST_SINGLEHAND_AND_SIDEBET': 'You lost your hand and your side bet. ',
   'LOST_MULTIPLEHANDS_AND_SIDEBET': 'You lost all your hands and your side bet. ',
-  'WINNING_STREAK': 'That\'s {0} wins in a row! ',
+  'WINNING_STREAK': 'That\'s {0} wins in a row earning you {1} achievement points! ',
+  'FIRST_DAILY_HAND': 'You earned 10 achievement points for your first hand of the day. ',
+  'NATURAL_BLACKJACK': 'A natural blackjack gives you 5 achievement points. ',
   'SIDEBET_ONESEVEN': 'Your first card was a seven winning £{0} on the side bet. ',
   'SIDEBET_TWOSEVENS': 'Your first two cards were sevens winning £{0} on the side bet. ',
   'SIDEBET_PROGRESSIVE': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your first three cards were sevens! You won the progressive jackpot of £{0}! ',
   'LEADER_RANKING': 'You have {0} achievement points ranking you as <say-as interpret-as="ordinal">{1}</say-as> of {2} players. ',
   'LEADER_NO_SCORES': 'Sorry, I\'m unable to read the current leader board',
   'LEADER_TOP_SCORES': 'The top {0} achievement scores are ',
+  'LEADER_BANKROLL_RANKING': 'You have £{0} ranking you as <say-as interpret-as="ordinal">{1}</say-as> of {2} players. ',
+  'LEADER_BANKROLL_FORMAT': '£{0}',
+  'LEADER_TOP_BANKROLLS': 'The top {0} bankrolls are ',
   'LEADER_ACHIEVEMENT_HELP': ' <break time=\'300ms\'/> Ask for help to hear how you earn achievement points',
   // From Tournament.js
   'TOURNAMENT_NOCHANGERULES': 'Sorry, you can\'t change the rules during tournament play. ',
@@ -156,7 +161,7 @@ const resources = {
   'TOURNAMENT_STANDING_FIRST': 'You are currently in <say-as interpret-as="ordinal">1</say-as> place. ',
   'TOURNAMENT_STANDING_TOGO': '<say-as interpret-as="ordinal">1</say-as> place has £{0}. ',
   'TOURNAMENT_HELP': 'You are playing in the Blackjack Game tournament. ',
-  'TOURNAMENT_HELP_CARD_TEXT': 'You are playing in the Blackjack Game tournament. You can place up to {0} bets on a four deck shoe. Whoever has the highest bankroll at the end of the tournament wins a trophy.\nYou can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet. You can say READ HIGH SCORES to hear the current leader board.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play. Note that you cannot change the rules of the game during tournament play.',
+  'TOURNAMENT_HELP_CARD_TEXT': 'You are playing in the Blackjack Game tournament. You can place up to {0} bets on a four deck shoe. Whoever has the highest bankroll at the end of the tournament wins 100 achievement points.\nYou can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet. You can say READ HIGH SCORES to hear the current leader board.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play. Note that you cannot change the rules of the game during tournament play.',
 };
 
 module.exports = {

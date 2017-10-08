@@ -145,8 +145,12 @@ module.exports = {
   },
   readLeaderBoard: function(locale, attributes, callback) {
     const res = require('./' + locale + '/resources');
+    const game = attributes[attributes.currentGame];
+    const scoreType = (attributes.currentGame === 'tournament') ? 'bankroll' : 'achievementScore';
+    const myScore = (scoreType === 'achievementScore') ?
+            getAchievementScore(attributes.achievements) : game[scoreType];
 
-    getTopScoresFromS3(attributes, 'achievementScore', (err, scores) => {
+    getTopScoresFromS3(attributes, scoreType, (err, scores) => {
       let speech = '';
 
       // OK, read up to five high scores
@@ -155,22 +159,27 @@ module.exports = {
         speech = res.strings.LEADER_NO_SCORES;
       } else {
         // What is your ranking - assuming you have achievements
-        const achievementScore = getAchievementScore(attributes.achievements);
-        if (achievementScore > 0) {
-          const ranking = scores.indexOf(achievementScore) + 1;
+        if (myScore > 0) {
+          const ranking = scores.indexOf(myScore) + 1;
 
-          speech += res.strings.LEADER_RANKING
-            .replace('{0}', achievementScore)
+          speech += ((scoreType === 'bankroll') ? res.strings.LEADER_BANKROLL_RANKING : res.strings.LEADER_RANKING)
+            .replace('{0}', myScore)
             .replace('{1}', ranking)
             .replace('{2}', scores.length);
         }
 
         // And what is the leader board?
         const toRead = (scores.length > 5) ? 5 : scores.length;
-        const topScores = scores.slice(0, toRead);
-        speech += res.strings.LEADER_TOP_SCORES.replace('{0}', toRead);
+        let topScores = scores.slice(0, toRead);
+        if (scoreType === 'bankroll') {
+          topScores = topScores.map((x) => res.strings.LEADER_BANKROLL_FORMAT.replace('{0}', x));
+        }
+
+        speech += ((scoreType === 'bankroll') ? res.strings.LEADER_TOP_BANKROLLS : res.strings.LEADER_TOP_SCORES).replace('{0}', toRead);
         speech += speechUtils.and(topScores, {locale: locale, pause: '300ms'});
-        speech += res.strings.LEADER_ACHIEVEMENT_HELP;
+        if (scoreType === 'achievementScore') {
+          speech += res.strings.LEADER_ACHIEVEMENT_HELP;
+        }
       }
 
       callback(speech);
