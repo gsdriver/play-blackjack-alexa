@@ -155,7 +155,7 @@ const resources = {
   'TOURNAMENT_LAUNCH_INFORM': 'Welcome to Blackjack Game. There is currently a tournament going on. Would you like to join?',
   'TOURNAMENT_LAUNCH_INFORM_REPROMPT': 'Would you like to join the tournament?',
   'TOURNAMENT_OUTOFHANDS': 'That was your last hand. Thanks for playing! Check back tomorrow for the results. ',
-  'TOURNAMENT_WELCOME_NEWPLAYER': 'Welcome to the Blackjack Tournament! You start the tournament with £{0} and have {1} hands to earn as high a bankroll as possible. At the end of the tournament, the highest bankroll will receive 1 trophy. Note that this tournament is separate from your normal bankroll. ',
+  'TOURNAMENT_WELCOME_NEWPLAYER': 'Welcome to the Blackjack Tournament! You start the tournament with £{0} and have {1} hands to earn as high a bankroll as possible. At the end of the tournament, the highest bankroll will receive 100 achievement points. Note that this tournament is separate from your normal bankroll. ',
   'TOURNAMENT_WELCOME_BACK': 'Welcome back to the Blackjack Tournament! You have {0} hands remaining. ',
   'TOURNAMENT_WELCOME_REPROMPT': 'Place your bets!',
   'TOURNAMENT_STANDING_FIRST': 'You are currently in <say-as interpret-as="ordinal">1</say-as> place. ',
