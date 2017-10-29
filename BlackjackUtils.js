@@ -71,6 +71,10 @@ module.exports = {
 
     // New game - ready to start a new game
     if (game.possibleActions.indexOf('bet') >= 0) {
+      if (attributes.newUser) {
+        attributes.newUser = undefined;
+        return 'FIRSTTIMEPLAYER';
+      }
       return 'NEWGAME';
     } else if (game.possibleActions.indexOf('noinsurance') >= 0) {
       return 'INSURANCEOFFERED';

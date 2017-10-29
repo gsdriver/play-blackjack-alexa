@@ -23,6 +23,7 @@ const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 
 const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
+let newUser;
 
 const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   'NewSession': function() {
@@ -46,6 +47,35 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
 });
 
 const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
+  'NewSession': function() {
+    this.handler.state = '';
+    this.emitWithState('NewSession');
+  },
+  'LaunchRequest': Launch.handleIntent,
+  'BettingIntent': Betting.handleIntent,
+  'PlaceSideBetIntent': SideBet.handlePlaceIntent,
+  'RemoveSideBetIntent': SideBet.handleRemoveIntent,
+  'ResetIntent': Reset.handleIntent,
+  'RulesIntent': Rules.handleIntent,
+  'ChangeRulesIntent': ChangeRules.handleIntent,
+  'HighScoreIntent': HighScore.handleIntent,
+  'AMAZON.YesIntent': Betting.handleIntent,
+  'AMAZON.NoIntent': Exit.handleIntent,
+  'AMAZON.RepeatIntent': Repeat.handleIntent,
+  'AMAZON.HelpIntent': Help.handleIntent,
+  'AMAZON.StopIntent': Exit.handleIntent,
+  'AMAZON.CancelIntent': Exit.handleIntent,
+  'SessionEndedRequest': function() {
+    saveState(this.event.session.user.userId, this.attributes);
+  },
+  'Unhandled': function() {
+    const res = require('./' + this.event.request.locale + '/resources');
+    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+            res.strings.UNKNOWNINTENT_NEWGAME, res.strings.UNKNOWNINTENT_NEWGAME_REPROMPT);
+  },
+});
+
+const firstTimeHandlers = Alexa.CreateStateHandler('FIRSTTIMEPLAYER', {
   'NewSession': function() {
     this.handler.state = '';
     this.emitWithState('NewSession');
@@ -212,6 +242,7 @@ exports.handler = function(event, context, callback) {
         if (err) {
           console.log('Error reading attributes ' + err);
         } else {
+          newUser = true;
           request.post({url: process.env.SERVICEURL + 'blackjack/newUser'}, (err, res, body) => {
           });
         }
@@ -227,7 +258,7 @@ exports.handler = function(event, context, callback) {
 
   function execute() {
     bjUtils.setEvent(event);
-    alexa.registerHandlers(handlers, resetHandlers, newGameHandlers,
+    alexa.registerHandlers(handlers, resetHandlers, newGameHandlers, firstTimeHandlers,
       insuranceHandlers, joinHandlers, inGameHandlers);
     alexa.execute();
   }
@@ -240,6 +271,7 @@ function initialize(attributes, locale, userId, callback) {
             ? (attributes.numRounds + 1) : 1;
   attributes.firsthand = true;
   attributes.readProgressive = undefined;
+  attributes.newUser = newUser;
 
   // If they don't have a game, create one
   if (!attributes.currentGame) {
