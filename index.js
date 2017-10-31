@@ -100,7 +100,7 @@ const firstTimeHandlers = Alexa.CreateStateHandler('FIRSTTIMEPLAYER', {
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
     bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
-            res.strings.UNKNOWNINTENT_NEWGAME, res.strings.UNKNOWNINTENT_NEWGAME_REPROMPT);
+            res.strings.UNKNOWNINTENT_FIRSTTIME, res.strings.UNKNOWNINTENT_FIRSTTIME_REPROMPT);
   },
 });
 

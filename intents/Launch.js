@@ -21,12 +21,12 @@ module.exports = {
     const game = this.attributes[this.attributes.currentGame];
 
     // Note that this is first hand (so we will say more on the first bet)
-    if (game.progressiveJackpot) {
+    if (game.progressiveJackpot && !this.attributes.newUser) {
       launchSpeech = res.strings.LAUNCH_WELCOME.replace('{0}', game.progressiveJackpot);
+      this.attributes.readProgressive = true;
     } else {
       launchSpeech = res.strings.LAUNCH_WELCOME_NOJACKPOT;
     }
-    this.attributes.readProgressive = true;
 
     if (this.attributes.tournamentResult) {
       launchSpeech = this.attributes.tournamentResult + launchSpeech;
@@ -41,16 +41,18 @@ module.exports = {
       } else {
         const options = [res.strings.LAUNCH_START_GAME];
 
-        if (game.possibleActions && (game.possibleActions.indexOf('sidebet') > 0)) {
-          options.push(res.strings.LAUNCH_START_PLACE_SIDEBET);
+        if (!this.attributes.newUser) {
+          if (game.possibleActions && (game.possibleActions.indexOf('sidebet') > 0)) {
+            options.push(res.strings.LAUNCH_START_PLACE_SIDEBET);
+          }
+          if (game.possibleActions && (game.possibleActions.indexOf('nosidebet') > 0)) {
+            options.push(res.strings.LAUNCH_START_REMOVE_SIDEBET);
+          }
+          if (!gameService.isDefaultGame(this.attributes)) {
+            options.push(res.strings.LAUNCH_START_RESET);
+          }
+          options.push(res.strings.LAUNCH_START_HIGH_SCORES);
         }
-        if (game.possibleActions && (game.possibleActions.indexOf('nosidebet') > 0)) {
-          options.push(res.strings.LAUNCH_START_REMOVE_SIDEBET);
-        }
-        if (!gameService.isDefaultGame(this.attributes)) {
-          options.push(res.strings.LAUNCH_START_RESET);
-        }
-        options.push(res.strings.LAUNCH_START_HIGH_SCORES);
 
         launchSpeech += bjUtils.readBankroll(this.event.request.locale, this.attributes);
         launchSpeech += speechUtils.or(options, {pause: '300ms'});

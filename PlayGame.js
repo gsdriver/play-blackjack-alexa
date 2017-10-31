@@ -448,8 +448,13 @@ function readGameResult(attributes) {
         : game.winningStreak;
   }
 
-  // Finally, if we haven't yet told them about the progressive jackpot, do it now
-  if (!attributes.readProgressive) {
+  // Tell new users about the leader board, and those who haven't heard about
+  // the progressive jackpot about the jackpot and placing a side bet
+  if (attributes.newUser) {
+    // Tell them about the leader board
+    attributes.newUser = undefined;
+    outcome += resources.strings.READ_ABOUT_LEADER_BOARD;
+  } else if (!attributes.readProgressive) {
     attributes.readProgressive = true;
     if (game.progressive && game.progressiveJackpot) {
       const format = (game.sideBetPlaced)
