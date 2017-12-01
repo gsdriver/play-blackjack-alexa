@@ -10,6 +10,7 @@ const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 const speechUtils = require('alexa-speech-utils')();
 const request = require('request');
+const VoiceLabs = require('voicelabs')('012d4c90-d6da-11a7-161f-02f814b60257');
 
 // Global session ID
 let globalEvent;
@@ -50,17 +51,30 @@ module.exports = {
       console.log(JSON.stringify(globalEvent));
     }
 
-    if (error) {
-      const res = require('./' + locale + '/resources');
-      console.log('Speech error: ' + error);
-      emit(':ask', error, res.ERROR_REPROMPT);
-    } else if (response) {
-      emit(':tell', response);
-    } else if (cardTitle) {
-      emit(':askWithCard', speech, reprompt, cardTitle, cardText);
+    let name;
+    let slots;
+    const speechText = (error) ? error : ((response) ? response : speech);
+    if (globalEvent.request.type === 'IntentRequest') {
+      name = globalEvent.request.intent.name;
+      slots = globalEvent.request.intent.slots;
     } else {
-      emit(':ask', speech, reprompt);
+      name = 'LaunchRequest';
+      slots = {};
     }
+
+    VoiceLabs.track(globalEvent.session, name, slots, speechText, (vlErr, vlResponse) => {
+      if (error) {
+        const res = require('./' + locale + '/resources');
+        console.log('Speech error: ' + error);
+        emit(':ask', error, res.ERROR_REPROMPT);
+      } else if (response) {
+        emit(':tell', response);
+      } else if (cardTitle) {
+        emit(':askWithCard', speech, reprompt, cardTitle, cardText);
+      } else {
+        emit(':ask', speech, reprompt);
+      }
+    });
   },
   setEvent: function(event) {
     globalEvent = event;
