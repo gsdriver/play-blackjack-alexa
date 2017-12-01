@@ -78,7 +78,7 @@ module.exports = {
     const res = require('./' + locale + '/resources');
     let reminder = '';
 
-    if (!isTournamentActive() && process.env.TOURNAMENT) {
+    if (!isTournamentActive() && process.env.TOURNAMENT && process.env.TOURNAMENT_REMINDER) {
       reminder = res.strings.TOURNAMENT_REMINDER;
     }
 
