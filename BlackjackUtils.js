@@ -53,7 +53,6 @@ module.exports = {
 
     let name;
     let slots;
-    const speechText = (error) ? error : ((response) ? response : speech);
     if (globalEvent.request.type === 'IntentRequest') {
       name = globalEvent.request.intent.name;
       slots = globalEvent.request.intent.slots;
@@ -62,7 +61,7 @@ module.exports = {
       slots = {};
     }
 
-    VoiceLabs.track(globalEvent.session, name, slots, speechText, (vlErr, vlResponse) => {
+    VoiceLabs.track(globalEvent.session, name, slots, null, (vlErr, vlResponse) => {
       if (error) {
         const res = require('./' + locale + '/resources');
         console.log('Speech error: ' + error);
