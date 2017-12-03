@@ -132,7 +132,9 @@ module.exports = {
       if (game.possibleActions.indexOf('noinsurance') > -1) {
         // It's possible you can't take insurance because you don't have enough money
         if (game.possibleActions.indexOf('insurance') > -1) {
-          result = resources.strings.HELP_TAKE_INSURANCE;
+          result = ((game.playerHands[0].total === 21) && (game.rules.blackjackBonus == 0.5))
+              ? resources.strings.HELP_TAKE_INSURANCE_BLACKJACK
+              : resources.strings.HELP_TAKE_INSURANCE;
         } else {
           result = resources.strings.HELP_INSURANCE_INSUFFICIENT_BANKROLL;
         }
@@ -211,7 +213,10 @@ function listValidActions(game, locale, type) {
     if (game.possibleActions.indexOf('noinsurance') > -1) {
       // It's possible you can't take insurance because you don't have enough money
       if (game.possibleActions.indexOf('insurance') > -1) {
-        result = resources.strings.ASK_TAKE_INSURANCE;
+        // Do you have blackjack?
+        result = ((game.playerHands[0].total === 21) && (game.rules.blackjackBonus == 0.5))
+            ? resources.strings.ASK_TAKE_INSURANCE_BLACKJACK
+            : resources.strings.ASK_TAKE_INSURANCE;
       } else {
         result = resources.strings.HELP_INSURANCE_INSUFFICIENT_BANKROLL;
       }

@@ -172,9 +172,13 @@ module.exports = {
         game.playerHands[game.currentPlayerHand].cards.push(newCard);
 
         // If they busted, it is the dealer's turn
-        if (handTotal(game.playerHands[game.currentPlayerHand].cards).total > 21) {
+        const total = handTotal(game.playerHands[game.currentPlayerHand].cards).total;
+        if (total > 21) {
           // Sorry, you lose - it's the dealer's turn now
           game.playerHands[game.currentPlayerHand].busted = true;
+          nextHand(game);
+        } else if (total == 21) {
+          // You have 21 - go to the next hand
           nextHand(game);
         }
         break;
@@ -524,14 +528,16 @@ function setNextActions(game) {
 function nextHand(game) {
   // If it's none, it goes to player 0
   if (game.activePlayer == 'none') {
-    // It is the player's turn -- UNLESS the dealer has a blackjack with a 10 up
-    // In that case, the hand is immediately over (goes to the dealer's turn)
-    if ((handTotal(game.dealerHand.cards).total == 21) && (game.dealerHand.cards[1].rank != 1)) {
+    // It's the player's turn unless the player has a blackjack (and the dealer doesn't
+    // have an ace showing), or if the dealer has a blackjack with a 10 up
+    game.currentPlayerHand = 0;
+    if (handTotal(game.playerHands[0].cards).total == 21) {
+      game.activePlayer = (game.dealerHand.cards[1].rank == 1) ? 'player' : 'dealer';
+    } else if ((handTotal(game.dealerHand.cards).total == 21) && (game.dealerHand.cards[1].rank != 1)) {
       // OK, mark it as the dealer's turn to cause the card to flip and end the game
       game.activePlayer = 'dealer';
     } else {
       game.activePlayer = 'player';
-      game.currentPlayerHand = 0;
     }
   } else if (game.activePlayer == 'player') {
       if (game.currentPlayerHand < game.playerHands.length - 1) {
