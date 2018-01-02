@@ -7,8 +7,8 @@
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
-const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 const speechUtils = require('alexa-speech-utils')();
+const querystring = require('querystring');
 const request = require('request');
 const VoiceLabs = require('voicelabs')('012d4c90-d6da-11a7-161f-02f814b60257');
 
@@ -155,46 +155,80 @@ module.exports = {
     }
   },
   getHighScore(attributes, callback) {
-    getTopScoresFromS3(attributes, 'bankroll', (err, scores) => {
-      callback(err, (scores) ? scores[0] : undefined);
+    const leaderURL = process.env.SERVICEURL + 'blackjack/leaders?count=1&game=' + attributes.currentGame;
+
+    request(
+      {
+        uri: leaderURL,
+        method: 'GET',
+        timeout: 1000,
+      }, (err, response, body) => {
+      if (err) {
+        callback(err);
+      } else {
+        const leaders = JSON.parse(body);
+
+        callback(null, (leaders.top) ? leaders.top[0] : undefined);
+      }
     });
   },
-  readLeaderBoard: function(locale, attributes, callback) {
+  readLeaderBoard: function(locale, userId, attributes, callback) {
     const res = require('./' + locale + '/resources');
     const game = attributes[attributes.currentGame];
-    const scoreType = (attributes.currentGame === 'tournament') ? 'bankroll' : 'achievementScore';
-    const myScore = (scoreType === 'achievementScore') ?
+    const scoreType = (attributes.currentGame === 'tournament') ? 'bankroll' : 'achievement';
+    let leaderURL = process.env.SERVICEURL + 'blackjack/leaders';
+    const myScore = (scoreType === 'achievement') ?
             getAchievementScore(attributes.achievements) : game[scoreType];
+    let speech = '';
+    const params = {};
 
-    getTopScoresFromS3(attributes, scoreType, (err, scores) => {
-      let speech = '';
+    if (myScore > 0) {
+      params.userId = userId;
+      params.score = myScore;
+    }
+    if (scoreType === 'bankroll') {
+      params.game = attributes.currentGame;
+    }
+    const paramText = querystring.stringify(params);
+    if (paramText.length) {
+      leaderURL += '?' + paramText;
+    }
 
-      // OK, read up to five high scores
-      if (!scores || (scores.length === 0)) {
+    request(
+      {
+        uri: leaderURL,
+        method: 'GET',
+        timeout: 1000,
+      }, (err, response, body) => {
+      if (err) {
         // No scores to read
         speech = res.strings.LEADER_NO_SCORES;
       } else {
-        // What is your ranking - assuming you have achievements
-        if (myScore > 0) {
-          const ranking = scores.indexOf(myScore) + 1;
+        const leaders = JSON.parse(body);
 
-          speech += ((scoreType === 'bankroll') ? res.strings.LEADER_BANKROLL_RANKING : res.strings.LEADER_RANKING)
-            .replace('{0}', myScore)
-            .replace('{1}', ranking)
-            .replace('{2}', scores.length);
-        }
+        if (!leaders.count || !leaders.top) {
+          // Something went wrong
+          speech = res.strings.LEADER_NO_SCORES;
+        } else {
+          if (leaders.rank) {
+            speech += ((scoreType === 'bankroll') ? res.strings.LEADER_BANKROLL_RANKING : res.strings.LEADER_RANKING)
+              .replace('{0}', myScore)
+              .replace('{1}', leaders.rank)
+              .replace('{2}', leaders.count);
+          }
 
-        // And what is the leader board?
-        const toRead = (scores.length > 5) ? 5 : scores.length;
-        let topScores = scores.slice(0, toRead);
-        if (scoreType === 'bankroll') {
-          topScores = topScores.map((x) => res.strings.LEADER_BANKROLL_FORMAT.replace('{0}', x));
-        }
+          // And what is the leader board?
+          let topScores = leaders.top;
+          if (scoreType === 'bankroll') {
+            topScores = topScores.map((x) => res.strings.LEADER_BANKROLL_FORMAT.replace('{0}', x));
+          }
 
-        speech += ((scoreType === 'bankroll') ? res.strings.LEADER_TOP_BANKROLLS : res.strings.LEADER_TOP_SCORES).replace('{0}', toRead);
-        speech += speechUtils.and(topScores, {locale: locale, pause: '300ms'});
-        if (scoreType === 'achievementScore') {
-          speech += res.strings.LEADER_ACHIEVEMENT_HELP;
+          speech += ((scoreType === 'bankroll') ? res.strings.LEADER_TOP_BANKROLLS
+              : res.strings.LEADER_TOP_SCORES).replace('{0}', topScores.length);
+          speech += speechUtils.and(topScores, {locale: locale, pause: '300ms'});
+          if (scoreType === 'achievement') {
+            speech += res.strings.LEADER_ACHIEVEMENT_HELP;
+          }
         }
       }
 
@@ -202,38 +236,6 @@ module.exports = {
     });
   },
 };
-
-function getTopScoresFromS3(attributes, scoreType, callback) {
-  const game = attributes[attributes.currentGame];
-
-  // Read the S3 buckets that has everyone's scores
-  s3.getObject({Bucket: 'garrett-alexa-usage', Key: 'BlackjackScores.txt'}, (err, data) => {
-    if (err) {
-      console.log(err, err.stack);
-      callback(err, null);
-    } else {
-      // Yeah, I can do a binary search (this is sorted), but straight search for now
-      const ranking = JSON.parse(data.Body.toString('ascii'));
-      const scores = ranking.scores;
-      const myScore = (scoreType === 'achievementScore') ?
-              getAchievementScore(attributes.achievements) : game[scoreType];
-
-      if (scores && scores[attributes.currentGame]) {
-        const mappedScores = scores[attributes.currentGame].map((a) => a[scoreType]);
-
-        // If their current achievement score isn't in the list, add it
-        if (mappedScores.indexOf(myScore) < 0) {
-          mappedScores.push(myScore);
-        }
-
-        callback(null, mappedScores.sort((a, b) => (b - a)));
-      } else {
-        console.log('No scores for ' + attributes.currentGame);
-        callback('No scoreset', null);
-      }
-    }
-  });
-}
 
 function getAchievementScore(achievements) {
   let achievementScore = 0;
