@@ -20,6 +20,7 @@ const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
 const request = require('request');
 const AWS = require('aws-sdk');
+const dashbot = require('dashbot')(process.env.DASHBOTKEY).alexa;
 AWS.config.update({region: 'us-east-1'});
 
 const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
@@ -228,7 +229,7 @@ const handlers = {
   },
 };
 
-exports.handler = function(event, context, callback) {
+exports.handler = dashbot.handler((event, context, callback) => {
   const alexa = Alexa.handler(event, context);
 
   alexa.appId = APP_ID;
@@ -262,7 +263,7 @@ exports.handler = function(event, context, callback) {
       insuranceHandlers, joinHandlers, inGameHandlers);
     alexa.execute();
   }
-};
+});
 
 function initialize(attributes, locale, userId, callback) {
   // Some initiatlization
