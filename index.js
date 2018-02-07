@@ -258,6 +258,7 @@ exports.handler = dashbot.handler((event, context, callback) => {
   }
 
   function execute() {
+    event.session.attributes.userId = event.session.user.userId;
     bjUtils.setEvent(event);
     alexa.registerHandlers(handlers, resetHandlers, newGameHandlers, firstTimeHandlers,
       insuranceHandlers, joinHandlers, inGameHandlers);

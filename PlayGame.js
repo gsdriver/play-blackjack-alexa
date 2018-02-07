@@ -7,6 +7,7 @@
 const utils = require('alexa-speech-utils')();
 const gameService = require('./GameService');
 const tournament = require('./tournament');
+const request = require('request');
 
 let resources;
 
@@ -361,6 +362,19 @@ function readGameResult(attributes) {
   let sideBetResult = '';
   const game = attributes[attributes.currentGame];
 
+  // Post to the service for post-game analysis
+  const params = {
+    url: process.env.SERVICEURL + 'blackjack/analyzePlay',
+    formData: {
+      attributes: JSON.stringify(attributes),
+    },
+  };
+  request.post(params, (err, res, body) => {
+    if (err) {
+      console.log(err);
+    }
+  });
+
   // Now read the side bet if placed
   if (game.sideBetPlaced) {
     // Oh, the side bet paid out - let them know
@@ -567,10 +581,11 @@ function readSplit(attributes, locale) {
  */
 function readSurrender(attributes, locale) {
   const game = attributes[attributes.currentGame];
-  let result = resources.strings.SURRENDER_RESULT;
+  let result;
 
   // Rub it in by saying what the dealer had
-  result += readDealerAction(game, locale);
+  result = readDealerAction(game, locale);
+  result += ' ' + readGameResult(attributes);
 
   return result;
 }
