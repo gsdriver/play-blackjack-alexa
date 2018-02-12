@@ -680,7 +680,7 @@ function promptHandPlay(attributes) {
   const game = attributes[attributes.currentGame];
   let suggestion = '';
 
-  if (attributes.analysis) {
+  if ((attributes.currentGame !== 'tournament') && attributes.analysis) {
     const suggest = gameService.getRecommendedAction(game);
     if (attributes.analysis[suggest]) {
       // OK, we should suggest this - once we do, we'll clear
