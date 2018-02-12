@@ -61,6 +61,7 @@ const resources = {
   // From Rules.js
   'RULES_CARD_TITLE': 'Blackjack Rules',
   // From PlayGame.js
+  'PROACTIVE_SUGGESTION': ' I\'ve noticed you haven\'t {0} recently and wanted to remind you that the book would say you should {1} on this hand.',
   'SUGGEST_OPTIONS': 'You should {0}|The book says you should {0}|The book would tell you to {0}|According to Basic Strategy you should {0}|The book would suggest that you {0}|I think you should {0}|Basic Strategy would suggest you {0}',
   'SUGGEST_TURNOVER': 'I can\'t give a suggestion when the game is over',
   'REPORT_ERROR': 'There was an error: {0}',
@@ -220,6 +221,11 @@ module.exports = {
   mapActionToSuggestion: function(action) {
     const actionMapping = {'insurance': 'take insurance', 'noinsurance': 'not take insurance', 'hit': 'hit',
                     'stand': 'stand', 'split': 'split', 'double': 'double', 'surrender': 'surrender'};
+    return actionMapping[action];
+  },
+  mapActionPastTense: function(action) {
+    const actionMapping = {'insurance': 'taken insurance', 'noinsurance': 'not taken insurance', 'hit': 'hit',
+                    'stand': 'stood', 'split': 'split', 'double': 'doubled', 'surrender': 'surrendered'};
     return actionMapping[action];
   },
   mapServerError: function(error) {

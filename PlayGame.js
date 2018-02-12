@@ -44,7 +44,7 @@ module.exports = {
             || (game.possibleActions.indexOf(action.action) < 0)) {
         // Probably need a way to read out the game state better
         speechError = resources.strings.INVALID_ACTION.replace('{0}', resources.mapPlayOption(action.action));
-        speechError += readHand(game, locale);
+        speechError += readHand(attributes, game, locale);
         speechError += ' ' + listValidActions(game, locale, 'full');
         sendUserCallback(attributes, speechError, null, null, null, callback);
       } else {
@@ -118,7 +118,7 @@ module.exports = {
     const game = attributes[attributes.currentGame];
     const reprompt = listValidActions(game, locale, 'full');
     const speech = resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll)
-              + readHand(game, locale) + ' ' + reprompt;
+              + readHand(attributes, game, locale) + ' ' + reprompt;
 
     callback(speech, reprompt);
   },
@@ -274,7 +274,7 @@ function tellResult(attributes, locale, action, oldGame) {
       break;
     case 'bet':
       // A new hand was dealt
-      result += readHand(game, locale);
+      result += readHand(attributes, game, locale);
       // If it is not the player's turn (could happen on dealer blackjack)
       // then read the game result here too
       if (game.activePlayer != 'player') {
@@ -547,7 +547,7 @@ function readStand(attributes, locale) {
   // If they are still playing, then read the next hand, otherwise read
   // the dealer action
   if (game.activePlayer == 'player') {
-    result = readHand(game, locale);
+    result = readHand(attributes, game, locale);
   } else {
     result = readDealerAction(game, locale);
     result += ' ' + readGameResult(attributes);
@@ -571,7 +571,7 @@ function readSplit(attributes, locale) {
   }
 
   // Now read the current hand
-  result += readHand(game, locale);
+  result += readHand(attributes, game, locale);
 
   return result;
 }
@@ -605,7 +605,7 @@ function readInsurance(attributes, locale) {
   } else if (game.dealerHand.outcome == 'nodealerblackjack') {
     // No blackjack - so what do you want to do now?
     result = resources.strings.DEALER_NO_BLACKJACK;
-    result += readHand(game, locale);
+    result += readHand(attributes, game, locale);
   }
 
   return result;
@@ -614,7 +614,7 @@ function readInsurance(attributes, locale) {
 /*
  * Reads the state of the hand - your cards and total, and the dealer up card
  */
-function readHand(game, locale) {
+function readHand(attributes, game, locale) {
   let result = '';
   let resultFormat;
 
@@ -667,9 +667,32 @@ function readHand(game, locale) {
     result += readDealerAction(game, locale);
   } else {
     result += resources.strings.READHAND_DEALER_ACTIVE.replace('{0}', dealerCardText);
+    result += promptHandPlay(attributes);
   }
 
   return result;
+}
+
+//
+// Reads a suggestion if the analysis indicates we should
+//
+function promptHandPlay(attributes) {
+  const game = attributes[attributes.currentGame];
+  let suggestion = '';
+
+  if (attributes.analysis) {
+    const suggest = gameService.getRecommendedAction(game);
+    if (attributes.analysis[suggest]) {
+      // OK, we should suggest this - once we do, we'll clear
+      // this attribute so it isn't suggested again
+      suggestion = resources.strings.PROACTIVE_SUGGESTION
+          .replace('{0}', resources.mapActionPastTense(suggest))
+          .replace('{1}', resources.mapActionToSuggestion(suggest));
+      attributes.analysis[suggest] = 0;
+    }
+  }
+
+  return suggestion;
 }
 
 //

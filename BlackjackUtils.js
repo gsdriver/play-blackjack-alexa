@@ -10,6 +10,7 @@ const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 const speechUtils = require('alexa-speech-utils')();
 const querystring = require('querystring');
 const request = require('request');
+const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 
 // Global session ID
 let globalEvent;
@@ -220,6 +221,30 @@ module.exports = {
       }
 
       callback(speech);
+    });
+  },
+  readSuggestions(attributes, callback) {
+    // If it's already been read, don't read it again
+    if (attributes.analysis) {
+      callback();
+      return;
+    }
+
+    // In the date range, so download from S3
+    s3.getObject({Bucket: 'garrett-alexa-analysis', Key: 'suggestions.txt'}, (err, data) => {
+      if (data) {
+        const suggestions = JSON.parse(data.Body.toString('ascii'));
+
+        if (suggestions && suggestions[attributes.userId]) {
+          // Great, save these suggestions
+          attributes.analysis = suggestions[attributes.userId];
+        } else {
+          // Make note that we've already read this and found no suggestion
+          attributes.analysis = {none: 1};
+        }
+      }
+
+      callback();
     });
   },
 };
