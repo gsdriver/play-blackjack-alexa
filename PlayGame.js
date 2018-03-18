@@ -150,7 +150,7 @@ module.exports = {
     callback(speech, reprompt);
   },
   // Gets contextual help based on the current state of the game
-  getContextualHelp: function(attributes, locale, userID, callback) {
+  getContextualHelp: function(attributes, locale, helpPrompt) {
     resources = require('./' + locale + '/resources');
     const game = attributes[attributes.currentGame];
     let result = '';
@@ -169,14 +169,19 @@ module.exports = {
       } else {
         const actions = game.possibleActions.map((x) => resources.mapPlayOption(x));
         actions.push(resources.strings.HELP_YOU_CAN_SAY_LEADER);
-        if (!game.training) {
+        if (helpPrompt && !game.training) {
           actions.push(resources.strings.HELP_YOU_CAN_SAY_ENABLE_TRAINING);
         }
         result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}', utils.or(actions, {locale: locale}));
       }
+    } else if (!helpPrompt) {
+      result = resources.strings.TRAINING_REPROMPT;
     }
 
-    result += resources.strings.HELP_MORE_OPTIONS;
+    if (helpPrompt) {
+      result += resources.strings.HELP_MORE_OPTIONS;
+    }
+
     return result;
   },
   // Changes the rules in play

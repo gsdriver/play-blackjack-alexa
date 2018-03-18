@@ -62,8 +62,8 @@ const resources = {
   // From Rules.js
   'RULES_CARD_TITLE': 'Blackjack Rules',
   // From Training.js
-  'TRAINING_ON': 'Training mode turned on. I will let you know when your play differs from Basic Strategy. Say disable training mode to leave this mode. What can I help you with?',
-  'TRAINING_OFF': 'Training mode turned off. What can I help you with?',
+  'TRAINING_ON': 'Training mode turned on. I will let you know when your play differs from Basic Strategy. ',
+  'TRAINING_OFF': 'Training mode turned off. ',
   'TRAINING_REPROMPT': 'What can I help you with?',
   // From PlayGame.js
   'PROACTIVE_SUGGESTION': ' I\'ve noticed you haven\'t {0} recently and wanted to remind you that the book would say you should {1} on this hand.',
