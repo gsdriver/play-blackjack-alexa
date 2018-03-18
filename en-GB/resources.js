@@ -48,6 +48,7 @@ const resources = {
   'LAUNCH_WELCOME': 'Welcome to Blackjack Game. The triple seven progressive jackpot is currently £{0}. ',
   'LAUNCH_WELCOME_NOJACKPOT': 'Welcome to Blackjack Game. ',
   'LAUNCH_START_GAME': 'Say bet to start a new game',
+  'LAUNCH_ENABLE_TRAINING': 'say enable training mode',
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet £5 towards the jackpot',
   'LAUNCH_START_REMOVE_SIDEBET': 'remove side bet to remove your side bet',
   'LAUNCH_START_HIGH_SCORES': 'read high scores to hear the leader board',

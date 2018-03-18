@@ -52,6 +52,8 @@ module.exports = {
             options.push(res.strings.LAUNCH_START_RESET);
           }
           options.push(res.strings.LAUNCH_START_HIGH_SCORES);
+        } else {
+          options.push(res.strings.LAUNCH_ENABLE_TRAINING);
         }
 
         launchSpeech += bjUtils.readBankroll(this.event.request.locale, this.attributes);
