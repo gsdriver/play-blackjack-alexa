@@ -76,6 +76,8 @@ module.exports = {
         return 'FIRSTTIMEPLAYER';
       }
       return 'NEWGAME';
+    } else if (game.suggestion) {
+      return 'SUGGESTION';
     } else if (game.possibleActions.indexOf('noinsurance') >= 0) {
       return 'INSURANCEOFFERED';
     } else {
