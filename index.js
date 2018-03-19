@@ -6,6 +6,7 @@ const Blackjack = require('./intents/Blackjack');
 const Betting = require('./intents/Betting');
 const SideBet = require('./intents/SideBet');
 const Suggest = require('./intents/Suggest');
+const TakeSuggestion = require('./intents/TakeSuggestion');
 const Rules = require('./intents/Rules');
 const ChangeRules = require('./intents/ChangeRules');
 const TakeInsurance = require('./intents/TakeInsurance');
@@ -15,16 +16,43 @@ const HighScore = require('./intents/HighScore');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const Reset = require('./intents/Reset');
+const Training = require('./intents/Training');
 const gameService = require('./GameService');
 const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
 const request = require('request');
 const AWS = require('aws-sdk');
-const dashbot = require('dashbot')(process.env.DASHBOTKEY).alexa;
 AWS.config.update({region: 'us-east-1'});
 
 const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
 let newUser;
+
+const suggestHandlers = Alexa.CreateStateHandler('SUGGESTION', {
+  'NewSession': function() {
+    this.handler.state = '';
+    this.emitWithState('NewSession');
+  },
+  'LaunchRequest': TakeSuggestion.handleNoIntent,
+  'BlackjackIntent': Blackjack.handleIntent,
+  'SuggestIntent': Suggest.handleIntent,
+  'HighScoreIntent': HighScore.handleIntent,
+  'EnableTrainingIntent': Training.handleEnableIntent,
+  'DisableTrainingIntent': Training.handleDisableIntent,
+  'RulesIntent': Rules.handleIntent,
+  'AMAZON.RepeatIntent': Repeat.handleIntent,
+  'AMAZON.YesIntent': TakeSuggestion.handleYesIntent,
+  'AMAZON.NoIntent': TakeSuggestion.handleNoIntent,
+  'AMAZON.StopIntent': Exit.handleIntent,
+  'AMAZON.CancelIntent': Exit.handleIntent,
+  'SessionEndedRequest': function() {
+    saveState(this.event.session.user.userId, this.attributes);
+  },
+  'Unhandled': function() {
+    const res = require('./' + this.event.request.locale + '/resources');
+    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+            res.strings.UNKNOWNINTENT_RESET, res.strings.UNKNOWNINTENT_RESET_REPROMPT);
+  },
+});
 
 const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   'NewSession': function() {
@@ -33,6 +61,8 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   },
   'LaunchRequest': Reset.handleNoReset,
   'HighScoreIntent': HighScore.handleIntent,
+  'EnableTrainingIntent': Training.handleEnableIntent,
+  'DisableTrainingIntent': Training.handleDisableIntent,
   'AMAZON.YesIntent': Reset.handleYesReset,
   'AMAZON.NoIntent': Reset.handleNoReset,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -60,6 +90,8 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'RulesIntent': Rules.handleIntent,
   'ChangeRulesIntent': ChangeRules.handleIntent,
   'HighScoreIntent': HighScore.handleIntent,
+  'EnableTrainingIntent': Training.handleEnableIntent,
+  'DisableTrainingIntent': Training.handleDisableIntent,
   'AMAZON.YesIntent': Betting.handleIntent,
   'AMAZON.NoIntent': Exit.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
@@ -89,6 +121,8 @@ const firstTimeHandlers = Alexa.CreateStateHandler('FIRSTTIMEPLAYER', {
   'RulesIntent': Rules.handleIntent,
   'ChangeRulesIntent': ChangeRules.handleIntent,
   'HighScoreIntent': HighScore.handleIntent,
+  'EnableTrainingIntent': Training.handleEnableIntent,
+  'DisableTrainingIntent': Training.handleDisableIntent,
   'AMAZON.YesIntent': Betting.handleIntent,
   'AMAZON.NoIntent': Exit.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
@@ -114,6 +148,8 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'SuggestIntent': Suggest.handleIntent,
   'RulesIntent': Rules.handleIntent,
   'HighScoreIntent': HighScore.handleIntent,
+  'EnableTrainingIntent': Training.handleEnableIntent,
+  'DisableTrainingIntent': Training.handleDisableIntent,
   'AMAZON.YesIntent': TakeInsurance.handleIntent,
   'AMAZON.NoIntent': DeclineInsurance.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
@@ -140,6 +176,8 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'SuggestIntent': Suggest.handleIntent,
   'RulesIntent': Rules.handleIntent,
   'HighScoreIntent': HighScore.handleIntent,
+  'EnableTrainingIntent': Training.handleEnableIntent,
+  'DisableTrainingIntent': Training.handleDisableIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -161,6 +199,8 @@ const joinHandlers = Alexa.CreateStateHandler('JOINTOURNAMENT', {
     this.emitWithState('NewSession');
   },
   'LaunchRequest': tournament.handlePass,
+  'EnableTrainingIntent': Training.handleEnableIntent,
+  'DisableTrainingIntent': Training.handleDisableIntent,
   'AMAZON.YesIntent': tournament.handleJoin,
   'AMAZON.NoIntent': tournament.handlePass,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -215,6 +255,8 @@ const handlers = {
   'BlackjackIntent': Blackjack.handleIntent,
   'RulesIntent': Rules.handleIntent,
   'HighScoreIntent': HighScore.handleIntent,
+  'EnableTrainingIntent': Training.handleEnableIntent,
+  'DisableTrainingIntent': Training.handleDisableIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -229,7 +271,14 @@ const handlers = {
   },
 };
 
-exports.handler = dashbot.handler((event, context, callback) => {
+if (process.env.DASHBOTKEY) {
+  const dashbot = require('dashbot')(process.env.DASHBOTKEY).alexa;
+  exports.handler = dashbot.handler(runGame);
+} else {
+  exports.handler = runGame;
+}
+
+function runGame(event, context, callback) {
   const alexa = Alexa.handler(event, context);
 
   alexa.appId = APP_ID;
@@ -262,11 +311,11 @@ exports.handler = dashbot.handler((event, context, callback) => {
     bjUtils.setEvent(event);
     bjUtils.readSuggestions(event.session.attributes, () => {
       alexa.registerHandlers(handlers, resetHandlers, newGameHandlers, firstTimeHandlers,
-        insuranceHandlers, joinHandlers, inGameHandlers);
+        insuranceHandlers, joinHandlers, inGameHandlers, suggestHandlers);
       alexa.execute();
     });
   }
-});
+}
 
 function initialize(attributes, locale, userId, callback) {
   // Some initiatlization

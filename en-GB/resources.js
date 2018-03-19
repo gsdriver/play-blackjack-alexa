@@ -39,7 +39,7 @@ const resources = {
   // From HighScore.js
   'HIGHSCORE_REPROMPT': 'What else can I help you with?',
   // From Help.js
-  'HELP_GENERIC_HELP': 'You can play a game by saying Deal <break time=\'200ms\'/> or you can say read high scores to hear the leader board. <break time=\'300ms\'/> Now, what can I help you with?',
+  'HELP_GENERIC_HELP': 'You can play a game by saying Deal <break time=\'200ms\'/> or you can say enable training mode if you would like me to prompt when your play differs from Basic Strategy. <break time=\'300ms\'/> Now, what can I help you with?',
   'HELP_CARD_TITLE': 'Blackjack Commands',
   'HELP_CARD_PROGRESSIVE_TEXT': 'This game features a progressive triple seven jackpot. Place a side bet of £5 by saying PLACE SIDE BET which will stay in effect until you say REMOVE SIDE BET.\nThe side bet pays out £25 if your first card is a seven, £100 if your first two cards are both seven, and the progressive jackpot if your first three cards are seven. The progressive jackpot is based on aggregate play across all users of this skill.\n',
   'HELP_CARD_TEXT': 'You can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet. You can say READ HIGH SCORES to hear the current leader board.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
@@ -48,6 +48,7 @@ const resources = {
   'LAUNCH_WELCOME': 'Welcome to Blackjack Game. The triple seven progressive jackpot is currently £{0}. ',
   'LAUNCH_WELCOME_NOJACKPOT': 'Welcome to Blackjack Game. ',
   'LAUNCH_START_GAME': 'Say bet to start a new game',
+  'LAUNCH_ENABLE_TRAINING': 'say enable training mode',
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet £5 towards the jackpot',
   'LAUNCH_START_REMOVE_SIDEBET': 'remove side bet to remove your side bet',
   'LAUNCH_START_HIGH_SCORES': 'read high scores to hear the leader board',
@@ -60,10 +61,16 @@ const resources = {
   'RESET_ABORTED': 'Game not reset. Say bet to start a new game.',
   // From Rules.js
   'RULES_CARD_TITLE': 'Blackjack Rules',
+  // From Training.js
+  'TRAINING_ON': 'Training mode turned on. I will let you know when your play differs from Basic Strategy. ',
+  'TRAINING_OFF': 'Training mode turned off. ',
+  'TRAINING_REPROMPT': 'What can I help you with?',
   // From PlayGame.js
   'PROACTIVE_SUGGESTION': ' I\'ve noticed you haven\'t {0} recently and wanted to remind you that the book would say you should {1} on this hand.',
   'SUGGEST_OPTIONS': 'You should {0}|The book says you should {0}|The book would tell you to {0}|According to Basic Strategy you should {0}|The book would suggest that you {0}|I think you should {0}|Basic Strategy would suggest you {0}',
   'SUGGEST_TURNOVER': 'I can\'t give a suggestion when the game is over',
+  'SUGGESTED_PLAY': 'The book would tell you to {0}. |Basic Strategy would suggest you {0}. ',
+  'SUGGESTED_PLAY_REPROMPT': 'Would you like to {0}?',
   'REPORT_ERROR': 'There was an error: {0}',
   'INVALID_ACTION': 'I\'m sorry, {0} is not a valid action at this time. ',
   'YOU_BET_TEXT': 'You bet £{0}. ',
@@ -76,6 +83,7 @@ const resources = {
   'HELP_INSURANCE_INSUFFICIENT_BANKROLL': 'You don\'t have enough money to take insurance - say no to decline insurance.',
   'HELP_YOU_CAN_SAY': 'You can say {0}.',
   'HELP_YOU_CAN_SAY_LEADER': 'read high scores',
+  'HELP_YOU_CAN_SAY_ENABLE_TRAINING': 'enable training mode',
   'HELP_MORE_OPTIONS': ' For more options, please check the Alexa companion application.<break time=\'300ms\'/> What can I help you with?',
   'INTERNAL_ERROR': 'Sorry, internal error. What else can I help with?',
   'CHANGERULES_REPROMPT': 'Would you like to bet?',

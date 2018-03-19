@@ -24,6 +24,8 @@ function BuildEvent(argv)
     var helpIntent = {"name": "AMAZON.HelpIntent", "slots": {}};
     var exitIntent = {"name": "SessionEndedRequest", "slots": {}};
     var highScore = {'name': 'HighScoreIntent', 'slots': {}};
+    var enableTraining = {'name': 'EnableTrainingIntent', 'slots': {}};
+    var disableTraining = {'name': 'DisableTrainingIntent', 'slots': {}};
 
     var lambda = {
        "session": {
@@ -137,6 +139,14 @@ function BuildEvent(argv)
     else if (argv[2] == "highscore")
     {
         lambda.request.intent = highScore;
+    }
+    else if (argv[2] == "enabletraining")
+    {
+        lambda.request.intent = enableTraining;
+    }
+    else if (argv[2] == "disabletraining")
+    {
+        lambda.request.intent = disableTraining;
     }
     else if (argv[2] == "exit")
     {

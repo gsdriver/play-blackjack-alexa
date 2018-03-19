@@ -52,6 +52,33 @@ module.exports = {
         const betAmount = (action.amount ? action.amount : game.lastBet);
         const oldGame = JSON.parse(JSON.stringify(game));
 
+        // If they are in training mode, first check if this is the right action
+        // and we didn't already make a suggestion that they are ignoring
+        if (game.training && !game.suggestion) {
+          const suggestion = gameService.getRecommendedAction(game);
+
+          if ((suggestion !== 'notplayerturn') && (suggestion !== action.action)) {
+            // Let them know what the recommended action was
+            // and give them a chance to use this action instead
+            game.suggestion = {suggestion: suggestion, player: action.action};
+
+            let suggestText;
+            if (resources.mapActionToSuggestion(suggestion)) {
+              suggestText = resources.mapActionToSuggestion(suggestion);
+            } else {
+              suggestText = suggestion;
+            }
+            let speech = resources.pickRandomOption('SUGGESTED_PLAY').replace('{0}', suggestText);
+            const reprompt = resources.strings.SUGGESTED_PLAY_REPROMPT.replace('{0}', suggestText);
+
+            speech += reprompt;
+            callback(null, null, speech, reprompt, null);
+            return;
+          }
+        }
+
+        // If there was a suggestion, remove it as we have taken a play
+        game.suggestion = undefined;
         gameService.userAction(attributes, action.action, betAmount, (speechError) => {
           let error;
 
@@ -123,7 +150,7 @@ module.exports = {
     callback(speech, reprompt);
   },
   // Gets contextual help based on the current state of the game
-  getContextualHelp: function(attributes, locale, userID, callback) {
+  getContextualHelp: function(attributes, locale, helpPrompt) {
     resources = require('./' + locale + '/resources');
     const game = attributes[attributes.currentGame];
     let result = '';
@@ -142,11 +169,19 @@ module.exports = {
       } else {
         const actions = game.possibleActions.map((x) => resources.mapPlayOption(x));
         actions.push(resources.strings.HELP_YOU_CAN_SAY_LEADER);
+        if (helpPrompt && !game.training) {
+          actions.push(resources.strings.HELP_YOU_CAN_SAY_ENABLE_TRAINING);
+        }
         result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}', utils.or(actions, {locale: locale}));
       }
+    } else if (!helpPrompt) {
+      result = resources.strings.TRAINING_REPROMPT;
     }
 
-    result += resources.strings.HELP_MORE_OPTIONS;
+    if (helpPrompt) {
+      result += resources.strings.HELP_MORE_OPTIONS;
+    }
+
     return result;
   },
   // Changes the rules in play

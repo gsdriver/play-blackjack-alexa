@@ -130,3 +130,31 @@ HighScoreIntent what is the leader board
 HighScoreIntent read leader board
 HighScoreIntent say high scores
 HighScoreIntent say leader board
+
+EnableTrainingIntent turn on training mode
+EnableTrainingIntent enter training mode
+EnableTrainingIntent enable training mode
+EnableTrainingIntent use training mode
+EnableTrainingIntent turn on training
+EnableTrainingIntent enter training
+EnableTrainingIntent enable training
+EnableTrainingIntent turn on suggestion mode
+EnableTrainingIntent enter suggestion mode
+EnableTrainingIntent use suggestion mode
+EnableTrainingIntent enable suggestion mode
+EnableTrainingIntent turn on suggestions
+EnableTrainingIntent enter suggestions
+EnableTrainingIntent enable suggestions
+
+DisableTrainingIntent turn off training mode
+DisableTrainingIntent exit training mode
+DisableTrainingIntent disable training mode
+DisableTrainingIntent turn off training
+DisableTrainingIntent exit training
+DisableTrainingIntent disable training
+DisableTrainingIntent turn off suggestion mode
+DisableTrainingIntent exit suggestion mode
+DisableTrainingIntent disable suggestion mode
+DisableTrainingIntent turn off suggestions
+DisableTrainingIntent exit suggestions
+DisableTrainingIntent disable suggestions
