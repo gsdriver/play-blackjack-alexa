@@ -67,6 +67,7 @@ const resources = {
   'TRAINING_OFF': 'Training mode turned off. ',
   'TRAINING_REPROMPT': 'What can I help you with?',
   // From PlayGame.js
+  'PROMPT_TRAINING': 'You can say enter training mode if you would like me to tell you when your play differs from Basic Strategy',
   'PROACTIVE_SUGGESTION': ' I\'ve noticed you haven\'t {0} recently and wanted to remind you that the book would say you should {1} on this hand.',
   'SUGGEST_OPTIONS': 'You should {0}|The book says you should {0}|The book would tell you to {0}|According to Basic Strategy you should {0}|The book would suggest that you {0}|I think you should {0}|Basic Strategy would suggest you {0}',
   'SUGGEST_TURNOVER': 'I can\'t give a suggestion when the game is over',

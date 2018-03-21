@@ -30,6 +30,18 @@ module.exports = {
         speech = suggestText;
       }
 
+      // If they aren't in training mode, and they haven't already heard
+      // about training mode, then let them know about this feature
+      if (!attributes.prompts) {
+        attributes.prompts = {};
+      }
+      if (!attributes.prompts.training) {
+        attributes.prompts.training = true;
+        if (!game.training) {
+          speech += ('. ' + resources.strings.PROMPT_TRAINING);
+        }
+      }
+
       const reprompt = listValidActions(game, locale, 'full');
       speech += ('. ' + reprompt);
       callback(null, null, speech, reprompt, null);
