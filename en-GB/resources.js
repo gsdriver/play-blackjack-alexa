@@ -3,17 +3,6 @@
 //
 
 const resources = {
-  // From index.js
-  'UNKNOWNINTENT_RESET': 'Sorry, I didn\'t get that. Try saying Yes or No.',
-  'UNKNOWNINTENT_RESET_REPROMPT': 'Try saying Yes or No.',
-  'UNKNOWNINTENT_NEWGAME': 'Sorry, I didn\'t get that. Try saying Bet.',
-  'UNKNOWNINTENT_NEWGAME_REPROMPT': 'Try saying Bet.',
-  'UNKNOWNINTENT_FIRSTTIME': 'Say bet to start a game.',
-  'UNKNOWNINTENT_FIRSTTIME_REPROMPT': 'Try saying Bet.',
-  'UNKNOWNINTENT_INSURANCE': 'Sorry, I didn\'t get that. Try saying Yes or No.',
-  'UNKNOWNINTENT_INSURANCE_REPROMPT': 'Try saying Yes or No.',
-  'UNKNOWNINTENT_INGAME': 'Sorry, I didn\'t get that. Try saying Repeat to hear the current status.',
-  'UNKNOWNINTENT_INGAME_REPROMPT': 'Try saying Repeat.',
   // From BlackjackUtils.js
   'ERROR_REPROMPT': 'What else can I help with?',
   'CHANGE_CARD_TEXT': 'You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
@@ -85,6 +74,7 @@ const resources = {
   'HELP_YOU_CAN_SAY': 'You can say {0}.',
   'HELP_YOU_CAN_SAY_LEADER': 'read high scores',
   'HELP_YOU_CAN_SAY_ENABLE_TRAINING': 'enable training mode',
+  'HELP_YOU_CAN_SAY_YESNO': 'You can say yes or no',
   'HELP_MORE_OPTIONS': ' For more options, please check the Alexa companion application.<break time=\'300ms\'/> What can I help you with?',
   'INTERNAL_ERROR': 'Sorry, internal error. What else can I help with?',
   'CHANGERULES_REPROMPT': 'Would you like to bet?',
@@ -316,6 +306,88 @@ module.exports = {
                            '0.2': '6 to 5',
                            '0': 'even money'};
     return blackjackPayout[rule];
+  },
+  buildUnhandledResponse: function(intent, state) {
+    const stateMapping = {'SUGGESTION': 'during the middle of a hand',
+      'CONFIRMRESET': 'while I\'m waiting to hear if you want to reset the game',
+      'NEWGAME': 'before the hand has started',
+      'FIRSTTIMEPLAYER': 'before the hand has started',
+      'INSURANCEOFFERED': 'while I\'m waiting to hear if you want insurance',
+      'INGAME': 'during the middle of a hand',
+      'JOINTOURNAMENT': 'before you decide if you want to join the tournament',
+    };
+    let response = 'I can\'t ';
+
+    // What are they trying to do?
+    switch (intent.name) {
+      case 'BlackjackIntent':
+        // This one is a little more involved - need to get the ActionSlot
+        if (intent.slots && intent.slots.Action && intent.slots.Action.value) {
+          response += (intent.slots.Action.value + ' ');
+        } else {
+          // Really shouldn't happen
+          console.log('Error - unhandled BlackjackIntent with no action in ' + state);
+          response += 'do that ';
+        }
+        break;
+      case 'SuggestIntent':
+        response += 'give a suggestion ';
+        break;
+      case 'ResetIntent':
+        response += 'reset the game ';
+        break;
+      case 'ChangeRulesIntent':
+        response += 'change the rules ';
+        break;
+      case 'AMAZON.YesIntent':
+        response = 'Yes doesn\'t make sense ';
+        break;
+      case 'AMAZON.NoIntent':
+        response = 'No doesn\'t make sense ';
+        break;
+      case 'BettingIntent':
+        response += 'place a new bet ';
+        break;
+      case 'PlaceSideBetIntent':
+        response += 'place a side bet ';
+        break;
+      case 'RemoveSideBetIntent':
+        response += 'remove your side bet ';
+        break;
+      case 'RulesIntent':
+        response += 'read the rules ';
+        break;
+      case 'HighScoreIntent':
+        response += 'read the leader board ';
+        break;
+      case 'EnableTrainingIntent':
+        response += 'turn on training mode ';
+        break;
+      case 'DisableTrainingIntent':
+        response += 'turn off training mode ';
+        break;
+
+      // These should be handled - so log an error
+      case 'AMAZON.RepeatIntent':
+      case 'AMAZON.HelpIntent':
+      case 'AMAZON.StopIntent':
+      case 'AMAZON.CancelIntent':
+      case 'SessionEndedRequest':
+      default:
+        console.log('Error - unhandled ' + intent.name + ' in state ' + state);
+        response += 'do that ';
+        break;
+    }
+
+    // Get the state
+    if (stateMapping[state]) {
+      response += stateMapping[state];
+    } else {
+      response += 'at this time';
+    }
+    response += '. ';
+
+    return response;
   },
 };
 

@@ -162,12 +162,18 @@ module.exports = {
     callback(speech, reprompt);
   },
   // Gets contextual help based on the current state of the game
-  getContextualHelp: function(attributes, locale, helpPrompt) {
-    resources = require('./' + locale + '/resources');
+  getContextualHelp: function(context, helpPrompt) {
+    const attributes = context.attributes;
+    resources = require('./' + context.event.request.locale + '/resources');
     const game = attributes[attributes.currentGame];
     let result = '';
 
-    if (game.possibleActions) {
+    // In some states, the choices are yes or no
+    if ((context.handler.state == 'CONFIRMRESET') ||
+          (context.handler.state == 'INSURANCEOFFERED') ||
+          (context.handler.state == 'JOINTOURNAMENT')) {
+      result = resources.strings.HELP_YOU_CAN_SAY_YESNO;
+    } else if (game.possibleActions) {
       // Special case - if there is insurance and noinsurance in the list, then pose as a yes/no
       if (game.possibleActions.indexOf('noinsurance') > -1) {
         // It's possible you can't take insurance because you don't have enough money
@@ -184,7 +190,7 @@ module.exports = {
         if (helpPrompt && !game.training) {
           actions.push(resources.strings.HELP_YOU_CAN_SAY_ENABLE_TRAINING);
         }
-        result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}', utils.or(actions, {locale: locale}));
+        result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}', utils.or(actions, {locale: context.event.request.locale}));
       }
     } else if (!helpPrompt) {
       result = resources.strings.TRAINING_REPROMPT;

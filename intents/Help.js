@@ -15,7 +15,7 @@ module.exports = {
       tournament.readHelp(this, this.attributes);
     } else {
       const res = require('../' + this.event.request.locale + '/resources');
-      let speech = playgame.getContextualHelp(this.attributes, this.event.request.locale, true);
+      let speech = playgame.getContextualHelp(this, true);
       if (!speech) {
         speech = res.strings.HELP_GENERIC_HELP;
       }

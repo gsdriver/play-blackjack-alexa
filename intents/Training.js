@@ -10,7 +10,7 @@ const playgame = require('../PlayGame');
 module.exports = {
   handleEnableIntent: function() {
     const res = require('../' + this.event.request.locale + '/resources');
-    const reprompt = playgame.getContextualHelp(this.attributes, this.event.request.locale);
+    const reprompt = playgame.getContextualHelp(this);
     const speech = res.strings.TRAINING_ON + reprompt;
     const game = this.attributes[this.attributes.currentGame];
 
@@ -19,7 +19,7 @@ module.exports = {
   },
   handleDisableIntent: function() {
     const res = require('../' + this.event.request.locale + '/resources');
-    const reprompt = playgame.getContextualHelp(this.attributes, this.event.request.locale);
+    const reprompt = playgame.getContextualHelp(this);
     const speech = res.strings.TRAINING_OFF + reprompt;
     const game = this.attributes[this.attributes.currentGame];
 

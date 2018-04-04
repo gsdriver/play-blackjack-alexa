@@ -17,6 +17,7 @@ const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const Reset = require('./intents/Reset');
 const Training = require('./intents/Training');
+const Unhandled = require('./intents/Unhandled');
 const gameService = require('./GameService');
 const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
@@ -44,13 +45,9 @@ const suggestHandlers = Alexa.CreateStateHandler('SUGGESTION', {
   'AMAZON.NoIntent': TakeSuggestion.handleNoIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
+  'Unhandled': Unhandled.handleIntent,
   'SessionEndedRequest': function() {
     saveState(this.event.session.user.userId, this.attributes);
-  },
-  'Unhandled': function() {
-    const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this, null, null,
-            res.strings.UNKNOWNINTENT_RESET, res.strings.UNKNOWNINTENT_RESET_REPROMPT);
   },
 });
 
@@ -67,13 +64,9 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   'AMAZON.NoIntent': Reset.handleNoReset,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
+  'Unhandled': Unhandled.handleIntent,
   'SessionEndedRequest': function() {
     saveState(this.event.session.user.userId, this.attributes);
-  },
-  'Unhandled': function() {
-    const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this, null, null,
-            res.strings.UNKNOWNINTENT_RESET, res.strings.UNKNOWNINTENT_RESET_REPROMPT);
   },
 });
 
@@ -98,13 +91,9 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
+  'Unhandled': Unhandled.handleIntent,
   'SessionEndedRequest': function() {
     saveState(this.event.session.user.userId, this.attributes);
-  },
-  'Unhandled': function() {
-    const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this, null, null,
-            res.strings.UNKNOWNINTENT_NEWGAME, res.strings.UNKNOWNINTENT_NEWGAME_REPROMPT);
   },
 });
 
@@ -129,13 +118,9 @@ const firstTimeHandlers = Alexa.CreateStateHandler('FIRSTTIMEPLAYER', {
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
+  'Unhandled': Unhandled.handleIntent,
   'SessionEndedRequest': function() {
     saveState(this.event.session.user.userId, this.attributes);
-  },
-  'Unhandled': function() {
-    const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this, null, null,
-            res.strings.UNKNOWNINTENT_FIRSTTIME, res.strings.UNKNOWNINTENT_FIRSTTIME_REPROMPT);
   },
 });
 
@@ -156,13 +141,9 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
+  'Unhandled': Unhandled.handleIntent,
   'SessionEndedRequest': function() {
     saveState(this.event.session.user.userId, this.attributes);
-  },
-  'Unhandled': function() {
-    const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this, null, null,
-            res.strings.UNKNOWNINTENT_INSURANCE, res.strings.UNKNOWNINTENT_INSURANCE_REPROMPT);
   },
 });
 
@@ -182,13 +163,9 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
+  'Unhandled': Unhandled.handleIntent,
   'SessionEndedRequest': function() {
     saveState(this.event.session.user.userId, this.attributes);
-  },
-  'Unhandled': function() {
-    const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this, null, null,
-            res.strings.UNKNOWNINTENT_INGAME, res.strings.UNKNOWNINTENT_INGAME_REPROMPT);
   },
 });
 
@@ -205,13 +182,9 @@ const joinHandlers = Alexa.CreateStateHandler('JOINTOURNAMENT', {
   'AMAZON.NoIntent': tournament.handlePass,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': tournament.handlePass,
+  'Unhandled': Unhandled.handleIntent,
   'SessionEndedRequest': function() {
     saveState(this.event.session.user.userId, this.attributes);
-  },
-  'Unhandled': function() {
-    const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this, null, null,
-            res.strings.UNKNOWNINTENT_RESET, res.strings.UNKNOWNINTENT_RESET_REPROMPT);
   },
 });
 
@@ -260,13 +233,9 @@ const handlers = {
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
+  'Unhandled': Unhandled.handleIntent,
   'SessionEndedRequest': function() {
     saveState(this.event.session.user.userId, this.attributes);
-  },
-  'Unhandled': function() {
-    const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this, null, null,
-            res.strings.UNKNOWNINTENT_INGAME, res.strings.UNKNOWNINTENT_INGAME_REPROMPT);
   },
 };
 
