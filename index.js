@@ -49,7 +49,7 @@ const suggestHandlers = Alexa.CreateStateHandler('SUGGESTION', {
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+    bjUtils.emitResponse(this, null, null,
             res.strings.UNKNOWNINTENT_RESET, res.strings.UNKNOWNINTENT_RESET_REPROMPT);
   },
 });
@@ -72,7 +72,7 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+    bjUtils.emitResponse(this, null, null,
             res.strings.UNKNOWNINTENT_RESET, res.strings.UNKNOWNINTENT_RESET_REPROMPT);
   },
 });
@@ -103,7 +103,7 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+    bjUtils.emitResponse(this, null, null,
             res.strings.UNKNOWNINTENT_NEWGAME, res.strings.UNKNOWNINTENT_NEWGAME_REPROMPT);
   },
 });
@@ -134,7 +134,7 @@ const firstTimeHandlers = Alexa.CreateStateHandler('FIRSTTIMEPLAYER', {
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+    bjUtils.emitResponse(this, null, null,
             res.strings.UNKNOWNINTENT_FIRSTTIME, res.strings.UNKNOWNINTENT_FIRSTTIME_REPROMPT);
   },
 });
@@ -161,7 +161,7 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+    bjUtils.emitResponse(this, null, null,
             res.strings.UNKNOWNINTENT_INSURANCE, res.strings.UNKNOWNINTENT_INSURANCE_REPROMPT);
   },
 });
@@ -187,7 +187,7 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+    bjUtils.emitResponse(this, null, null,
             res.strings.UNKNOWNINTENT_INGAME, res.strings.UNKNOWNINTENT_INGAME_REPROMPT);
   },
 });
@@ -210,7 +210,7 @@ const joinHandlers = Alexa.CreateStateHandler('JOINTOURNAMENT', {
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+    bjUtils.emitResponse(this, null, null,
             res.strings.UNKNOWNINTENT_RESET, res.strings.UNKNOWNINTENT_RESET_REPROMPT);
   },
 });
@@ -226,8 +226,7 @@ const handlers = {
           this.handler.state = 'JOINTOURNAMENT';
           tournament.promptToEnter(this.event.request.locale,
               this.attributes, (speech, reprompt) => {
-            bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
-                    result + speech, reprompt);
+            bjUtils.emitResponse(this, null, null, result + speech, reprompt);
           });
         } else {
           if (result && (result.length > 0)) {
@@ -266,7 +265,7 @@ const handlers = {
   },
   'Unhandled': function() {
     const res = require('./' + this.event.request.locale + '/resources');
-    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+    bjUtils.emitResponse(this, null, null,
             res.strings.UNKNOWNINTENT_INGAME, res.strings.UNKNOWNINTENT_INGAME_REPROMPT);
   },
 };

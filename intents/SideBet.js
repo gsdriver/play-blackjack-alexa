@@ -12,16 +12,14 @@ module.exports = {
     playgame.playBlackjackAction(this.attributes, this.event.request.locale,
       this.event.session.user.userId, {action: 'sidebet'},
       (error, response, speech, reprompt) => {
-      bjUtils.emitResponse(this.emit, this.event.request.locale,
-        error, response, speech, reprompt);
+      bjUtils.emitResponse(this, error, response, speech, reprompt);
     });
   },
   handleRemoveIntent: function() {
     playgame.playBlackjackAction(this.attributes, this.event.request.locale,
       this.event.session.user.userId, {action: 'nosidebet'},
       (error, response, speech, reprompt) => {
-      bjUtils.emitResponse(this.emit, this.event.request.locale,
-        error, response, speech, reprompt);
+      bjUtils.emitResponse(this, error, response, speech, reprompt);
     });
   },
 };

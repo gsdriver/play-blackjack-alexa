@@ -15,8 +15,7 @@ module.exports = {
     const game = this.attributes[this.attributes.currentGame];
 
     game.training = true;
-    bjUtils.emitResponse(this.emit, this.event.request.locale, null,
-          null, speech, reprompt);
+    bjUtils.emitResponse(this, null, null, speech, reprompt);
   },
   handleDisableIntent: function() {
     const res = require('../' + this.event.request.locale + '/resources');
@@ -25,7 +24,6 @@ module.exports = {
     const game = this.attributes[this.attributes.currentGame];
 
     game.training = undefined;
-    bjUtils.emitResponse(this.emit, this.event.request.locale, null,
-          null, speech, reprompt);
+    bjUtils.emitResponse(this, null, null, speech, reprompt);
   },
 };

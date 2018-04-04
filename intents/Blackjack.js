@@ -10,10 +10,10 @@ module.exports = {
     const actionSlot = this.event.request.intent.slots.Action;
 
     if (!actionSlot) {
-      bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+      bjUtils.emitResponse(this, null, null,
               res.strings.BLACKJACKINTENT_NO_ACTION, res.strings.ERROR_REPROMPT);
     } else if (!actionSlot.value) {
-      bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+      bjUtils.emitResponse(this, null, null,
               res.strings.BLACKJACKINTENT_UNKNOWN_ACTION.replace('{0}', actionSlot.value),
               res.strings.ERROR_REPROMPT);
     } else {
@@ -31,8 +31,7 @@ module.exports = {
           this.event.session.user.userId,
           actionObj, (error, response, speech, reprompt) => {
           this.handler.state = bjUtils.getState(this.attributes);
-        bjUtils.emitResponse(this.emit, this.event.request.locale,
-          error, response, speech, reprompt);
+        bjUtils.emitResponse(this, error, response, speech, reprompt);
       });
     }
   },

@@ -43,13 +43,12 @@ module.exports = {
                 cardText = res.strings.FULL_RULES.replace('{0}', readSpeech);
               }
 
-              bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+              bjUtils.emitResponse(this, null, null,
                       speech, res.strings.ERROR_REPROMPT,
                       res.strings.CHANGERULES_CARD_TITLE, cardText);
             });
           } else {
-            bjUtils.emitResponse(this.emit, this.event.request.locale,
-              error, response, speech, reprompt);
+            bjUtils.emitResponse(this, error, response, speech, reprompt);
           }
         });
       }
@@ -69,7 +68,7 @@ module.exports = {
         if (this.attributes[this.attributes.currentGame].canReset) {
           cardText += res.strings.CHANGE_CARD_TEXT;
         }
-        bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+        bjUtils.emitResponse(this, null, null,
                 ruleError, res.strings.ERROR_REPROMPT,
                 res.strings.CHANGERULES_CARD_TITLE, cardText);
       });

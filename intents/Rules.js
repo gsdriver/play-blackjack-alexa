@@ -12,7 +12,7 @@ module.exports = {
     const res = require('../' + this.event.request.locale + '/resources');
 
     playgame.readRules(this.attributes, this.event.request.locale, (speech, reprompt) => {
-      bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+      bjUtils.emitResponse(this, null, null,
               speech, reprompt, res.strings.RULES_CARD_TITLE, speech);
     });
   },

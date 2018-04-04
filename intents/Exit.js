@@ -21,7 +21,7 @@ module.exports = {
       ads.getAd(this.attributes, 'blackjack', this.event.request.locale, (adText) => {
         exitSpeech += tournament.getReminderText(this.event.request.locale);
         exitSpeech += (adText + ' ' + res.strings.EXIT_GOODBYE);
-        bjUtils.emitResponse(this.emit, this.event.request.locale, null, exitSpeech);
+        bjUtils.emitResponse(this, null, exitSpeech);
       });
     });
   },

@@ -24,8 +24,7 @@ module.exports = {
       reprompt = res.strings.TOURNAMENT_INVALIDACTION_REPROMPT;
     }
 
-    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
-            speech, reprompt);
+    bjUtils.emitResponse(this, null, null, speech, reprompt);
   },
   handleYesReset: function() {
     const res = require('../' + this.event.request.locale + '/resources');
@@ -35,7 +34,7 @@ module.exports = {
     gameService.initializeGame(this.attributes, this.event.session.user.userId);
     this.attributes[this.attributes.currentGame].timestamp = timestamp;
     this.handler.state = 'NEWGAME';
-    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+    bjUtils.emitResponse(this, null, null,
             res.strings.RESET_COMPLETED, res.strings.RESET_REPROMPT);
   },
   handleNoReset: function() {
@@ -43,7 +42,7 @@ module.exports = {
     const res = require('../' + this.event.request.locale + '/resources');
 
     this.handler.state = 'NEWGAME';
-    bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+    bjUtils.emitResponse(this, null, null,
             res.strings.RESET_ABORTED, res.strings.RESET_REPROMPT);
   },
 };

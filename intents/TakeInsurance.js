@@ -14,7 +14,7 @@ module.exports = {
       this.event.session.user.userId, {action: 'insurance'},
       (error, response, speech, reprompt) => {
       this.handler.state = bjUtils.getState(this.attributes);
-      bjUtils.emitResponse(this.emit, this.event.request.locale, error, response, speech, reprompt);
+      bjUtils.emitResponse(this, error, response, speech, reprompt);
     });
   },
 };

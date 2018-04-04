@@ -117,7 +117,8 @@ module.exports = {
     attributes['tournament'].finished = true;
     return response;
   },
-  readHelp: function(emit, locale, attributes) {
+  readHelp: function(context, attributes) {
+    const locale = context.event.request.locale;
     const res = require('./' + locale + '/resources');
     let speech;
     const game = attributes['tournament'];
@@ -128,7 +129,7 @@ module.exports = {
     readStanding(locale, attributes, (standing) => {
       speech += standing;
       speech += reprompt;
-      bjUtils.emitResponse(emit, locale, null, null,
+      bjUtils.emitResponse(context, null, null,
               speech, reprompt,
               res.strings.HELP_CARD_TITLE,
               res.strings.TOURNAMENT_HELP_CARD_TEXT.replace('{0}', game.maxHands));
@@ -151,7 +152,7 @@ module.exports = {
             .replace('{0}', this.attributes['tournament'].bankroll)
             .replace('{1}', this.attributes['tournament'].maxHands);
       speech += reprompt;
-      bjUtils.emitResponse(this.emit, this.event.request.locale, null, null, speech, reprompt);
+      bjUtils.emitResponse(this, null, null, speech, reprompt);
     } else {
       speech = res.strings.TOURNAMENT_WELCOME_BACK.replace('{0}', game.maxHands - game.hands);
       readStanding(this.event.request.locale, this.attributes, (standing) => {
@@ -160,7 +161,7 @@ module.exports = {
         }
 
         speech += reprompt;
-        bjUtils.emitResponse(this.emit, this.event.request.locale, null, null, speech, reprompt);
+        bjUtils.emitResponse(this, null, null, speech, reprompt);
       });
     }
   },

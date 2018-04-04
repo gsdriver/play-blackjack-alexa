@@ -13,7 +13,7 @@ module.exports = {
       this.event.request.locale,
       this.event.session.user.userId, {action: 'suggest'},
       (error, response, speech, reprompt) => {
-      bjUtils.emitResponse(this.emit, this.event.request.locale, error, response, speech, reprompt);
+      bjUtils.emitResponse(this, error, response, speech, reprompt);
     });
   },
 };

@@ -61,8 +61,7 @@ module.exports = {
       }
 
       this.handler.state = bjUtils.getState(this.attributes);
-      bjUtils.emitResponse(this.emit, this.event.request.locale,
-            null, null, launchSpeech, reprompt);
+      bjUtils.emitResponse(this, null, null, launchSpeech, reprompt);
     });
   },
 };

@@ -24,7 +24,7 @@ module.exports = {
     // If the bet is non-numeric, refuse it
     if (isNaN(amount)) {
       const betError = res.strings.BAD_BET_FORMAT.replace('{0}', amount);
-      bjUtils.emitResponse(this.emit, this.event.request.locale, betError, null, null, null);
+      bjUtils.emitResponse(this, betError, null, null, null);
     } else {
       // Take the bet
       const action = {action: 'bet', amount: amount, firsthand: this.attributes['firsthand']};
@@ -46,8 +46,7 @@ module.exports = {
         }
 
         this.handler.state = bjUtils.getState(this.attributes);
-        bjUtils.emitResponse(this.emit, this.event.request.locale,
-          error, response, speech, reprompt);
+        bjUtils.emitResponse(this, error, response, speech, reprompt);
       });
     }
   },

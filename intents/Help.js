@@ -12,7 +12,7 @@ module.exports = {
   handleIntent: function() {
     // Help is different for tournament play
     if (this.attributes.currentGame === 'tournament') {
-      tournament.readHelp(this.emit, this.event.request.locale, this.attributes);
+      tournament.readHelp(this, this.attributes);
     } else {
       const res = require('../' + this.event.request.locale + '/resources');
       let speech = playgame.getContextualHelp(this.attributes, this.event.request.locale, true);
@@ -21,7 +21,7 @@ module.exports = {
       }
       speech = res.strings.HELP_ACHIEVEMENT_POINTS + speech;
 
-      bjUtils.emitResponse(this.emit, this.event.request.locale, null, null,
+      bjUtils.emitResponse(this, null, null,
           speech, speech, res.strings.HELP_CARD_TITLE,
           res.strings.HELP_CARD_PROGRESSIVE_TEXT +
           res.strings.HELP_ACHIEVEMENT_CARD_TEXT +

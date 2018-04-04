@@ -16,7 +16,7 @@ const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 let globalEvent;
 
 module.exports = {
-  emitResponse: function(emit, locale, error, response, speech, reprompt, cardTitle, cardText) {
+  emitResponse: function(context, error, response, speech, reprompt, cardTitle, cardText) {
     const formData = {};
 
     // Async call to save state and logs if necessary
@@ -52,16 +52,22 @@ module.exports = {
     }
 
     if (error) {
-      const res = require('./' + locale + '/resources');
+      const res = require('./' + context.event.request.locale + '/resources');
       console.log('Speech error: ' + error);
-      emit(':ask', error, res.ERROR_REPROMPT);
+      context.response.speak(error)
+        .listen(res.strings.ERROR_REPROMPT);
     } else if (response) {
-      emit(':tell', response);
+      context.response.speak(response);
     } else if (cardTitle) {
-      emit(':askWithCard', speech, reprompt, cardTitle, cardText);
+      context.response.speak(speech)
+        .listen(reprompt)
+        .cardRenderer(cardTitle, cardText);
     } else {
-      emit(':ask', speech, reprompt);
+      context.response.speak(speech)
+        .listen(reprompt);
     }
+
+    context.emit(':responseReady');
   },
   setEvent: function(event) {
     globalEvent = event;
