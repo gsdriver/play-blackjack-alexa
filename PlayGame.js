@@ -225,7 +225,7 @@ module.exports = {
 
 //
 // It's possible the game gets to a state where you have to reset the bankroll
-// or shuffle the deck.  Let's do that automatically for the user
+// and/or shuffle the deck.  Let's do that automatically for the user
 //
 function sendUserCallback(attributes, error, response, speech, reprompt, callback) {
   const game = attributes[attributes.currentGame];
@@ -235,20 +235,30 @@ function sendUserCallback(attributes, error, response, speech, reprompt, callbac
     if (game.possibleActions.indexOf('shuffle') > -1) {
       // Simplify things and just shuffle for them
       gameService.userAction(attributes, 'shuffle', 0, (err) => {
-        callback(error, response, speech, reprompt);
+        testReset();
       });
-      return;
-    } else if (game.possibleActions.indexOf('resetbankroll') > -1) {
-      // Simplify things and just shuffle for them if this is resetbankroll
-      gameService.userAction(attributes, 'resetbankroll', 0, (err) => {
-        callback(error, response, speech, reprompt);
-      });
-      return;
+    } else {
+      testReset();
     }
+
+    function testReset() {
+      if (game.possibleActions.indexOf('resetbankroll') > -1) {
+        // Simplify things and just shuffle for them if this is resetbankroll
+        gameService.userAction(attributes, 'resetbankroll', 0, (err) => {
+          sendCallback();
+        });
+      } else {
+        sendCallback();
+      }
+    }
+  } else {
+    sendCallback();
   }
 
-  // Nope, just do a regular callback
-  callback(error, response, speech, reprompt);
+  function sendCallback() {
+    // We're done and ready to callback
+    callback(error, response, speech, reprompt);
+  }
 }
 
 /*

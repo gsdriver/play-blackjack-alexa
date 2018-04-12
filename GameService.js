@@ -514,7 +514,10 @@ function setNextActions(game) {
           && ((game.bankroll - game.progressive.bet) >= game.rules.minBet)) {
         game.possibleActions.push('sidebet');
       }
-    } else {
+    }
+
+    // Shuffle if there aren't enough cards to play
+    if (game.deck.cards.length <= 20) {
       game.possibleActions.push('shuffle');
     }
 

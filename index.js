@@ -21,6 +21,7 @@ const Unhandled = require('./intents/Unhandled');
 const gameService = require('./GameService');
 const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
+const playgame = require('./PlayGame');
 const request = require('request');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
@@ -323,14 +324,28 @@ function initialize(attributes, locale, userId, callback) {
       game.canReset = true;
     }
 
-    // Now read the progressive jackpot amount
-    if (game.progressive) {
-      bjUtils.getProgressivePayout(attributes, (jackpot) => {
-        game.progressiveJackpot = jackpot;
-        callback();
+    // It's possible you are stuck in shuffle state if you ran out of cards
+    // and money at the same time - if so, let's fix that here
+    if (attributes && attributes.standard && attributes.standard.possibleActions
+      && (attributes.standard.possibleActions.indexOf('shuffle') > -1)) {
+      console.log('Player stuck in shuffle state!');
+      playgame.playBlackjackAction(attributes, locale, userId, {action: 'shuffle'}, () => {
+        getProgressive();
       });
     } else {
-      callback();
+      getProgressive();
+    }
+
+    function getProgressive() {
+      // Now read the progressive jackpot amount
+      if (game.progressive) {
+        bjUtils.getProgressivePayout(attributes, (jackpot) => {
+          game.progressiveJackpot = jackpot;
+          callback();
+        });
+      } else {
+        callback();
+      }
     }
   }
 }
