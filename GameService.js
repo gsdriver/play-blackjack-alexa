@@ -6,6 +6,7 @@
 const suggest = require('blackjack-strategy');
 const bjUtils = require('./BlackjackUtils.js');
 const request = require('request');
+const seedrandom = require('seedrandom');
 
 const STARTING_BANKROLL = 5000;
 
@@ -387,8 +388,16 @@ function shuffleDeck(game, newPlayer) {
   // 10 * number of cards times, and swap random pairs each iteration
   // Yeah, there are probably more elegant solutions but this should do the job
   for (i = 0; i < game.rules.numberOfDecks * 520; i++) {
-    const card1 = Math.floor(Math.random() * game.rules.numberOfDecks * 52);
-    const card2 = Math.floor(Math.random() * game.rules.numberOfDecks * 52);
+    const randomValue1 = seedrandom(i + game.userID + (game.timestamp ? game.timestamp : ''))();
+    const randomValue2 = seedrandom('A' + i + game.userID + (game.timestamp ? game.timestamp : ''))();
+    const card1 = Math.floor(randomValue1 * game.rules.numberOfDecks * 52);
+    const card2 = Math.floor(randomValue2 * game.rules.numberOfDecks * 52);
+    if (card1 == game.rules.numberOfDecks * 52) {
+      card1--;
+    }
+    if (card2 == game.rules.numberOfDecks * 52) {
+      card2--;
+    }
     const tempCard = game.deck.cards[card1];
 
     game.deck.cards[card1] = game.deck.cards[card2];
