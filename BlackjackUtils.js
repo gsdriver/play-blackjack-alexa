@@ -23,12 +23,6 @@ module.exports = {
   emitResponse: function(context, error, response, speech, reprompt, cardTitle, cardText) {
     const formData = {};
 
-    const start = Date.now();
-    displayTable(context, () => {
-      const end = Date.now();
-      console.log('Response in ' + (end - start));
-    });
-
     // Async call to save state and logs if necessary
     if (process.env.SAVELOG) {
       const result = (error) ? error : ((response) ? response : speech);
@@ -77,7 +71,9 @@ module.exports = {
         .listen(reprompt);
     }
 
-    context.emit(':responseReady');
+    displayTable(context, () => {
+      context.emit(':responseReady');
+    });
   },
   setEvent: function(event) {
     globalEvent = event;
@@ -291,49 +287,64 @@ function getAchievementScore(achievements) {
 function displayTable(context, callback) {
   if (context.event.context &&
       context.event.context.System.device.supportedInterfaces.Display) {
-    const game = context.attributes[context.attributes.currentGame];
-    const playerCards = game.playerHands.map((x) => x.cards);
-    let dealerCards = [];
+    if ((context.attributes.temp && context.attributes.temp.drawBoard)
+        || !(context.attributes.temp && context.attributes.temp.imageUrl)) {
+      if (!context.attributes.temp) {
+        context.attributes.temp = {};
+      }
+      context.attributes.temp.drawBoard = false;
+      context.attributes.display = true;
 
-    if (game.activePlayer !== 'none') {
-      dealerCards.push({rank: 1, suit: 'N'});
-      dealerCards.push(game.dealerHand.cards[1]);
-    } else {
-      dealerCards = game.dealerHand.cards;
-    }
+      const start = Date.now();
+      const game = context.attributes[context.attributes.currentGame];
+      const playerCards = game.playerHands.map((x) => x.cards);
+      let dealerCards = [];
 
-    const params = {};
-    params.userId = context.event.session.user.userId;
-    params.game = 'blackjack';
-    params.dealer = JSON.stringify(dealerCards);
-    params.player = JSON.stringify(playerCards);
-    const urlPath = process.env.IMAGEURL + querystring.stringify(params);
+      if (game.activePlayer !== 'none') {
+        dealerCards.push({rank: 1, suit: 'N'});
+        dealerCards.push(game.dealerHand.cards[1]);
+      } else {
+        dealerCards = game.dealerHand.cards;
+      }
 
-    request(
-      {
-        uri: urlPath,
-        method: 'GET',
-        timeout: 2000,
-      }, (err, response, body) => {
+      const formData = {};
+      formData.userId = context.event.session.user.userId;
+      formData.dealer = JSON.stringify(dealerCards);
+      formData.player = JSON.stringify(playerCards);
+      const params = {
+        url: process.env.SERVICEURL + 'blackjack/drawImage',
+        formData: formData,
+        timeout: 3000,
+      };
+
+      request.post(params, (err, res, body) => {
         if (err) {
+          console.log(err);
           callback(err);
         } else {
-          const tableFile = JSON.parse(body).file;
-          console.log(tableFile);
-
-          // Use this as the background image
-          const builder = new Alexa.templateBuilders.BodyTemplate6Builder();
-          const template = builder.setTitle('')
-                      .setBackgroundImage(makeImage(tableFile))
-                      .setTextContent(makePlainText(''))
-                      .setBackButtonBehavior('HIDDEN')
-                      .build();
-
-          context.response.renderTemplate(template);
-          context.attributes.display = true;
-          callback();
+          context.attributes.temp.imageUrl = JSON.parse(body).file;
+          const end = Date.now();
+          console.log('Drawing table took ' + (end - start) + ' ms');
+          done();
         }
-    });
+      });
+    } else {
+      // Just re-use the image URL from last time
+      done();
+    }
+
+    function done() {
+      // Use this as the background image
+      const builder = new Alexa.templateBuilders.BodyTemplate6Builder();
+      const template = builder.setTitle('')
+                  .setBackgroundImage(makeImage(context.attributes.temp.imageUrl))
+                  .setTextContent(makePlainText(''))
+                  .setBackButtonBehavior('HIDDEN')
+                  .build();
+
+      context.response.renderTemplate(template);
+      callback();
+    }
   } else {
     // Not a display device
     callback();
