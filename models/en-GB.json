@@ -72,6 +72,7 @@
         },
         {
           "name": "PlaceSideBetIntent",
+          "slots": [],
           "samples": [
             "place side bet",
             "place a side bet",
@@ -92,6 +93,7 @@
         },
         {
           "name": "RemoveSideBetIntent",
+          "slots": [],
           "samples": [
             "remove side bet",
             "remove a side bet",
@@ -112,6 +114,7 @@
         },
         {
           "name": "RulesIntent",
+          "slots": [],
           "samples": [
             "read rules",
             "read the rules",
@@ -135,6 +138,7 @@
         },
         {
           "name": "ResetIntent",
+          "slots": [],
           "samples": [
             "reset game",
             "reset bankroll",
@@ -172,6 +176,7 @@
         },
         {
           "name": "SuggestIntent",
+          "slots": [],
           "samples": [
             "what should I do",
             "give suggestion",
@@ -189,6 +194,7 @@
         },
         {
           "name": "EnableTrainingIntent",
+          "slots": [],
           "samples": [
             "turn on training mode",
             "enter training mode",
@@ -208,6 +214,7 @@
         },
         {
           "name": "DisableTrainingIntent",
+          "slots": [],
           "samples": [
             "turn off training mode",
             "exit training mode",
@@ -225,6 +232,7 @@
         },
         {
           "name": "HighScoreIntent",
+          "slots": [],
           "samples": [
             "read high scores",
             "tell me high scores",
@@ -236,26 +244,77 @@
           ]
         },
         {
-          "name": "AMAZON.HelpIntent"
+          "name": "AMAZON.HelpIntent",
+          "samples": []
         },
         {
-          "name": "AMAZON.StopIntent"
+          "name": "AMAZON.StopIntent",
+          "samples": []
         },
         {
-          "name": "AMAZON.CancelIntent"
+          "name": "AMAZON.CancelIntent",
+          "samples": []
         },
         {
-          "name": "AMAZON.RepeatIntent"
+          "name": "AMAZON.RepeatIntent",
+          "samples": []
         },
         {
-          "name": "AMAZON.YesIntent"
+          "name": "AMAZON.YesIntent",
+          "samples": []
         },
         {
-          "name": "AMAZON.NoIntent"
+          "name": "AMAZON.NoIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.MoreIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateSettingsIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NextIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageUpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PreviousIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollRightIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollLeftIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollUpIntent",
+          "samples": []
         }
       ],
       "types": [
         {
+          "name": "LIST_OF_ACTION",
           "values": [
             {
               "name": {
@@ -322,10 +381,10 @@
                 "value": "deal"
               }
             }
-          ],
-          "name": "LIST_OF_ACTION"
+          ]
         },
         {
+          "name": "LIST_OF_RULES_OPTIONS",
           "values": [
             {
               "name": {
@@ -432,10 +491,10 @@
                 "value": "split hands"
               }
             }
-          ],
-          "name": "LIST_OF_RULES_OPTIONS"
+          ]
         },
         {
+          "name": "LIST_OF_RULE_VALUES",
           "values": [
             {
               "name": {
@@ -557,8 +616,7 @@
                 "value": "eight"
               }
             }
-          ],
-          "name": "LIST_OF_RULE_VALUES"
+          ]
         }
       ]
     }

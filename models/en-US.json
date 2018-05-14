@@ -8,7 +8,7 @@
           "slots": [
             {
               "name": "Action",
-              "type": "LIST_OF_ACTION"
+              "type": "LIST_OF_ACTIONS"
             }
           ],
           "samples": [
@@ -152,7 +152,7 @@
           "slots": [
             {
               "name": "Change",
-              "type": "LIST_OF_RULES_OPTIONS"
+              "type": "LIST_OF_RULE_OPTIONS"
             },
             {
               "name": "ChangeOption",
@@ -236,22 +236,72 @@
           ]
         },
         {
-          "name": "AMAZON.HelpIntent"
+          "name": "AMAZON.HelpIntent",
+          "samples": []
         },
         {
-          "name": "AMAZON.StopIntent"
+          "name": "AMAZON.StopIntent",
+          "samples": []
         },
         {
-          "name": "AMAZON.CancelIntent"
+          "name": "AMAZON.CancelIntent",
+          "samples": []
         },
         {
-          "name": "AMAZON.RepeatIntent"
+          "name": "AMAZON.RepeatIntent",
+          "samples": []
         },
         {
-          "name": "AMAZON.YesIntent"
+          "name": "AMAZON.YesIntent",
+          "samples": []
         },
         {
-          "name": "AMAZON.NoIntent"
+          "name": "AMAZON.NoIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.MoreIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateSettingsIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NextIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageUpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PreviousIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollRightIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollLeftIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollUpIntent",
+          "samples": []
         }
       ],
       "types": [
@@ -323,7 +373,7 @@
               }
             }
           ],
-          "name": "LIST_OF_ACTION"
+          "name": "LIST_OF_ACTIONS"
         },
         {
           "values": [
@@ -433,7 +483,7 @@
               }
             }
           ],
-          "name": "LIST_OF_RULES_OPTIONS"
+          "name": "LIST_OF_RULE_OPTIONS"
         },
         {
           "values": [

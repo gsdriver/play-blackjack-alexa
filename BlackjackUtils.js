@@ -5,6 +5,10 @@
 'use strict';
 
 const AWS = require('aws-sdk');
+const Alexa = require('alexa-sdk');
+// utility methods for creating Image and TextField objects
+const makePlainText = Alexa.utils.TextUtils.makePlainText;
+const makeImage = Alexa.utils.ImageUtils.makeImage;
 AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 const speechUtils = require('alexa-speech-utils')();
@@ -18,6 +22,12 @@ let globalEvent;
 module.exports = {
   emitResponse: function(context, error, response, speech, reprompt, cardTitle, cardText) {
     const formData = {};
+
+    const start = Date.now();
+    displayTable(context, () => {
+      const end = Date.now();
+      console.log('Response in ' + (end - start));
+    });
 
     // Async call to save state and logs if necessary
     if (process.env.SAVELOG) {
@@ -276,4 +286,56 @@ function getAchievementScore(achievements) {
   }
 
   return achievementScore;
+}
+
+function displayTable(context, callback) {
+  if (context.event.context &&
+      context.event.context.System.device.supportedInterfaces.Display) {
+    const game = context.attributes[context.attributes.currentGame];
+    const playerCards = game.playerHands.map((x) => x.cards);
+    let dealerCards = [];
+
+    if (game.activePlayer !== 'none') {
+      dealerCards.push({rank: 1, suit: 'N'});
+      dealerCards.push(game.dealerHand.cards[1]);
+    } else {
+      dealerCards = game.dealerHand.cards;
+    }
+
+    const params = {};
+    params.userId = context.event.session.user.userId;
+    params.game = 'blackjack';
+    params.dealer = JSON.stringify(dealerCards);
+    params.player = JSON.stringify(playerCards);
+    const urlPath = process.env.IMAGEURL + querystring.stringify(params);
+
+    request(
+      {
+        uri: urlPath,
+        method: 'GET',
+        timeout: 2000,
+      }, (err, response, body) => {
+        if (err) {
+          callback(err);
+        } else {
+          const tableFile = JSON.parse(body).file;
+          console.log(tableFile);
+
+          // Use this as the background image
+          const builder = new Alexa.templateBuilders.BodyTemplate6Builder();
+          const template = builder.setTitle('')
+                      .setBackgroundImage(makeImage(tableFile))
+                      .setTextContent(makePlainText(''))
+                      .setBackButtonBehavior('HIDDEN')
+                      .build();
+
+          context.response.renderTemplate(template);
+          context.attributes.display = true;
+          callback();
+        }
+    });
+  } else {
+    // Not a display device
+    callback();
+  }
 }
