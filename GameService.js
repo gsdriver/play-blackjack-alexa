@@ -100,6 +100,11 @@ module.exports = {
   getRecommendedAction: function(game) {
     // Only make a suggestion if the game is still in play (the player's turn)
     if (game.activePlayer == 'player') {
+      // If there is only one possible action, return that
+      if (game.possibleActions.length == 1) {
+        return game.possibleActions[0];
+      }
+
       const playerCards = game.playerHands[game.currentPlayerHand].cards.map(
             (card) => ((card.rank) > 10 ? 10 : card.rank));
 
