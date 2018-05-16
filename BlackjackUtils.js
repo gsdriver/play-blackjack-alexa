@@ -298,19 +298,15 @@ function displayTable(context, callback) {
       const start = Date.now();
       const game = context.attributes[context.attributes.currentGame];
       const playerCards = game.playerHands.map((x) => x.cards);
-      let dealerCards = [];
-
-      if (game.activePlayer !== 'none') {
-        dealerCards.push({rank: 1, suit: 'N'});
-        dealerCards.push(game.dealerHand.cards[1]);
-      } else {
-        dealerCards = game.dealerHand.cards;
+      const formData = {
+        dealer: JSON.stringify(game.dealerHand.cards),
+        player: JSON.stringify(playerCards),
+        nextCards: JSON.stringify(game.deck.cards.slice(0, 4)),
+      };
+      if (game.activePlayer == 'none') {
+        formData.showHoleCard = 'true';
       }
 
-      const formData = {};
-      formData.userId = context.event.session.user.userId;
-      formData.dealer = JSON.stringify(dealerCards);
-      formData.player = JSON.stringify(playerCards);
       const params = {
         url: process.env.SERVICEURL + 'blackjack/drawImage',
         formData: formData,
