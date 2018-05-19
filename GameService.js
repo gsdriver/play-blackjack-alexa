@@ -45,6 +45,8 @@ module.exports = {
 
     // Start by shuffling the deck
     shuffleDeck(game, attributes.newUser);
+    game.dealerHand.cards = [];
+    game.playerHands = [];
 
     // Get the next possible actions
     setNextActions(game);
@@ -81,8 +83,11 @@ module.exports = {
        timestamp: Date.now(),
     };
 
-    shuffleDeck(attributes['tournament']);
-    setNextActions(attributes['tournament']);
+    const game = attributes['tournament'];
+    shuffleDeck(game);
+    game.dealerHand.cards = [];
+    game.playerHands = [];
+    setNextActions(game);
     attributes.currentGame = 'tournament';
   },
   // Determines if this is the initial game state or not
@@ -419,8 +424,6 @@ function shuffleDeck(game, newPlayer) {
 
   // Clear out all hands
   game.activePlayer = 'none';
-  game.dealerHand.cards = [];
-  game.playerHands = [];
 }
 
 function setNextActions(game) {
