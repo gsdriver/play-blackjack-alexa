@@ -172,6 +172,7 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
+  'AMAZON.YesIntent': Blackjack.handleYesIntent,
   'Unhandled': Unhandled.handleIntent,
   'SessionEndedRequest': function() {
     saveState(this.event.session.user.userId, this.attributes);
