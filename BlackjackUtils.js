@@ -5,6 +5,10 @@
 'use strict';
 
 const AWS = require('aws-sdk');
+const Alexa = require('alexa-sdk');
+// utility methods for creating Image and TextField objects
+const makePlainText = Alexa.utils.TextUtils.makePlainText;
+const makeImage = Alexa.utils.ImageUtils.makeImage;
 AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 const speechUtils = require('alexa-speech-utils')();
@@ -67,7 +71,9 @@ module.exports = {
         .listen(reprompt);
     }
 
-    context.emit(':responseReady');
+    displayTable(context, () => {
+      context.emit(':responseReady');
+    });
   },
   setEvent: function(event) {
     globalEvent = event;
@@ -94,7 +100,7 @@ module.exports = {
     const res = require('./' + locale + '/resources');
     const game = attributes[attributes.currentGame];
     let text;
-    const achievementScore = getAchievementScore(attributes.achievements);
+    const achievementScore = module.exports.getAchievementScore(attributes.achievements);
 
     if (achievementScore) {
       text = res.strings.READ_BANKROLL_WITH_ACHIEVEMENT.replace('{0}', game.bankroll).replace('{1}', achievementScore);
@@ -174,7 +180,7 @@ module.exports = {
     const scoreType = (attributes.currentGame === 'tournament') ? 'bankroll' : 'achievement';
     let leaderURL = process.env.SERVICEURL + 'blackjack/leaders';
     const myScore = (scoreType === 'achievement') ?
-            getAchievementScore(attributes.achievements) : game[scoreType];
+            module.exports.getAchievementScore(attributes.achievements) : game[scoreType];
     let speech = '';
     const params = {};
 
@@ -210,7 +216,7 @@ module.exports = {
             speech += ((scoreType === 'bankroll') ? res.strings.LEADER_BANKROLL_RANKING : res.strings.LEADER_RANKING)
               .replace('{0}', myScore)
               .replace('{1}', leaders.rank)
-              .replace('{2}', leaders.count);
+              .replace('{2}', roundPlayers(locale, leaders.count));
           }
 
           // And what is the leader board?
@@ -255,25 +261,98 @@ module.exports = {
       callback();
     });
   },
+  getAchievementScore: function(achievements) {
+    let achievementScore = 0;
+
+    if (achievements) {
+      if (achievements.trophy) {
+        achievementScore += 100 * achievements.trophy;
+      }
+      if (achievements.daysPlayed) {
+        achievementScore += 10 * achievements.daysPlayed;
+      }
+      if (achievements.naturals) {
+        achievementScore += 5 * achievements.naturals;
+      }
+      if (achievements.streakScore) {
+        achievementScore += achievements.streakScore;
+      }
+    }
+
+    return achievementScore;
+  },
 };
 
-function getAchievementScore(achievements) {
-  let achievementScore = 0;
+function displayTable(context, callback) {
+  if (context.event.context &&
+      context.event.context.System.device.supportedInterfaces.Display) {
+    if ((context.attributes.temp && context.attributes.temp.drawBoard)
+        || !(context.attributes.temp && context.attributes.temp.imageUrl)) {
+      if (!context.attributes.temp) {
+        context.attributes.temp = {};
+      }
+      context.attributes.temp.drawBoard = false;
+      context.attributes.display = true;
 
-  if (achievements) {
-    if (achievements.trophy) {
-      achievementScore += 100 * achievements.trophy;
+      const start = Date.now();
+      const game = context.attributes[context.attributes.currentGame];
+      const playerCards = game.playerHands.map((x) => x.cards);
+      const formData = {
+        dealer: JSON.stringify(game.dealerHand.cards),
+        player: JSON.stringify(playerCards),
+        nextCards: JSON.stringify(game.deck.cards.slice(0, 4)),
+      };
+      if (game.activePlayer == 'none') {
+        formData.showHoleCard = 'true';
+      }
+
+      const params = {
+        url: process.env.SERVICEURL + 'blackjack/drawImage',
+        formData: formData,
+        timeout: 3000,
+      };
+
+      request.post(params, (err, res, body) => {
+        if (err) {
+          console.log(err);
+          callback(err);
+        } else {
+          context.attributes.temp.imageUrl = JSON.parse(body).file;
+          const end = Date.now();
+          console.log('Drawing table took ' + (end - start) + ' ms');
+          done();
+        }
+      });
+    } else {
+      // Just re-use the image URL from last time
+      done();
     }
-    if (achievements.daysPlayed) {
-      achievementScore += 10 * achievements.daysPlayed;
+
+    function done() {
+      // Use this as the background image
+      const builder = new Alexa.templateBuilders.BodyTemplate6Builder();
+      const template = builder.setTitle('')
+                  .setBackgroundImage(makeImage(context.attributes.temp.imageUrl))
+                  .setTextContent(makePlainText(''))
+                  .setBackButtonBehavior('HIDDEN')
+                  .build();
+
+      context.response.renderTemplate(template);
+      callback();
     }
-    if (achievements.naturals) {
-      achievementScore += 5 * achievements.naturals;
-    }
-    if (achievements.streakScore) {
-      achievementScore += achievements.streakScore;
-    }
+  } else {
+    // Not a display device
+    callback();
   }
+}
 
-  return achievementScore;
+function roundPlayers(locale, playerCount) {
+  const res = require('./' + locale + '/resources');
+
+  if (playerCount < 200) {
+    return playerCount;
+  } else {
+    // "Over" to the nearest hundred
+    return res.strings.MORE_THAN_PLAYERS.replace('{0}', 100 * Math.floor(playerCount / 100));
+  }
 }

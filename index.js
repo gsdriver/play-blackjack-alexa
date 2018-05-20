@@ -42,6 +42,7 @@ const suggestHandlers = Alexa.CreateStateHandler('SUGGESTION', {
   'DisableTrainingIntent': Training.handleDisableIntent,
   'RulesIntent': Rules.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
+  'AMAZON.FallbackIntent': Repeat.handleIntent,
   'AMAZON.YesIntent': TakeSuggestion.handleYesIntent,
   'AMAZON.NoIntent': TakeSuggestion.handleNoIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -61,6 +62,9 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   'HighScoreIntent': HighScore.handleIntent,
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
+  'AMAZON.FallbackIntent': Reset.handleRepeat,
+  'AMAZON.RepeatIntent': Reset.handleRepeat,
+  'AMAZON.HelpIntent': Reset.handleRepeat,
   'AMAZON.YesIntent': Reset.handleYesReset,
   'AMAZON.NoIntent': Reset.handleNoReset,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -88,6 +92,7 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'DisableTrainingIntent': Training.handleDisableIntent,
   'AMAZON.YesIntent': Betting.handleIntent,
   'AMAZON.NoIntent': Exit.handleIntent,
+  'AMAZON.FallbackIntent': Repeat.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -115,6 +120,7 @@ const firstTimeHandlers = Alexa.CreateStateHandler('FIRSTTIMEPLAYER', {
   'DisableTrainingIntent': Training.handleDisableIntent,
   'AMAZON.YesIntent': Betting.handleIntent,
   'AMAZON.NoIntent': Exit.handleIntent,
+  'AMAZON.FallbackIntent': Repeat.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -138,6 +144,7 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'DisableTrainingIntent': Training.handleDisableIntent,
   'AMAZON.YesIntent': TakeInsurance.handleIntent,
   'AMAZON.NoIntent': DeclineInsurance.handleIntent,
+  'AMAZON.FallbackIntent': Repeat.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -160,10 +167,12 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'HighScoreIntent': HighScore.handleIntent,
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
+  'AMAZON.FallbackIntent': Repeat.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
+  'AMAZON.YesIntent': Blackjack.handleYesIntent,
   'Unhandled': Unhandled.handleIntent,
   'SessionEndedRequest': function() {
     saveState(this.event.session.user.userId, this.attributes);
@@ -289,11 +298,9 @@ function runGame(event, context, callback) {
 function initialize(attributes, locale, userId, callback) {
   // Some initiatlization
   attributes.playerLocale = locale;
-  attributes.numRounds = (attributes.numRounds)
-            ? (attributes.numRounds + 1) : 1;
-  attributes.firsthand = true;
-  attributes.readProgressive = undefined;
+  attributes.numRounds = (attributes.numRounds + 1) || 1;
   attributes.newUser = newUser;
+  attributes.temp = {firsthand: true};
 
   // If they don't have a game, create one
   if (!attributes.currentGame) {

@@ -6,6 +6,7 @@
 
 const gameService = require('../GameService');
 const bjUtils = require('../BlackjackUtils');
+const playgame = require('../PlayGame');
 
 module.exports = {
   handleIntent: function() {
@@ -44,5 +45,13 @@ module.exports = {
     this.handler.state = 'NEWGAME';
     bjUtils.emitResponse(this, null, null,
             res.strings.RESET_ABORTED, res.strings.RESET_REPROMPT);
+  },
+  handleRepeat: function() {
+    // Just repeat the reset instruction
+    const res = require('../' + this.event.request.locale + '/resources');
+    const reprompt = playgame.getContextualHelp(this);
+    const speech = res.strings.RESET_CONFIRM + ' ' + reprompt;
+
+    bjUtils.emitResponse(this, null, null, speech, reprompt);
   },
 };

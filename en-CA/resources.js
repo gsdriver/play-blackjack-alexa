@@ -10,7 +10,7 @@ const resources = {
   // From Betting.js
   'BAD_BET_FORMAT': 'Unable to place a bet for {0}',
   // From SideBet.js
-  'SIDEBET_PLACED': '${0} side bet placed. The side bet will remain in play until you say remove side bet. ',
+  'SIDEBET_PLACED': '${0} side bet placed for the ${1} progressive jackpot. The side bet will remain in play until you say remove side bet. ',
   'SIDEBET_REMOVED': 'Side bet removed. ',
   // From Blackjack.js
   'BLACKJACKINTENT_NO_ACTION': 'I\'m sorry, I didn\'t catch that action. Please say what you want to do on this hand like hit or stand. What else can I help with?',
@@ -57,6 +57,7 @@ const resources = {
   'TRAINING_REPROMPT': 'What can I help you with?',
   // From PlayGame.js
   'PROMPT_TRAINING': 'You can say enter training mode if you would like me to tell you when your play differs from Basic Strategy',
+  'PROMPT_LEADER_BOARD': 'You can say read high scores to hear the leader board. ',
   'PROACTIVE_SUGGESTION': ' I\'ve noticed you haven\'t {0} recently and wanted to remind you that the book would say you should {1} on this hand.',
   'SUGGEST_OPTIONS': 'You should {0}|The book says you should {0}|The book would tell you to {0}|According to Basic Strategy you should {0}|The book would suggest that you {0}|I think you should {0}|Basic Strategy would suggest you {0}',
   'SUGGEST_TURNOVER': 'I can\'t give a suggestion when the game is over',
@@ -133,9 +134,11 @@ const resources = {
   'SIDEBET_LOST': 'Your side bet lost. ',
   'LOST_SINGLEHAND_AND_SIDEBET': 'You lost your hand and your side bet. ',
   'LOST_MULTIPLEHANDS_AND_SIDEBET': 'You lost all your hands and your side bet. ',
-  'WINNING_STREAK': 'That\'s {0} wins in a row earning you {1} achievement points! ',
-  'FIRST_DAILY_HAND': 'You earned 10 achievement points for your first hand of the day. ',
-  'NATURAL_BLACKJACK': 'A natural blackjack gives you 5 achievement points. ',
+  'WINNING_STREAK': '{1} points for {0} wins in a row',
+  'FIRST_DAILY_HAND': '10 points for your first hand of the day',
+  'NATURAL_BLACKJACK': '5 points for a natural blackjack ',
+  'POINTS_EARNED_SCORE': 'You earned {0} giving you {1} achievement points. ',
+  'POINTS_EARNED_NOSCORE': 'You earned {0}. ',
   'SIDEBET_ONESEVEN': 'Your first card was a seven winning ${0} on the side bet. ',
   'SIDEBET_TWOSEVENS': 'Your first two cards were sevens winning ${0} on the side bet. ',
   'SIDEBET_PROGRESSIVE': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your first three cards were sevens! You won the progressive jackpot of ${0}! ',
@@ -146,6 +149,7 @@ const resources = {
   'LEADER_BANKROLL_FORMAT': '${0}',
   'LEADER_TOP_BANKROLLS': 'The top {0} bankrolls are ',
   'LEADER_ACHIEVEMENT_HELP': ' <break time=\'300ms\'/> Ask for help to hear how you earn achievement points',
+  'MORE_THAN_PLAYERS': 'over {0}',
   // From Tournament.js
   'TOURNAMENT_NOCHANGERULES': 'Sorry, you can\'t change the rules during tournament play. ',
   'TOURNAMENT_NORESET': 'Sorry, you can\'t reset your bankroll during tournament play. What else can I help you with?',

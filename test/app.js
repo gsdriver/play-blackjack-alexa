@@ -6,6 +6,7 @@ const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 const USERID = 'not-amazon';
+const DEVICEID= 'not-amazon';
 
 function BuildEvent(argv)
 {
@@ -46,8 +47,34 @@ function BuildEvent(argv)
          "timestamp": "2016-11-03T21:31:08Z",
          "intent": {}
        },
-       "version": "1.0"
-     };
+       "version": "1.0",
+       "context": {
+         "AudioPlayer": {
+           "playerActivity": "IDLE"
+         },
+         "Display": {},
+         "System": {
+           "application": {
+             "applicationId": "amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce"
+           },
+           "user": {
+             "userId": USERID,
+           },
+           "device": {
+             "deviceId": DEVICEID,
+             "supportedInterfaces": {
+               "AudioPlayer": {},
+               "Display": {
+                 "templateVersion": "1.0",
+                 "markupVersion": "1.0"
+               }
+             }
+           },
+           "apiEndpoint": "https://api.amazonalexa.com",
+           "apiAccessToken": "",
+         }
+       },
+   };
 
     var openEvent = {
        "session": {
@@ -68,7 +95,33 @@ function BuildEvent(argv)
          "timestamp": "2016-11-03T21:31:08Z",
          "intent": {}
        },
-       "version": "1.0"
+       "version": "1.0",
+       "context": {
+         "AudioPlayer": {
+           "playerActivity": "IDLE"
+         },
+         "Display": {},
+         "System": {
+           "application": {
+             "applicationId": "amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce"
+           },
+           "user": {
+             "userId": USERID,
+           },
+           "device": {
+             "deviceId": DEVICEID,
+             "supportedInterfaces": {
+               "AudioPlayer": {},
+               "Display": {
+                 "templateVersion": "1.0",
+                 "markupVersion": "1.0"
+               }
+             }
+           },
+           "apiEndpoint": "https://api.amazonalexa.com",
+           "apiAccessToken": "",
+         }
+       },
     };
 
     // If there is an attributes.txt file, read the attributes from there

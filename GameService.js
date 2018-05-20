@@ -44,7 +44,9 @@ module.exports = {
     };
 
     // Start by shuffling the deck
-    shuffleDeck(game, attributes.newUser);
+    shuffleDeck(game);
+    game.dealerHand.cards = [];
+    game.playerHands = [];
 
     // Get the next possible actions
     setNextActions(game);
@@ -81,8 +83,11 @@ module.exports = {
        timestamp: Date.now(),
     };
 
-    shuffleDeck(attributes['tournament']);
-    setNextActions(attributes['tournament']);
+    const game = attributes['tournament'];
+    shuffleDeck(game);
+    game.dealerHand.cards = [];
+    game.playerHands = [];
+    setNextActions(game);
     attributes.currentGame = 'tournament';
   },
   // Determines if this is the initial game state or not
@@ -100,6 +105,11 @@ module.exports = {
   getRecommendedAction: function(game) {
     // Only make a suggestion if the game is still in play (the player's turn)
     if (game.activePlayer == 'player') {
+      // If there is only one possible action, return that
+      if (game.possibleActions.length == 1) {
+        return game.possibleActions[0];
+      }
+
       const playerCards = game.playerHands[game.currentPlayerHand].cards.map(
             (card) => ((card.rank) > 10 ? 10 : card.rank));
 
@@ -369,7 +379,7 @@ function deal(attributes, betAmount) {
   }
 }
 
-function shuffleDeck(game, newPlayer) {
+function shuffleDeck(game) {
   // Start by initializing the deck
   let i;
   let rank;
@@ -404,18 +414,8 @@ function shuffleDeck(game, newPlayer) {
     game.deck.cards[card2] = tempCard;
   }
 
-  // If this is a brand-new player, we'll guarantee a win
-  if (newPlayer) {
-    game.deck.cards.unshift({'rank': 7, 'suit': 'C'});
-    game.deck.cards.unshift({'rank': 9, 'suit': 'S'});
-    game.deck.cards.unshift({'rank': 11, 'suit': 'D'});
-    game.deck.cards.unshift({'rank': 10, 'suit': 'C'});
-  }
-
   // Clear out all hands
   game.activePlayer = 'none';
-  game.dealerHand.cards = [];
-  game.playerHands = [];
 }
 
 function setNextActions(game) {

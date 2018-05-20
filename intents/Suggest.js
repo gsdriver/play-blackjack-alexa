@@ -9,6 +9,7 @@ const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
   handleIntent: function() {
+    this.attributes.suggestRequests = (this.attributes.suggestRequests + 1) || 1;
     playgame.playBlackjackAction(this.attributes,
       this.event.request.locale,
       this.event.session.user.userId, {action: 'suggest'},

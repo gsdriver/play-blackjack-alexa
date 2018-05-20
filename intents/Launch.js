@@ -6,8 +6,6 @@
 
 const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
-const gameService = require('../GameService');
-const speechUtils = require('alexa-speech-utils')();
 
 module.exports = {
   handleIntent: function() {
@@ -20,14 +18,8 @@ module.exports = {
     }
     const game = this.attributes[this.attributes.currentGame];
 
-    // Note that this is first hand (so we will say more on the first bet)
-    if (game.progressiveJackpot && !this.attributes.newUser) {
-      launchSpeech = res.strings.LAUNCH_WELCOME.replace('{0}', game.progressiveJackpot);
-      this.attributes.readProgressive = true;
-    } else {
-      launchSpeech = res.strings.LAUNCH_WELCOME_NOJACKPOT;
-    }
-
+    // Try to keep it simple
+    launchSpeech = res.strings.LAUNCH_WELCOME_NOJACKPOT;
     if (this.attributes.tournamentResult) {
       launchSpeech = this.attributes.tournamentResult + launchSpeech;
       this.attributes.tournamentResult = undefined;
@@ -35,29 +27,11 @@ module.exports = {
 
     // Figure out what the current game state is - give them option to reset
     playgame.readCurrentHand(this.attributes, this.event.request.locale, (speech, reprompt) => {
-      // Tell them how much money they are starting with
       if (game.activePlayer === 'player') {
+        // They are in the middle of a hand; remind them what they have
         launchSpeech += speech;
       } else {
-        const options = [res.strings.LAUNCH_START_GAME];
-
-        if (!this.attributes.newUser) {
-          if (game.possibleActions && (game.possibleActions.indexOf('sidebet') > 0)) {
-            options.push(res.strings.LAUNCH_START_PLACE_SIDEBET);
-          }
-          if (game.possibleActions && (game.possibleActions.indexOf('nosidebet') > 0)) {
-            options.push(res.strings.LAUNCH_START_REMOVE_SIDEBET);
-          }
-          if (!gameService.isDefaultGame(this.attributes)) {
-            options.push(res.strings.LAUNCH_START_RESET);
-          }
-          options.push(res.strings.LAUNCH_START_HIGH_SCORES);
-        } else {
-          options.push(res.strings.LAUNCH_ENABLE_TRAINING);
-        }
-
-        launchSpeech += bjUtils.readBankroll(this.event.request.locale, this.attributes);
-        launchSpeech += speechUtils.or(options, {pause: '300ms'});
+        launchSpeech += res.strings.LAUNCH_START_GAME;
       }
 
       this.handler.state = bjUtils.getState(this.attributes);

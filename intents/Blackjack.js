@@ -35,4 +35,23 @@ module.exports = {
       });
     }
   },
+  handleYesIntent: function() {
+    // Valid if there is only one option - otherwise, repeat and ask for clarification
+    const game = this.attributes[this.attributes.currentGame];
+
+    if (game.possibleActions && (game.possibleActions.length == 1)) {
+      // Play this action
+      const actionObj = {action: game.possibleActions[0]};
+      playgame.playBlackjackAction(this.attributes,
+          this.event.request.locale,
+          this.event.session.user.userId,
+          actionObj, (error, response, speech, reprompt) => {
+          this.handler.state = bjUtils.getState(this.attributes);
+        bjUtils.emitResponse(this, error, response, speech, reprompt);
+      });
+    } else {
+      // Ambiguous - punt to unhandled
+      this.emit('Unhandled');
+    }
+  },
 };
