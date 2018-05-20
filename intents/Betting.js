@@ -27,13 +27,13 @@ module.exports = {
       bjUtils.emitResponse(this, betError, null, null, null);
     } else {
       // Take the bet
-      const action = {action: 'bet', amount: amount, firsthand: this.attributes['firsthand']};
+      const action = {action: 'bet', amount: amount, firsthand: this.attributes.temp.firsthand};
 
       playgame.playBlackjackAction(this.attributes, this.event.request.locale,
         this.event.session.user.userId, action,
         (error, response, speech, reprompt) => {
         if (!error) {
-          this.attributes['firsthand'] = undefined;
+          this.attributes.temp.firsthand = undefined;
           if (game.timestamp) {
             const lastPlay = new Date(game.timestamp);
             const now = new Date(Date.now());

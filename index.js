@@ -297,11 +297,9 @@ function runGame(event, context, callback) {
 function initialize(attributes, locale, userId, callback) {
   // Some initiatlization
   attributes.playerLocale = locale;
-  attributes.numRounds = (attributes.numRounds)
-            ? (attributes.numRounds + 1) : 1;
-  attributes.firsthand = true;
-  attributes.readProgressive = undefined;
+  attributes.numRounds = (attributes.numRounds + 1) || 1;
   attributes.newUser = newUser;
+  attributes.temp = {firsthand: true};
 
   // If they don't have a game, create one
   if (!attributes.currentGame) {

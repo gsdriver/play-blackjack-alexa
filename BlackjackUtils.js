@@ -100,7 +100,7 @@ module.exports = {
     const res = require('./' + locale + '/resources');
     const game = attributes[attributes.currentGame];
     let text;
-    const achievementScore = getAchievementScore(attributes.achievements);
+    const achievementScore = module.exports.getAchievementScore(attributes.achievements);
 
     if (achievementScore) {
       text = res.strings.READ_BANKROLL_WITH_ACHIEVEMENT.replace('{0}', game.bankroll).replace('{1}', achievementScore);
@@ -180,7 +180,7 @@ module.exports = {
     const scoreType = (attributes.currentGame === 'tournament') ? 'bankroll' : 'achievement';
     let leaderURL = process.env.SERVICEURL + 'blackjack/leaders';
     const myScore = (scoreType === 'achievement') ?
-            getAchievementScore(attributes.achievements) : game[scoreType];
+            module.exports.getAchievementScore(attributes.achievements) : game[scoreType];
     let speech = '';
     const params = {};
 
@@ -216,7 +216,7 @@ module.exports = {
             speech += ((scoreType === 'bankroll') ? res.strings.LEADER_BANKROLL_RANKING : res.strings.LEADER_RANKING)
               .replace('{0}', myScore)
               .replace('{1}', leaders.rank)
-              .replace('{2}', leaders.count);
+              .replace('{2}', roundPlayers(locale, leaders.count));
           }
 
           // And what is the leader board?
@@ -261,28 +261,27 @@ module.exports = {
       callback();
     });
   },
+  getAchievementScore: function(achievements) {
+    let achievementScore = 0;
+
+    if (achievements) {
+      if (achievements.trophy) {
+        achievementScore += 100 * achievements.trophy;
+      }
+      if (achievements.daysPlayed) {
+        achievementScore += 10 * achievements.daysPlayed;
+      }
+      if (achievements.naturals) {
+        achievementScore += 5 * achievements.naturals;
+      }
+      if (achievements.streakScore) {
+        achievementScore += achievements.streakScore;
+      }
+    }
+
+    return achievementScore;
+  },
 };
-
-function getAchievementScore(achievements) {
-  let achievementScore = 0;
-
-  if (achievements) {
-    if (achievements.trophy) {
-      achievementScore += 100 * achievements.trophy;
-    }
-    if (achievements.daysPlayed) {
-      achievementScore += 10 * achievements.daysPlayed;
-    }
-    if (achievements.naturals) {
-      achievementScore += 5 * achievements.naturals;
-    }
-    if (achievements.streakScore) {
-      achievementScore += achievements.streakScore;
-    }
-  }
-
-  return achievementScore;
-}
 
 function displayTable(context, callback) {
   if (context.event.context &&
@@ -344,5 +343,16 @@ function displayTable(context, callback) {
   } else {
     // Not a display device
     callback();
+  }
+}
+
+function roundPlayers(locale, playerCount) {
+  const res = require('./' + locale + '/resources');
+
+  if (playerCount < 200) {
+    return playerCount;
+  } else {
+    // "Over" to the nearest hundred
+    return res.strings.MORE_THAN_PLAYERS.replace('{0}', 100 * Math.floor(playerCount / 100));
   }
 }

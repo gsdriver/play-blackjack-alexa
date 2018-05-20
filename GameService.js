@@ -44,7 +44,7 @@ module.exports = {
     };
 
     // Start by shuffling the deck
-    shuffleDeck(game, attributes.newUser);
+    shuffleDeck(game);
     game.dealerHand.cards = [];
     game.playerHands = [];
 
@@ -379,7 +379,7 @@ function deal(attributes, betAmount) {
   }
 }
 
-function shuffleDeck(game, newPlayer) {
+function shuffleDeck(game) {
   // Start by initializing the deck
   let i;
   let rank;
@@ -412,14 +412,6 @@ function shuffleDeck(game, newPlayer) {
 
     game.deck.cards[card1] = game.deck.cards[card2];
     game.deck.cards[card2] = tempCard;
-  }
-
-  // If this is a brand-new player, we'll guarantee a win
-  if (newPlayer) {
-    game.deck.cards.unshift({'rank': 7, 'suit': 'C'});
-    game.deck.cards.unshift({'rank': 9, 'suit': 'S'});
-    game.deck.cards.unshift({'rank': 11, 'suit': 'D'});
-    game.deck.cards.unshift({'rank': 10, 'suit': 'C'});
   }
 
   // Clear out all hands

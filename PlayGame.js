@@ -8,6 +8,8 @@ const utils = require('alexa-speech-utils')();
 const gameService = require('./GameService');
 const tournament = require('./tournament');
 const request = require('request');
+const bjUtils = require('./BlackjackUtils');
+const speechUtils = require('alexa-speech-utils')();
 
 let resources;
 
@@ -162,8 +164,7 @@ module.exports = {
     resources = require('./' + locale + '/resources');
     const game = attributes[attributes.currentGame];
     const reprompt = listValidActions(game, locale, 'full');
-    const speech = resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll)
-              + readHand(attributes, game, locale) + ' ' + reprompt;
+    const speech = readHand(attributes, game, locale) + ' ' + reprompt;
 
     callback(speech, reprompt);
   },
@@ -352,7 +353,9 @@ function tellResult(attributes, locale, action, oldGame) {
       break;
     case 'sidebet':
       // A side bet was placed
-      result += resources.strings.SIDEBET_PLACED.replace('{0}', game.progressive.bet);
+      result += resources.strings.SIDEBET_PLACED
+        .replace('{0}', game.progressive.bet)
+        .replace('{1}', game.progressiveJackpot);
       break;
     case 'nosidebet':
       // A side bet was removed
@@ -508,8 +511,10 @@ function readGameResult(attributes) {
     attributes.achievements = {};
   }
   // 10 points if this is the first play of the day
+  const pointsEarned = [];
+  const noPoints = (bjUtils.getAchievementScore(attributes.achievements) === 0);
   if (game.firstDailyHand) {
-    outcome += resources.strings.FIRST_DAILY_HAND;
+    pointsEarned.push(resources.strings.FIRST_DAILY_HAND);
     attributes.achievements.daysPlayed = (attributes.achievements.daysPlayed)
           ? (attributes.achievements.daysPlayed + 1) : 1;
   }
@@ -517,7 +522,7 @@ function readGameResult(attributes) {
   if ((game.playerHands.length === 1)
       && (game.playerHands[0].cards.length === 2)
       && (game.playerHands[0].total === 21)) {
-    outcome += resources.strings.NATURAL_BLACKJACK;
+    pointsEarned.push(resources.strings.NATURAL_BLACKJACK);
     attributes.achievements.naturals = (attributes.achievements.naturals)
           ? (attributes.achievements.naturals + 1) : 1;
   }
@@ -530,27 +535,43 @@ function readGameResult(attributes) {
   });
   game.winningStreak = (winner) ? ((game.winningStreak) ? (game.winningStreak + 1) : 1) : 0;
   if (game.winningStreak > 1) {
-    outcome += resources.strings.WINNING_STREAK.replace('{0}', game.winningStreak).replace('{1}', game.winningStreak);
+    pointsEarned.push(resources.strings.WINNING_STREAK
+      .replace('{0}', game.winningStreak).replace('{1}', game.winningStreak));
     attributes.achievements.streakScore = (attributes.achievements.streakScore)
         ? (attributes.achievements.streakScore + game.winningStreak)
         : game.winningStreak;
   }
 
-  // Tell new users about the leader board, and those who haven't heard about
-  // the progressive jackpot about the jackpot and placing a side bet
-  if (attributes.newUser) {
-    // Tell them about the leader board
-    attributes.newUser = undefined;
-    outcome += resources.strings.READ_ABOUT_LEADER_BOARD;
-  } else if (!attributes.readProgressive) {
-    attributes.readProgressive = true;
-    if (game.progressive && game.progressiveJackpot) {
-      const format = (game.sideBetPlaced)
-            ? resources.strings.READ_JACKPOT_AFTER_LAUNCH
-            : resources.strings.READ_JACKPOT_AFTER_LAUNCH_NOSIDEBET;
-
-      outcome += format.replace('{0}', game.progressiveJackpot);
+  if (pointsEarned.length) {
+    // Tell them what they earned - and what they have if we haven't said it yet
+    let score;
+    let format = resources.strings.POINTS_EARNED_NOSCORE;
+    if (!attributes.temp.readScore) {
+      if (!noPoints) {
+        score = bjUtils.getAchievementScore(attributes.achievements);
+        format = resources.strings.POINTS_EARNED_SCORE;
+      }
+      attributes.temp.readScore = true;
     }
+
+    outcome += format.replace('{0}', speechUtils.and(pointsEarned, {pause: '200ms'}))
+        .replace('{1}', score);
+
+    // If this isn't the first time earning points, prompt about the leader board
+    if (!noPoints) {
+      if (!attributes.prompts) {
+        attributes.prompts = {};
+      }
+      if (!attributes.prompts.leaderBoard) {
+        attributes.prompts.leaderBoard = true;
+        outcome += resources.strings.PROMPT_LEADER_BOARD;
+      }
+    }
+  }
+
+  // They are no longer a new user
+  if (attributes.newUser) {
+    attributes.newUser = undefined;
   }
 
   // What was the outcome?
