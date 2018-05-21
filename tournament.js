@@ -147,7 +147,7 @@ module.exports = {
 
     if (!game) {
       // New player
-      gameService.initializeTournamentGame(this.attributes, this.event.session.user.userId);
+      gameService.initializeGame('tournament', this.attributes, this.event.session.user.userId);
       speech = res.strings.TOURNAMENT_WELCOME_NEWPLAYER
             .replace('{0}', this.attributes['tournament'].bankroll)
             .replace('{1}', this.attributes['tournament'].maxHands);

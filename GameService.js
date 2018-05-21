@@ -10,147 +10,138 @@ const seedrandom = require('seedrandom');
 
 const STARTING_BANKROLL = 5000;
 
-module.exports = {
-  initializeGame: function(attributes, userID) {
-    const game = {version: '1.0.0',
-       userID: userID,
-       deck: {cards: []},
-       dealerHand: {cards: []},
-       playerHands: [],
-       rules: {
-           hitSoft17: false,         // Does dealer hit soft 17
-           surrender: 'late',        // Surrender offered - none, late, or early
-           double: 'any',            // Double rules - none, 10or11, 9or10or11, any
-           doubleaftersplit: true,   // Can double after split - none, 10or11, 9or10or11, any
-           resplitAces: false,       // Can you resplit aces
-           blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
-           numberOfDecks: 1,         // Number of decks in play
-           minBet: 5,                // The minimum bet - not configurable
-           maxBet: 1000,             // The maximum bet - not configurable
-           maxSplitHands: 4,         // Maximum number of hands you can have due to splits
-       },
-       progressive: {
-           bet: 5,                   // Amount of the side bet
-           starting: 2500,           // Starting payout of the side bet
-           jackpotRate: 1.25,        // Amount jackpot goes up with each hand played
-       },
-       activePlayer: 'none',
-       currentPlayerHand: 0,
-       specialState: null,
-       bankroll: STARTING_BANKROLL,
-       lastBet: 100,
-       possibleActions: [],
-       canReset: true,
-       canChangeRules: true,
-    };
-
-    // Start by shuffling the deck
-    shuffleDeck(game);
-    game.dealerHand.cards = [];
-    game.playerHands = [];
-
-    // Get the next possible actions
-    setNextActions(game);
-
-    // For now we only support the standard game
-    attributes.standard = game;
-    attributes.currentGame = 'standard';
+availableGames = {
+  'standard': {version: '1.0.0',
+     deck: {cards: []},
+     dealerHand: {cards: []},
+     playerHands: [],
+     rules: {
+       hitSoft17: false,         // Does dealer hit soft 17
+       surrender: 'late',        // Surrender offered - none, late, or early
+       double: 'any',            // Double rules - none, 10or11, 9or10or11, any
+       doubleaftersplit: true,   // Can double after split - none, 10or11, 9or10or11, any
+       resplitAces: false,       // Can you resplit aces
+       blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
+       numberOfDecks: 1,         // Number of decks in play
+       minBet: 5,                // The minimum bet - not configurable
+       maxBet: 1000,             // The maximum bet - not configurable
+       maxSplitHands: 4,         // Maximum number of hands you can have due to splits
+     },
+     progressive: {
+       bet: 5,                   // Amount of the side bet
+       starting: 2500,           // Starting payout of the side bet
+       jackpotRate: 1.25,        // Amount jackpot goes up with each hand played
+     },
+     activePlayer: 'none',
+     currentPlayerHand: 0,
+     specialState: null,
+     bankroll: STARTING_BANKROLL,
+     lastBet: 100,
+     possibleActions: [],
+     canReset: true,
+     canChangeRules: true,
   },
-  initializeTournamentGame: function(attributes, userId) {
-    attributes['tournament'] = {version: '1.0.0',
-       userID: userId,
-       deck: {cards: []},
-       dealerHand: {cards: []},
-       playerHands: [],
-       rules: {
-           hitSoft17: true,          // Does dealer hit soft 17
-           surrender: 'none',        // Surrender offered - none, late, or early
-           double: 'any',            // Double rules - none, 10or11, 9or10or11, any
-           doubleaftersplit: true,   // Can double after split - none, 10or11, 9or10or11, any
-           resplitAces: false,       // Can you resplit aces
-           blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
-           numberOfDecks: 4,         // Number of decks in play
-           minBet: 5,                // The minimum bet - not configurable
-           maxBet: 1000,             // The maximum bet - not configurable
-           maxSplitHands: 4,         // Maximum number of hands you can have due to splits
-       },
-       activePlayer: 'none',
-       currentPlayerHand: 0,
-       specialState: null,
-       bankroll: 25000,
-       lastBet: 100,
-       maxHands: 100,
-       possibleActions: [],
-       timestamp: Date.now(),
-    };
-
-    const game = attributes['tournament'];
-    shuffleDeck(game);
-    game.dealerHand.cards = [];
-    game.playerHands = [];
-    setNextActions(game);
-    attributes.currentGame = 'tournament';
+  'tournament': {version: '1.0.0',
+     deck: {cards: []},
+     dealerHand: {cards: []},
+     playerHands: [],
+     rules: {
+       hitSoft17: true,          // Does dealer hit soft 17
+       surrender: 'none',        // Surrender offered - none, late, or early
+       double: 'any',            // Double rules - none, 10or11, 9or10or11, any
+       doubleaftersplit: true,   // Can double after split - none, 10or11, 9or10or11, any
+       resplitAces: false,       // Can you resplit aces
+       blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
+       numberOfDecks: 4,         // Number of decks in play
+       minBet: 5,                // The minimum bet - not configurable
+       maxBet: 1000,             // The maximum bet - not configurable
+       maxSplitHands: 4,         // Maximum number of hands you can have due to splits
+     },
+     activePlayer: 'none',
+     currentPlayerHand: 0,
+     specialState: null,
+     bankroll: 25000,
+     lastBet: 100,
+     maxHands: 100,
+     possibleActions: [],
   },
-  initializeSpanish: function(attributes, userId) {
-    attributes['spanish'] = {version: '1.0.0',
-       userID: userId,
-       removeCards: [10],
-       deck: {cards: []},
-       dealerHand: {cards: []},
-       playerHands: [],
-       rules: {
-          hitSoft17: false,         // Does dealer hit soft 17
-          surrender: 'late',        // Surrender offered - none, late, or early
-          double: 'anyCards',       // Double rules - anyCards means any time, any number of cards
-          doubleaftersplit: true,   // Can double after split - none, 10or11, 9or10or11, any
-          resplitAces: true,        // Can you resplit aces
-          blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
-          numberOfDecks: 6,         // Number of decks in play
-          minBet: 5,                // The minimum bet - not configurable
-          maxBet: 1000,             // The maximum bet - not configurable
-          maxSplitHands: 4,         // Maximum number of hands you can have due to splits
-          pay21: {
-            playerWin: true,        // Does 21 always win (not push)
-            handLength: {           // 21 with this many cards pays this payout
-              5: 1.5,
-              6: 2,
-              max: {                // This many or more pays this payout
-                cards: 7,
-                payout: 3,
-              },
-            },
-            cardCombos: {           // 21 with this combination of cards pays this payout
-                                    // Pays out even after split; not if double down
-              '6|7|8': 1.5,
-              '7|7|7': 1.5,
-              'suit': {             // Payout when all cards are same suit
-                'C': 2,
-                'D': 2,
-                'H': 2,
-                'S': 3,
-              },
-            },
+  'spanish': {version: '1.0.0',
+    removeCards: [10],
+    deck: {cards: []},
+    dealerHand: {cards: []},
+    playerHands: [],
+    rules: {
+      hitSoft17: false,         // Does dealer hit soft 17
+      surrender: 'late',        // Surrender offered - none, late, or early
+      double: 'anyCards',       // Double rules - anyCards means any time, any number of cards
+      doubleaftersplit: true,   // Can double after split - none, 10or11, 9or10or11, any
+      resplitAces: true,        // Can you resplit aces
+      blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
+      numberOfDecks: 6,         // Number of decks in play
+      minBet: 5,                // The minimum bet - not configurable
+      maxBet: 1000,             // The maximum bet - not configurable
+      maxSplitHands: 4,         // Maximum number of hands you can have due to splits
+      pay21: {
+        playerWin: true,        // Does 21 always win (not push)
+        handLength: {           // 21 with this many cards pays this payout
+          5: 1.5,
+          6: 2,
+          max: {                // This many or more pays this payout
+            cards: 7,
+            payout: 3,
           },
-       },
-       superBonus: true,            // Suited 7-7-7 against dealer 7 pays $1000 for bets under $25;
-                                    // $5000 for bets over $25 - not on split/double down
-       activePlayer: 'none',
-       currentPlayerHand: 0,
-       specialState: null,
-       bankroll: 5000,
-       lastBet: 100,
-       possibleActions: [],
-       timestamp: Date.now(),
-       readSuit: true,
-       canReset: true,
-    };
+        },
+        cardCombos: {           // 21 with this combination of cards pays this payout
+                                // Pays out even after split; not if double down
+          '6|7|8': 1.5,
+          '7|7|7': 1.5,
+          'suit': {             // Payout when all cards are same suit
+            'C': 2,
+            'D': 2,
+            'H': 2,
+            'S': 3,
+          },
+        },
+      },
+    },
+    superBonus: true,            // Suited 7-7-7 against dealer 7 pays $1000 for bets under $25;
+                                 // $5000 for bets over $25 - not on split/double down
+    activePlayer: 'none',
+    currentPlayerHand: 0,
+    specialState: null,
+    bankroll: 5000,
+    lastBet: 100,
+    possibleActions: [],
+    readSuit: true,
+    canReset: true,
+  },
+};
 
-    const game = attributes['spanish'];
-    shuffleDeck(game);
-    game.dealerHand.cards = [];
-    game.playerHands = [];
-    setNextActions(game);
-    attributes.currentGame = 'spanish';
+module.exports = {
+  initializeGame: function(game, attributes, userID) {
+    let newGame;
+
+    if (availableGames[game]) {
+      newGame = JSON.parse(JSON.stringify(availableGames[game]));
+      game.userID = userID;
+
+      // Set timestamp for tournament to avoid extra achievement points
+      if (game == 'tournament') {
+        newGame.timestamp = Date.now();
+      }
+
+      // Start by shuffling the deck
+      shuffleDeck(newGame);
+      newGame.dealerHand.cards = [];
+      newGame.playerHands = [];
+
+      // Get the next possible actions
+      setNextActions(newGame);
+      attributes[game] = newGame;
+      attributes.currentGame = game;
+    }
+
+    return newGame;
   },
   // Determines if this is the initial game state or not
   isDefaultGame: function(attributes) {

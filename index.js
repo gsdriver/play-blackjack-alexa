@@ -304,8 +304,8 @@ function initialize(attributes, locale, userId, callback) {
 
   // If they don't have a game, create one
   if (!attributes.currentGame) {
-    gameService.initializeGame(attributes, userId);
-    gameService.initializeSpanish(attributes, userId);
+    gameService.initializeGame('standard', attributes, userId);
+    gameService.initializeGame('spanish', attributes, userId);
 
     // Now read the progressive jackpot amount
     bjUtils.getProgressivePayout(attributes, (jackpot) => {
@@ -332,6 +332,7 @@ function initialize(attributes, locale, userId, callback) {
       game.canReset = true;
       game.canChangeRules = true;
     }
+    game.bankroll = Math.floor(game.bankroll);
 
     // It's possible you are stuck in shuffle state if you ran out of cards
     // and money at the same time - if so, let's fix that here
