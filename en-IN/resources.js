@@ -240,15 +240,23 @@ module.exports = {
                         'sidebettoosmall': 'Your bankroll is too low to place the side bet and continue playing'};
     return (errorMapping[error] ? errorMapping[error] : 'Internal error');
   },
-  cardRanks: function(card, withArticle) {
+  readCard: function(card, withArticle, readSuit) {
     const names = ['none', 'ace', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'jack', 'queen', 'king'];
+    const suits = {'C': 'clubs', 'D': 'diamonds', 'H': 'hearts', 'S': 'spades'};
     const articleNames = ['none', 'an ace', 'a two', 'a three', 'a four', 'a five', 'a six', 'a seven', 'an eight', 'a nine', 'a ten', 'a jack', 'a queen', 'a king'];
+    let result;
 
     if (withArticle === 'article') {
-      return articleNames[card.rank];
+      result = articleNames[card.rank];
     } else {
-      return names[card.rank];
+      result = names[card.rank];
     }
+
+    if (readSuit) {
+      result += (' of ' + suits[card.suit]);
+    }
+
+    return result;
   },
   pluralCardRanks: function(card) {
     const names = ['none', 'aces', 'twos', 'threes', 'fours', 'fives', 'sixes', 'sevens', 'eights', 'nines', 'tens', 'jacks', 'queens', 'kings'];

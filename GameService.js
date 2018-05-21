@@ -141,6 +141,7 @@ module.exports = {
        lastBet: 100,
        possibleActions: [],
        timestamp: Date.now(),
+       readSuit: true,
        canReset: true,
     };
 
@@ -171,6 +172,12 @@ module.exports = {
         return game.possibleActions[0];
       }
 
+      // Spanish 21 is special case
+      if (game.superBonus) {
+        const spanishSuggest = require('./suggest-spanish');
+        return spanishSuggest.suggestion(game.playerHands[game.currentPlayerHand].cards,
+            ((game.dealerHand.cards[1].rank > 10) ? 10 : game.dealerHand.cards[1].rank));
+      }
       const playerCards = game.playerHands[game.currentPlayerHand].cards.map(
             (card) => ((card.rank) > 10 ? 10 : card.rank));
 
