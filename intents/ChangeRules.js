@@ -15,7 +15,7 @@ module.exports = {
     let ruleError;
     const res = require('../' + this.event.request.locale + '/resources');
 
-    if (!this.attributes[this.attributes.currentGame].canReset) {
+    if (!this.attributes[this.attributes.currentGame].canChangeRules) {
       // Sorry, you can't reset this or change the rules
       ruleError = res.strings.TOURNAMENT_NOCHANGERULES;
     } else if (!changeSlot) {

@@ -41,6 +41,7 @@ module.exports = {
        lastBet: 100,
        possibleActions: [],
        canReset: true,
+       canChangeRules: true,
     };
 
     // Start by shuffling the deck
@@ -89,6 +90,66 @@ module.exports = {
     game.playerHands = [];
     setNextActions(game);
     attributes.currentGame = 'tournament';
+  },
+  initializeSpanish: function(attributes, userId) {
+    attributes['spanish'] = {version: '1.0.0',
+       userID: userId,
+       removeCards: [10],
+       deck: {cards: []},
+       dealerHand: {cards: []},
+       playerHands: [],
+       rules: {
+          hitSoft17: false,         // Does dealer hit soft 17
+          surrender: 'late',        // Surrender offered - none, late, or early
+          double: 'anyCards',       // Double rules - anyCards means any time, any number of cards
+          doubleaftersplit: true,   // Can double after split - none, 10or11, 9or10or11, any
+          resplitAces: true,        // Can you resplit aces
+          blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
+          numberOfDecks: 6,         // Number of decks in play
+          minBet: 5,                // The minimum bet - not configurable
+          maxBet: 1000,             // The maximum bet - not configurable
+          maxSplitHands: 4,         // Maximum number of hands you can have due to splits
+          pay21: {
+            playerWin: true,        // Does 21 always win (not push)
+            handLength: {           // 21 with this many cards pays this payout
+              5: 1.5,
+              6: 2,
+              max: {                // This many or more pays this payout
+                cards: 7,
+                payout: 3,
+              },
+            },
+            cardCombos: {           // 21 with this combination of cards pays this payout
+                                    // Pays out even after split; not if double down
+              '6|7|8': 1.5,
+              '7|7|7': 1.5,
+              'suit': {             // Payout when all cards are same suit
+                'C': 2,
+                'D': 2,
+                'H': 2,
+                'S': 3,
+              },
+            },
+          },
+       },
+       superBonus: true,            // Suited 7-7-7 against dealer 7 pays $1000 for bets under $25;
+                                    // $5000 for bets over $25 - not on split/double down
+       activePlayer: 'none',
+       currentPlayerHand: 0,
+       specialState: null,
+       bankroll: 5000,
+       lastBet: 100,
+       possibleActions: [],
+       timestamp: Date.now(),
+       canReset: true,
+    };
+
+    const game = attributes['spanish'];
+    shuffleDeck(game);
+    game.dealerHand.cards = [];
+    game.playerHands = [];
+    setNextActions(game);
+    attributes.currentGame = 'spanish';
   },
   // Determines if this is the initial game state or not
   isDefaultGame: function(attributes) {
@@ -225,11 +286,26 @@ module.exports = {
 
       case 'double':
         // For this, we mimick a hit and a stand, and set the special state to doubled
+        // unless double is 'anyCard' (e.g. for Spanish 21)
         game.bankroll -= game.playerHands[game.currentPlayerHand].bet;
         game.playerHands[game.currentPlayerHand].bet *= 2;
         newCard = game.deck.cards.shift();
         game.playerHands[game.currentPlayerHand].cards.push(newCard);
-        nextHand(game);
+
+        if (game.rules.double == 'anyCards') {
+          // Still their turn unless they busted
+          const total = handTotal(game.playerHands[game.currentPlayerHand].cards).total;
+          if (total > 21) {
+            // Sorry, you lose - it's the dealer's turn now
+            game.playerHands[game.currentPlayerHand].busted = true;
+            nextHand(game);
+          } else if (total == 21) {
+            // You have 21 - go to the next hand
+            nextHand(game);
+          }
+        } else {
+          nextHand(game);
+        }
         break;
 
       case 'split':
@@ -278,6 +354,24 @@ module.exports = {
 
         for (let i = 0; i < game.playerHands.length; i++) {
           determineWinner(game, game.playerHands[i]);
+        }
+
+        // Any super bonus winner?
+        game.superBonusWin = undefined;
+        if (game.superBonus) {
+          // Super bonus is 7-7-7 suited against a dealer 7
+          if ((game.playerHands.length == 1) && (game.playerHands[0].bet == game.lastBet)) {
+            const cards = game.playerHands[0].cards;
+
+            if ((cards.length == 3) && (cards[0].rank == 7) &&
+              (cards[1].rank == 7) && (cards[2].rank == 7) &&
+              (cards[0].suit == cards[1].suit) && (cards[1].suit == cards[2].suit) &&
+              (game.dealerHand.cards[1].rank == 7)) {
+                // OMG - it's the super bonus!
+                game.superBonusWin = (game.lastBet < 25) ? 1000 : 5000;
+                game.bankroll += game.superBonusWin;
+              }
+          }
         }
 
         // And the side bet winner
@@ -388,9 +482,11 @@ function shuffleDeck(game) {
   const suits = ['C', 'D', 'H', 'S'];
   for (i = 0; i < game.rules.numberOfDecks; i++) {
     for (rank = 1; rank <= 13; rank++) {
-      suits.map((item) => {
-        game.deck.cards.push({'rank': rank, 'suit': item});
-      });
+      if (!game.removeCards || (game.removeCards.indexOf(rank) == -1)) {
+        suits.map((item) => {
+          game.deck.cards.push({'rank': rank, 'suit': item});
+        });
+      }
     }
   }
 
@@ -400,12 +496,12 @@ function shuffleDeck(game) {
   for (i = 0; i < game.rules.numberOfDecks * 520; i++) {
     const randomValue1 = seedrandom(i + game.userID + (game.timestamp ? game.timestamp : ''))();
     const randomValue2 = seedrandom('A' + i + game.userID + (game.timestamp ? game.timestamp : ''))();
-    const card1 = Math.floor(randomValue1 * game.rules.numberOfDecks * 52);
-    const card2 = Math.floor(randomValue2 * game.rules.numberOfDecks * 52);
-    if (card1 == game.rules.numberOfDecks * 52) {
+    const card1 = Math.floor(randomValue1 * game.deck.cards.length);
+    const card2 = Math.floor(randomValue2 * game.deck.cards.length);
+    if (card1 == game.deck.cards.length) {
       card1--;
     }
-    if (card2 == game.rules.numberOfDecks * 52) {
+    if (card2 == game.deck.cards.length) {
       card2--;
     }
     const tempCard = game.deck.cards[card1];
@@ -447,6 +543,12 @@ function setNextActions(game) {
     if (game.rules.surrender != 'none') {
         game.possibleActions.push('surrender');
     }
+  }
+
+  // If you can double any cards (Spanish 21), then set that as long as it's still their turn
+  if ((game.activePlayer == 'player') && (game.rules.double == 'anyCards')
+      && (game.playerHands[game.currentPlayerHand].bet <= game.bankroll)) {
+    game.possibleActions.push('double');
   }
 
   // Other actions are only available for the first two cards of a hand
@@ -545,7 +647,8 @@ function nextHand(game) {
     game.currentPlayerHand = 0;
     if (handTotal(game.playerHands[0].cards).total == 21) {
       game.activePlayer = (game.dealerHand.cards[1].rank == 1) ? 'player' : 'dealer';
-    } else if ((handTotal(game.dealerHand.cards).total == 21) && (game.dealerHand.cards[1].rank != 1)) {
+    } else if ((handTotal(game.dealerHand.cards).total == 21)
+        && (game.dealerHand.cards[1].rank != 1)) {
       // OK, mark it as the dealer's turn to cause the card to flip and end the game
       game.activePlayer = 'dealer';
     } else {
@@ -651,6 +754,7 @@ function determineWinner(game, playerHand) {
   const dealerBlackjack = ((dealerTotal == 21) && (game.dealerHand.cards.length == 2));
   const playerBlackjack = ((game.playerHands.length == 1)
         && (playerTotal == 21) && (playerHand.cards.length == 2));
+  let specialPayout;
 
   // Did they surrender?  If so, that's that
   if (game.specialState == 'surrender') {
@@ -667,12 +771,73 @@ function determineWinner(game, playerHand) {
 
     // Start with blackjack
     if (playerBlackjack) {
-      playerHand.outcome = (dealerBlackjack) ? 'push' : 'blackjack';
+      playerHand.outcome = (dealerBlackjack && !(game.rules.pay21 && game.rules.pay21.playerWin))
+            ? 'push' : 'blackjack';
     } else if (dealerBlackjack) {
       game.dealerHand.outcome = 'dealerblackjack';
       playerHand.outcome = 'loss';
     } else if (playerTotal > 21) {
       playerHand.outcome = 'loss';
+    } else if ((playerTotal == 21) && game.rules.pay21) {
+      // Special payouts of 21's (as long as you didn't double)!
+      playerHand.outcome = 'win';
+      if (playerHand.bet == game.lastBet) {
+        if (game.rules.pay21.handLength) {
+          if (game.rules.pay21.handLength.max &&
+            game.rules.pay21.handLength.max.cards &&
+            playerHand.cards.length >= game.rules.pay21.handLength.max.cards) {
+            specialPayout = game.rules.pay21.handLength.max.payout;
+          } else if (game.rules.pay21.handLength[playerHand.cards.length]) {
+            specialPayout = game.rules.pay21.handLength[playerHand.cards.length];
+          }
+        }
+        if (game.rules.pay21.cardCombos) {
+          // Do the cards math the pattern?
+          let combo;
+          let match;
+          for (combo in game.rules.pay21.cardCombos) {
+            if (!match && (combo !== 'suit')) {
+              const ranks = combo.split('|');
+              if (ranks.length == playerHand.cards.length) {
+                // Sort playerCards
+                const playerCards = JSON.parse(JSON.stringify(playerHand.cards));
+                playerCards.sort((a, b) => (a.rank - b.rank));
+                let i;
+
+                match = combo;
+                for (i = 0; i < playerCards.length; i++) {
+                  if (playerCards[i].rank != ranks[i]) {
+                    // No match
+                    match = undefined;
+                  }
+                }
+              }
+            }
+          }
+
+          // Do we have a match?
+          if (match) {
+            // Great!  Are they suited?
+            let isSuited;
+            if (game.rules.pay21.cardCombos.suit) {
+              isSuited = true;
+              let i;
+
+              for (i = 1; i < playerHand.cards.length; i++) {
+                if (playerHand.cards[i].suit !== playerHand.cards[0].suit) {
+                  isSuited = false;
+                }
+              }
+            }
+
+            if (isSuited) {
+              specialPayout = game.rules.pay21.cardCombos.suit[playerHand.cards[0].suit];
+            } else {
+              specialPayout = game.rules.pay21.cardCombos[match];
+            }
+          }
+        }
+      }
     } else {
       if (dealerTotal > 21) {
         playerHand.outcome = 'win';
@@ -688,10 +853,15 @@ function determineWinner(game, playerHand) {
 
   switch (playerHand.outcome) {
     case 'blackjack':
-      game.bankroll += (playerHand.bet * game.rules.blackjackBonus);
+      game.bankroll += Math.floor(playerHand.bet * game.rules.blackjackBonus);
       // FALL THROUGH
     case 'win':
-      game.bankroll += (playerHand.bet * 2);
+      if (specialPayout) {
+        console.log('Special payout ratio ' + specialPayout);
+        game.bankroll += Math.floor((1 + specialPayout) * playerHand.bet);
+      } else {
+        game.bankroll += (playerHand.bet * 2);
+      }
       break;
     case 'push':
     case 'surrender':

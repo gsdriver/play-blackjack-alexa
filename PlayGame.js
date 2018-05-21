@@ -461,6 +461,11 @@ function readGameResult(attributes) {
     }
   }
 
+  // And read super bonus if it hit
+  if (game.superBonusWin) {
+    sideBetResult += resources.strings.SUPERBONUS_WIN.replace('{0}', game.superBonusWin);
+  }
+
   if (game.playerHands.length > 1) {
   // If more than one hand and the outcome is the same, say all hands
     let allSame = true;
@@ -492,7 +497,7 @@ function readGameResult(attributes) {
     }
   } else {
     // Single hand - how we read depends on whether side bet was placed
-    if (game.sideBetPlaced) {
+    if (sideBetResult.length) {
       // Special case if you lost the hand and side bet
       if ((game.playerHands[0].outcome === 'loss') &&
           (game.numSevens === 0)) {
