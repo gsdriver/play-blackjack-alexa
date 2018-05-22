@@ -27,6 +27,7 @@ function BuildEvent(argv)
     var highScore = {'name': 'HighScoreIntent', 'slots': {}};
     var enableTraining = {'name': 'EnableTrainingIntent', 'slots': {}};
     var disableTraining = {'name': 'DisableTrainingIntent', 'slots': {}};
+    var selectIntent = {'name': 'SelectIntent', 'slots': {}};
 
     var lambda = {
        "session": {
@@ -145,6 +146,10 @@ function BuildEvent(argv)
     else if (argv[2] == "help")
     {
         lambda.request.intent = helpIntent;;
+    }
+    else if (argv[2] == "select")
+    {
+        lambda.request.intent = selectIntent;;
     }
     else if (argv[2] == "bet")
     {

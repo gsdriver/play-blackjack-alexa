@@ -284,6 +284,8 @@ module.exports = {
 };
 
 function displayTable(context, callback) {
+  const res = require('./' + context.event.request.locale + '/resources');
+
   if (context.event.context &&
       context.event.context.System.device.supportedInterfaces.Display) {
     if ((context.attributes.temp && context.attributes.temp.drawBoard)
@@ -294,35 +296,58 @@ function displayTable(context, callback) {
       context.attributes.temp.drawBoard = false;
       context.attributes.display = true;
 
-      const start = Date.now();
-      const game = context.attributes[context.attributes.currentGame];
-      const playerCards = game.playerHands.map((x) => x.cards);
-      const formData = {
-        dealer: JSON.stringify(game.dealerHand.cards),
-        player: JSON.stringify(playerCards),
-        nextCards: JSON.stringify(game.deck.cards.slice(0, 4)),
-      };
-      if (game.activePlayer == 'none') {
-        formData.showHoleCard = 'true';
-      }
+      if (context.attributes.originalChoices) {
+        const listItemBuilder = new Alexa.templateBuilders.ListItemBuilder();
+        const listTemplateBuilder = new Alexa.templateBuilders.ListTemplate1Builder();
+        let i = 0;
 
-      const params = {
-        url: process.env.SERVICEURL + 'blackjack/drawImage',
-        formData: formData,
-        timeout: 3000,
-      };
+        context.attributes.originalChoices.forEach((choice) => {
+          listItemBuilder.addItem(null, 'game.' + i++,
+            makeRichText('<font size="7">' + res.sayGame(choice) + '</font>'));
+        });
 
-      request.post(params, (err, res, body) => {
-        if (err) {
-          console.log(err);
-          callback(err);
-        } else {
-          context.attributes.temp.imageUrl = JSON.parse(body).file;
-          const end = Date.now();
-          console.log('Drawing table took ' + (end - start) + ' ms');
-          done();
+        const listItems = listItemBuilder.build();
+        listTemplate = listTemplateBuilder
+          .setToken('listToken')
+          .setTitle(res.strings.SELECT_GAME_TITLE)
+          .setListItems(listItems)
+          .setBackButtonBehavior('HIDDEN')
+          .setBackgroundImage(makeImage('http://garrettvargas.com/img/blackjack-background.png'))
+          .build();
+
+        context.response.renderTemplate(listTemplate);
+        callback();
+      } else {
+        const start = Date.now();
+        const game = context.attributes[context.attributes.currentGame];
+        const playerCards = game.playerHands.map((x) => x.cards);
+        const formData = {
+          dealer: JSON.stringify(game.dealerHand.cards),
+          player: JSON.stringify(playerCards),
+          nextCards: JSON.stringify(game.deck.cards.slice(0, 4)),
+        };
+        if (game.activePlayer == 'none') {
+          formData.showHoleCard = 'true';
         }
-      });
+
+        const params = {
+          url: process.env.SERVICEURL + 'blackjack/drawImage',
+          formData: formData,
+          timeout: 3000,
+        };
+
+        request.post(params, (err, res, body) => {
+          if (err) {
+            console.log(err);
+            callback(err);
+          } else {
+            context.attributes.temp.imageUrl = JSON.parse(body).file;
+            const end = Date.now();
+            console.log('Drawing table took ' + (end - start) + ' ms');
+            done();
+          }
+        });
+      }
     } else {
       // Just re-use the image URL from last time
       done();

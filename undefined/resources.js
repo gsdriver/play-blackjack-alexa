@@ -7,8 +7,13 @@ const resources = {
   'ERROR_REPROMPT': 'What else can I help with?',
   'CHANGE_CARD_TEXT': 'You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
   'READ_BANKROLL_WITH_ACHIEVEMENT': 'You have ${0} and {1} achievement points. ',
+  'SELECT_GAME_TITLE': 'Select a game',
   // From Betting.js
   'BAD_BET_FORMAT': 'Unable to place a bet for {0}',
+  // From Select.js
+  'SELECT_ONE_GAME': 'Sorry, there is only one game available to play. ',
+  'SELECT_GAMES': 'We have the following games available to play <break time=\'200ms\'/> {0}. ',
+  'SELECT_REPROMPT': 'Would you like to play {0}?',
   // From SideBet.js
   'SIDEBET_PLACED': '${0} side bet placed for the ${1} progressive jackpot. The side bet will remain in play until you say remove side bet. ',
   'SIDEBET_REMOVED': 'Side bet removed. ',
@@ -36,8 +41,7 @@ const resources = {
   'HELP_ACHIEVEMENT_POINTS': 'You earn 100 achievement points for every tournament win <break time=\'200ms\'/> 10 points each day you play <break time=\'200ms\'/> 5 points for a natural winning blackjack <break time=\'200ms\'/> and N points for each streak of N winning hands more than one. ',
   'HELP_ACHIEVEMENT_CARD_TEXT': '\nYou earn achievement points as you play which is how the high score board is determined. You earn points as follows:\n - 100 achievement points each time you win the Tuesday Tournament\n - 10 points each day you play\n - 5 points for a natural winning blackjack\n - N points for each streak of N winning hands more than one.\n',
   // From Launch.js
-  'LAUNCH_WELCOME': 'Welcome to Blackjack Game. The triple seven progressive jackpot is currently ${0}. ',
-  'LAUNCH_WELCOME_NOJACKPOT': 'Welcome to Blackjack Game. ',
+  'LAUNCH_WELCOME': '{"standard":"Welcome to Blackjack Game. ","tournament":"Welcome to the tournament round of Blackjack Game. ","spanish":"Welcome to Spanish 21. "}',
   'LAUNCH_START_GAME': 'Say bet to start a new game',
   'LAUNCH_ENABLE_TRAINING': 'say enable training mode',
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet $5 towards the jackpot',
@@ -331,6 +335,7 @@ module.exports = {
       'INSURANCEOFFERED': 'while I\'m waiting to hear if you want insurance',
       'INGAME': 'during the middle of a hand',
       'JOINTOURNAMENT': 'before you decide if you want to join the tournament',
+      'SELECTGAME': 'while selecting a new game',
     };
     let response = 'I can\'t ';
 
@@ -382,6 +387,9 @@ module.exports = {
       case 'DisableTrainingIntent':
         response += 'turn off training mode ';
         break;
+      case 'SelectIntent':
+        response += 'select a new game ';
+        break;
 
       // These should be handled - so log an error
       case 'AMAZON.RepeatIntent':
@@ -404,6 +412,13 @@ module.exports = {
     response += '. ';
 
     return response;
+  },
+  sayGame: function(game) {
+    const games = {'standard': 'standard blackjack',
+      'tournament': 'the tournament round',
+      'spanish': 'spanish 21'};
+
+    return (games[game] ? games[game] : game);
   },
 };
 

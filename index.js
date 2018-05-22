@@ -16,6 +16,7 @@ const HighScore = require('./intents/HighScore');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const Reset = require('./intents/Reset');
+const Select = require('./intents/Select');
 const Training = require('./intents/Training');
 const Unhandled = require('./intents/Unhandled');
 const gameService = require('./GameService');
@@ -28,6 +29,25 @@ AWS.config.update({region: 'us-east-1'});
 
 const APP_ID = 'amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce';
 let newUser;
+
+const selectGameHandlers = Alexa.CreateStateHandler('SELECTGAME', {
+  'NewSession': function() {
+    this.handler.state = '';
+    this.emitWithState('NewSession');
+  },
+  'ElementSelected': Select.handleYesIntent,
+  'GameIntent': Select.handleYesIntent,
+  'SelectIntent': Select.handleNoIntent,
+  'AMAZON.YesIntent': Select.handleYesIntent,
+  'AMAZON.NextIntent': Select.handleNoIntent,
+  'AMAZON.NoIntent': Select.handleNoIntent,
+  'AMAZON.StopIntent': Exit.handleIntent,
+  'AMAZON.CancelIntent': Exit.handleIntent,
+  'Unhandled': Unhandled.handleIntent,
+  'SessionEndedRequest': function() {
+    saveState(this.event.session.user.userId, this.attributes);
+  },
+});
 
 const suggestHandlers = Alexa.CreateStateHandler('SUGGESTION', {
   'NewSession': function() {
@@ -90,6 +110,7 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'HighScoreIntent': HighScore.handleIntent,
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
+  'SelectIntent': Select.handleIntent,
   'AMAZON.YesIntent': Betting.handleIntent,
   'AMAZON.NoIntent': Exit.handleIntent,
   'AMAZON.FallbackIntent': Repeat.handleIntent,
@@ -118,6 +139,7 @@ const firstTimeHandlers = Alexa.CreateStateHandler('FIRSTTIMEPLAYER', {
   'HighScoreIntent': HighScore.handleIntent,
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
+  'SelectIntent': Select.handleIntent,
   'AMAZON.YesIntent': Betting.handleIntent,
   'AMAZON.NoIntent': Exit.handleIntent,
   'AMAZON.FallbackIntent': Repeat.handleIntent,
@@ -289,7 +311,7 @@ function runGame(event, context, callback) {
     bjUtils.setEvent(event);
     bjUtils.readSuggestions(event.session.attributes, () => {
       alexa.registerHandlers(handlers, resetHandlers, newGameHandlers, firstTimeHandlers,
-        insuranceHandlers, joinHandlers, inGameHandlers, suggestHandlers);
+        insuranceHandlers, joinHandlers, inGameHandlers, suggestHandlers, selectGameHandlers);
       alexa.execute();
     });
   }
@@ -305,7 +327,6 @@ function initialize(attributes, locale, userId, callback) {
   // If they don't have a game, create one
   if (!attributes.currentGame) {
     gameService.initializeGame('standard', attributes, userId);
-    gameService.initializeGame('spanish', attributes, userId);
 
     // Now read the progressive jackpot amount
     bjUtils.getProgressivePayout(attributes, (jackpot) => {

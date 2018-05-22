@@ -19,7 +19,8 @@ module.exports = {
     const game = this.attributes[this.attributes.currentGame];
 
     // Try to keep it simple
-    launchSpeech = res.strings.LAUNCH_WELCOME_NOJACKPOT;
+    const launchWelcome = JSON.parse(res.strings.LAUNCH_WELCOME);
+    launchSpeech = launchWelcome[this.attributes.currentGame];
     if (this.attributes.tournamentResult) {
       launchSpeech = this.attributes.tournamentResult + launchSpeech;
       this.attributes.tournamentResult = undefined;

@@ -4,7 +4,8 @@
 //
 
 const suggest = require('blackjack-strategy');
-const bjUtils = require('./BlackjackUtils.js');
+const bjUtils = require('./BlackjackUtils');
+const tournament = require('./tournament');
 const request = require('request');
 const seedrandom = require('seedrandom');
 
@@ -142,6 +143,20 @@ module.exports = {
     }
 
     return newGame;
+  },
+  // Gets a list of available games
+  getAvailableGames: function(attributes) {
+    const tournamentAvailable = tournament.canEnterTournament(attributes);
+    let game;
+    const games = [];
+
+    for (game in availableGames) {
+      if (tournamentAvailable || (game !== 'tournament')) {
+        games.push(game);
+      }
+    }
+
+    return games;
   },
   // Determines if this is the initial game state or not
   isDefaultGame: function(attributes) {

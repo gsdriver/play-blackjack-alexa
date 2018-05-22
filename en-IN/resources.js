@@ -7,8 +7,13 @@ const resources = {
   'ERROR_REPROMPT': 'What else can I help with?',
   'CHANGE_CARD_TEXT': 'You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
   'READ_BANKROLL_WITH_ACHIEVEMENT': 'You have ${0} and {1} achievement points. ',
+  'SELECT_GAME_TITLE': 'Select a game',
   // From Betting.js
   'BAD_BET_FORMAT': 'Unable to place a bet for {0}',
+  // From Select.js
+  'SELECT_ONE_GAME': 'Sorry, there is only one game available to play. ',
+  'SELECT_GAMES': 'We have the following games available to play <break time=\'200ms\'/> {0}. ',
+  'SELECT_REPROMPT': 'Would you like to play {0}?',
   // From SideBet.js
   'SIDEBET_PLACED': '${0} side bet placed for the ${1} progressive jackpot. The side bet will remain in play until you say remove side bet. ',
   'SIDEBET_REMOVED': 'Side bet removed. ',
@@ -34,9 +39,9 @@ const resources = {
   'HELP_CARD_PROGRESSIVE_TEXT': 'This game features a progressive triple seven jackpot. Place a side bet of $5 by saying PLACE SIDE BET which will stay in effect until you say REMOVE SIDE BET.\nThe side bet pays out $25 if your first card is a seven, $100 if your first two cards are both seven, and the progressive jackpot if your first three cards are seven. The progressive jackpot is based on aggregate play across all users of this skill.\n',
   'HELP_CARD_TEXT': 'You can say BET to place a bet. If no amount is mentioned, the game will use the last amount bet. You can say READ HIGH SCORES to hear the current leader board.\nDuring a hand, ask WHAT SHOULD I DO to hear the Basic Strategy suggestion.\nSay READ THE RULES if you would like to hear the rules currently in play.\nCHANGE will change the rules in play. You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
   'HELP_ACHIEVEMENT_POINTS': 'You earn 100 achievement points for every tournament win <break time=\'200ms\'/> 10 points each day you play <break time=\'200ms\'/> 5 points for a natural winning blackjack <break time=\'200ms\'/> and N points for each streak of N winning hands more than one. ',
+  'HELP_ACHIEVEMENT_CARD_TEXT': '\nYou earn achievement points as you play which is how the high score board is determined. You earn points as follows:\n - 100 achievement points each time you win the Tuesday Tournament\n - 10 points each day you play\n - 5 points for a natural winning blackjack\n - N points for each streak of N winning hands more than one.\n',
   // From Launch.js
-  'LAUNCH_WELCOME': 'Welcome to Blackjack Game. The triple seven progressive jackpot is currently ${0}. ',
-  'LAUNCH_WELCOME_NOJACKPOT': 'Welcome to Blackjack Game. ',
+  'LAUNCH_WELCOME': '{"standard":"Welcome to Blackjack Game. ","tournament":"Welcome to the tournament round of Blackjack Game. ","spanish":"Welcome to Spanish 21. "}',
   'LAUNCH_START_GAME': 'Say bet to start a new game',
   'LAUNCH_ENABLE_TRAINING': 'say enable training mode',
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet $5 towards the jackpot',
@@ -71,7 +76,7 @@ const resources = {
   'READ_JACKPOT_AFTER_LAUNCH': 'The triple seven progressive jackpot is currently ${0}. ',
   'READ_JACKPOT_AFTER_LAUNCH_NOSIDEBET': 'The triple seven progressive jackpot is currently ${0}. Say place side bet to place a $5 side bet. ',
   'HELP_TAKE_INSURANCE': 'You can say yes to take insurance or no to decline insurance.',
-  'HELP_TAKE_INSURANCE_BLACKJACK': 'Since you have a blackjack, can you say yes to get paid your bet, or no in which case you push if the dealer has blackjack.',
+  'HELP_TAKE_INSURANCE_BLACKJACK': 'Since you have a blackjack, can you say yes to get paid your bet, or no in which case you push if I have blackjack.',
   'HELP_INSURANCE_INSUFFICIENT_BANKROLL': 'You don\'t have enough money to take insurance - say no to decline insurance.',
   'HELP_YOU_CAN_SAY': 'You can say {0}.',
   'HELP_YOU_CAN_SAY_LEADER': 'read high scores',
@@ -92,18 +97,17 @@ const resources = {
   'RESULT_AFTER_HIT_NOBUST': 'You got {0} for a total of {1}. ',
   'RESULT_BANKROLL_RESET': 'Bankroll reset',
   'RESULT_DECK_SHUFFLED': 'Deck shuffled',
-  'DEALER_HOLE_CARD': 'The dealer had {0} down',
+  'DEALER_HOLE_CARD': 'I have {0} down',
   'DEALER_BUSTED': ' and busted.',
-  'DEALER_BLACKJACK': ' and has Blackjack.',
+  'DEALER_BLACKJACK': ' and have Blackjack.',
   'DEALER_TOTAL': ' for a total of {0}.',
-  'DEALER_DRAW': '. The dealer drew ',
-  'PLAYER_HIT_BUSTED': 'You got {0} and busted. ',
-  'DEALER_SHOWING': ' The dealer is showing {0}.',
+  'DEALER_DRAW': '. I drew ',
+  'DEALER_SHOWING': ' I am showing {0}.',
   'SPLIT_TENS': 'You split tens. ',
   'SPLIT_PAIR': 'You split a pair of {0}. ',
   'SURRENDER_RESULT': 'You surrendered. ',
-  'DEALER_HAD_BLACKJACK': 'The dealer had a blackjack. ',
-  'DEALER_NO_BLACKJACK': 'The dealer didn\'t have a blackjack. ',
+  'DEALER_HAD_BLACKJACK': 'I had a blackjack. ',
+  'DEALER_NO_BLACKJACK': 'I didn\'t have a blackjack. ',
   'READHAND_PLAYER_TOTAL_ACTIVE_BLACKJACK': 'You have {0} for a blackjack. ',
   'READHAND_PLAYER_TOTAL_END_BLACKJACK': 'You had {0} for a blackjack. ',
   'READHAND_PLAYER_BUSTED_SOFT': 'You busted with {0} for a total of soft {1}. ',
@@ -112,8 +116,8 @@ const resources = {
   'READHAND_PLAYER_BUSTED': 'You busted with {0} for a total of {1}.  ',
   'READHAND_PLAYER_TOTAL_ACTIVE': 'You have {0} for a total of {1}.  ',
   'READHAND_PLAYER_TOTAL_END': 'You had {0} for a total of {1}.  ',
-  'READHAND_DEALER_ACTIVE': 'The dealer has {0} showing.',
-  'READHAND_DEALER_DONE': 'The dealer had {0} showing. ',
+  'READHAND_DEALER_ACTIVE': 'I have {0} showing.',
+  'READHAND_DEALER_DONE': 'I had {0} showing. ',
   'RULES_DECKS': '{0} deck game. ',
   'RULES_BET_RANGE': 'Bet from ${0} to ${1}. ',
   'RULES_HIT_SOFT17': 'Dealer hits on soft 17. ',
@@ -127,10 +131,11 @@ const resources = {
   'RULES_BLACKJACK': 'Blackjack pays {0}. ',
   'RULES_SURRENDER_OFFERED': 'Surrender allowed. ',
   'RULES_NO_SURRENDER': 'Surrender not offered. ',
-  'PLAYER_HIT_NOTBUSTED_SOFT': 'You got {0} for a total of soft {1}. |Here\'s {0} for a total of soft {1}. |The dealer has {0} for you giving you soft {1}. ',
-  'PLAYER_HIT_NOTBUSTED': 'You got {0} for a total of {1}. |Here\'s {0} for a total of {1}. |The dealer has {0} for you giving you {1}. ',
-  'GOOD_HIT_OPTIONS': 'The dealer has {0} for you giving you {1}. Not bad! |You got {0} for a total of {1}. Good hit. |Here\'s {0} for a total of {1}. ',
-  'GREAT_HIT_OPTIONS': 'The dealer has {0} giving you {1}. Brilliant! |Yes, it\'s {0} for a total of {1}! |Here\'s a good one, {0} for a total of {1}. ',
+  'PLAYER_HIT_BUSTED': 'Sorry, it\'s a {0}. You busted. |You got {0} and busted. |You got {0} and busted. ',
+  'PLAYER_HIT_NOTBUSTED_SOFT': 'You got {0} for a total of soft {1}. |Here\'s {0} for a total of soft {1}. |I have {0} for you giving you soft {1}. ',
+  'PLAYER_HIT_NOTBUSTED': 'You got {0} for a total of {1}. |Here\'s {0} for a total of {1}. |I have {0} for you giving you {1}. ',
+  'GOOD_HIT_OPTIONS': 'I have {0} for you giving you {1}. Not bad! |You got {0} for a total of {1}. Good hit. |Here\'s {0} for a total of {1}. ',
+  'GREAT_HIT_OPTIONS': 'Look at this, I have {0} giving you {1}. |It\'s {0} for a total of {1}! Nice hit! |Here\'s a beauty, {0} for a total of {1}. ',
   'SIDEBET_LOST': 'Your side bet lost. ',
   'LOST_SINGLEHAND_AND_SIDEBET': 'You lost your hand and your side bet. ',
   'LOST_MULTIPLEHANDS_AND_SIDEBET': 'You lost all your hands and your side bet. ',
@@ -296,11 +301,11 @@ module.exports = {
   mapMultipleOutcomes: function(outcome, numHands) {
     const twoHandMapping = {'win': 'You won both hands!',
                'loss': 'You lost both hands.',
-               'push': 'Both hands tied.',
+               'push': 'Both hands pushed.',
                'surrender': 'You surrendered both hands.'};
     const multipleHandMapping = {'win': 'You won all your hands!',
                'loss': 'You lost all your hands.',
-               'push': 'You tied on all your hands.',
+               'push': 'You pushed on all your hands.',
                'surrender': 'You surrendered all your hands.'};
     return (numHands == 2) ? twoHandMapping[outcome] : multipleHandMapping[outcome];
   },
@@ -330,6 +335,7 @@ module.exports = {
       'INSURANCEOFFERED': 'while I\'m waiting to hear if you want insurance',
       'INGAME': 'during the middle of a hand',
       'JOINTOURNAMENT': 'before you decide if you want to join the tournament',
+      'SELECTGAME': 'while selecting a new game',
     };
     let response = 'I can\'t ';
 
@@ -381,6 +387,9 @@ module.exports = {
       case 'DisableTrainingIntent':
         response += 'turn off training mode ';
         break;
+      case 'SelectIntent':
+        response += 'select a new game ';
+        break;
 
       // These should be handled - so log an error
       case 'AMAZON.RepeatIntent':
@@ -403,6 +412,13 @@ module.exports = {
     response += '. ';
 
     return response;
+  },
+  sayGame: function(game) {
+    const games = {'standard': 'standard blackjack',
+      'tournament': 'the tournament round',
+      'spanish': 'spanish 21'};
+
+    return (games[game] ? games[game] : game);
   },
 };
 
