@@ -53,9 +53,9 @@ module.exports = {
       selectedGame(this);
     } else {
       const res = require('../' + this.event.request.locale + '/resources');
-      const speech = res.strings.LAUNCH_REPROMPT.replace('{0}', res.sayGame(this.attributes.choices[0]));
+      const speech = res.strings.SELECT_REPROMPT.replace('{0}', res.sayGame(this.attributes.choices[0]));
 
-      utils.emitResponse(this, null, null, speech, speech);
+      bjUtils.emitResponse(this, null, null, speech, speech);
     }
   },
 };

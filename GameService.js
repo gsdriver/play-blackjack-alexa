@@ -72,31 +72,32 @@ availableGames = {
     dealerHand: {cards: []},
     playerHands: [],
     rules: {
-      hitSoft17: false,         // Does dealer hit soft 17
-      surrender: 'late',        // Surrender offered - none, late, or early
-      double: 'anyCards',       // Double rules - anyCards means any time, any number of cards
-      doubleaftersplit: true,   // Can double after split - none, 10or11, 9or10or11, any
-      resplitAces: true,        // Can you resplit aces
-      blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
-      numberOfDecks: 6,         // Number of decks in play
-      minBet: 5,                // The minimum bet - not configurable
-      maxBet: 1000,             // The maximum bet - not configurable
-      maxSplitHands: 4,         // Maximum number of hands you can have due to splits
+      hitSoft17: false,           // Does dealer hit soft 17
+      surrender: 'late',          // Surrender offered - none, late, or early
+      double: 'anyCards',         // Double rules - anyCards means any time, any number of cards
+      doubleaftersplit: true,     // Can double after split - none, 10or11, 9or10or11, any
+      resplitAces: true,          // Can you resplit aces
+      blackjackBonus: 0.5,        // Bonus for player blackjack, usually 0.5 or 0.2
+      numberOfDecks: 6,           // Number of decks in play
+      minBet: 5,                  // The minimum bet - not configurable
+      maxBet: 1000,               // The maximum bet - not configurable
+      maxSplitHands: 4,           // Maximum number of hands you can have due to splits
+      surrenderAfterDouble: true, // Can you surrender after doubling?
       pay21: {
-        playerWin: true,        // Does 21 always win (not push)
-        handLength: {           // 21 with this many cards pays this payout
+        playerWin: true,          // Does 21 always win (not push)
+        handLength: {             // 21 with this many cards pays this payout
           5: 1.5,
           6: 2,
-          max: {                // This many or more pays this payout
+          max: {                  // This many or more pays this payout
             cards: 7,
             payout: 3,
           },
         },
-        cardCombos: {           // 21 with this combination of cards pays this payout
-                                // Pays out even after split; not if double down
+        cardCombos: {             // 21 with this combination of cards pays this payout
+                                  // Pays out even after split; not if double down
           '6|7|8': 1.5,
           '7|7|7': 1.5,
-          'suit': {             // Payout when all cards are same suit
+          'suit': {               // Payout when all cards are same suit
             'C': 2,
             'D': 2,
             'H': 2,
@@ -151,7 +152,15 @@ module.exports = {
     const games = [];
 
     for (game in availableGames) {
-      if (tournamentAvailable || (game !== 'tournament')) {
+      if (game == 'tournament') {
+        if (tournamentAvailable) {
+          games.push(game);
+        }
+      } else if (game == 'spanish') {
+        if (attributes.paidSpanish) {
+          games.push(game);
+        }
+      } else {
         games.push(game);
       }
     }
@@ -562,6 +571,13 @@ function setNextActions(game) {
   if ((game.activePlayer == 'player') && (game.rules.double == 'anyCards')
       && (game.playerHands[game.currentPlayerHand].bet <= game.bankroll)) {
     game.possibleActions.push('double');
+  }
+
+  if ((game.activePlayer == 'player') && game.rules.surrenderAfterDouble
+    && (game.playerHands.length == 1) && (game.playerHands[0].cards.length == 3)
+    && (game.playerHands[0].bet > game.lastBet)) {
+    // Spanish 21 - surrender after double
+    game.possibleActions.push('surrender');
   }
 
   // Other actions are only available for the first two cards of a hand
