@@ -191,7 +191,7 @@ const joinHandlers = Alexa.CreateStateHandler('JOINTOURNAMENT', {
   'AMAZON.YesIntent': tournament.handleJoin,
   'AMAZON.NoIntent': tournament.handlePass,
   'AMAZON.StopIntent': Exit.handleIntent,
-  'AMAZON.CancelIntent': tournament.handlePass,
+  'AMAZON.CancelIntent': Exit.handleIntent,
   'Unhandled': Unhandled.handleIntent,
   'SessionEndedRequest': function() {
     saveState(this.event.session.user.userId, this.attributes);
