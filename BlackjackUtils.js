@@ -23,6 +23,16 @@ module.exports = {
   emitResponse: function(context, error, response, speech, reprompt, cardTitle, cardText) {
     const formData = {};
 
+    // Save these for repeat
+    context.attributes.temp.repeat = {
+      error: error,
+      response: response,
+      speech: speech,
+      reprompt: reprompt,
+      cardTitle: cardTitle,
+      cardText: cardText,
+    };
+
     // Async call to save state and logs if necessary
     if (process.env.SAVELOG) {
       const result = (error) ? error : ((response) ? response : speech);
