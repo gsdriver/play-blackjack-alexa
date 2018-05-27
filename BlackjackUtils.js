@@ -16,9 +16,6 @@ const querystring = require('querystring');
 const request = require('request');
 const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 
-// Global session ID
-let globalEvent;
-
 module.exports = {
   emitResponse: function(context, error, response, speech, reprompt, cardTitle, cardText) {
     const formData = {};
@@ -27,14 +24,14 @@ module.exports = {
     if (process.env.SAVELOG) {
       const result = (error) ? error : ((response) ? response : speech);
       formData.savelog = JSON.stringify({
-        event: globalEvent,
+        event: context.event,
         result: result,
       });
     }
     if (response) {
       formData.savedb = JSON.stringify({
-        userId: globalEvent.session.user.userId,
-        attributes: globalEvent.session.attributes,
+        userId: context.event.session.user.userId,
+        attributes: context.event.session.attributes,
       });
     }
 
@@ -49,10 +46,6 @@ module.exports = {
           console.log(err);
         }
       });
-    }
-
-    if (!process.env.NOLOG) {
-      console.log(JSON.stringify(globalEvent));
     }
 
     if (error) {
@@ -74,9 +67,6 @@ module.exports = {
     displayTable(context, () => {
       context.emit(':responseReady');
     });
-  },
-  setEvent: function(event) {
-    globalEvent = event;
   },
   // Figures out what state of the game we're in
   getState: function(attributes) {

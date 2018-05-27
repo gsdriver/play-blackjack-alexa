@@ -280,6 +280,9 @@ if (process.env.DASHBOTKEY) {
 
 function runGame(event, context, callback) {
   const alexa = Alexa.handler(event, context);
+  if (!process.env.NOLOG) {
+    console.log(JSON.stringify(event));
+  }
 
   alexa.appId = APP_ID;
   if (!event.session.sessionId || event.session['new']) {
@@ -308,7 +311,6 @@ function runGame(event, context, callback) {
 
   function execute() {
     event.session.attributes.userId = event.session.user.userId;
-    bjUtils.setEvent(event);
     bjUtils.readSuggestions(event.session.attributes, () => {
       alexa.registerHandlers(handlers, resetHandlers, newGameHandlers, firstTimeHandlers,
         insuranceHandlers, joinHandlers, inGameHandlers, suggestHandlers, selectGameHandlers);
