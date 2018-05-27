@@ -147,6 +147,7 @@ module.exports = {
 
     if (!game) {
       // New player
+      this.attributes.tournamentsPlayed = (this.attributes.tournamentsPlayed + 1) || 1;
       gameService.initializeGame('tournament', this.attributes, this.event.session.user.userId);
       speech = res.strings.TOURNAMENT_WELCOME_NEWPLAYER
             .replace('{0}', this.attributes['tournament'].bankroll)
