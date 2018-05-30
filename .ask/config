@@ -2,7 +2,7 @@
   "deploy_settings": {
     "default": {
       "skill_id": "amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce",
-      "was_cloned": true,
+      "was_cloned": false,
       "merge": {
         "manifest": {
           "apis": {
