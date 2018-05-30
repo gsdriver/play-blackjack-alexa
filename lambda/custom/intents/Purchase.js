@@ -14,7 +14,7 @@ module.exports = {
     if (this.event.request.intent.slots && this.event.request.intent.slots.Product
       && this.event.request.intent.slots.Product.value) {
       // They specified a product - we'll assume it's Spanish 21
-      sendBuyResponse(this, 'spanish');
+      bjUtils.sendBuyResponse(this, {name: 'Buy', id: 'spanish'});
     } else if (this.attributes.paid && this.attributes.paid.spanish) {
       // We only offer Spanish 21, and they already have it
       bjUtils.emitResponse(this, null, null,
@@ -28,7 +28,7 @@ module.exports = {
   },
   handleYesIntent: function() {
     // Great, let's do the purchase!
-    sendBuyResponse(this, 'spanish');
+    bjUtils.sendBuyResponse(this, {name: 'Buy', id: 'spanish'});
   },
   handleNoIntent: function() {
     // OK, put them back to where they were and repeat
@@ -41,22 +41,3 @@ module.exports = {
     this.emit('AMAZON.RepeatIntent');
   },
 };
-
-// We need to hand-roll the buy response
-function sendBuyResponse(context, productName) {
-  const res = require('../' + context.event.request.locale + '/resources');
-  let productId;
-  context.attributes.inSkillProducts.forEach((product) => {
-    if (product.referenceName == productName) {
-      productId = product.productId;
-    }
-  });
-
-  if (productId) {
-    bjUtils.emitResponse(context, null, null, null, null, null, null, productId);
-  } else {
-    // Something went wrong
-    bjUtils.emitResponse(context, null, null,
-        res.strings.PURCHASE_PRODUCT_NOT_FOUND, res.strings.PURCHASE_REPROMPT);
-  }
-}

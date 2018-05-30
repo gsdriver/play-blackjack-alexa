@@ -14,6 +14,7 @@ const resources = {
   'SELECT_ONE_GAME': 'Sorry, there is only one game available to play. ',
   'SELECT_GAMES': 'We have the following games available to play <break time=\'200ms\'/> {0}. ',
   'SELECT_REPROMPT': 'Would you like to play {0}?',
+  'SELECT_SPANISH_UPSELL': 'You\'ve played standard Blackjack, you can now get the Spanish 21 expansion pack. Want to learn more?',
   // From SideBet.js
   'SIDEBET_PLACED': '${0} side bet placed for the ${1} progressive jackpot. The side bet will remain in play until you say remove side bet. ',
   'SIDEBET_REMOVED': 'Side bet removed. ',
@@ -53,8 +54,11 @@ const resources = {
   'PURCHASE_ONLY_SPANISH': 'We only offer the Spanish 21 expansion product, and you\'ve already purchased it. What else can I help you with?',
   'PURCHASE_SPANISH': 'We have a Spanish 21 game available for purchase. Would you like to buy it? ',
   'PURCHASE_CONFIRM_REPROMPT': 'Say yes to buy Spanish 21',
-  'PURCHASE_PRODUCT_NOT_FOUND': 'Sorry, I wasn\'t able to complete the transaction. What else can I help you with?',
   'PURCHASE_REPROMPT': 'What else can I help you with?',
+  // From Refund.js
+  'REFUND_SPANISH': 'OK, as a reminder you will no longer be able to access Spanish 21 and will lose your progress on that game. Would you like to refund Spanish 21?',
+  'REFUND_SPANISH_REPROMPT': 'Would you like to refund Spanish 21?',
+  'REFUND_REPROMPT': 'What else can I help you with?',
   // From Reset.js
   'RESET_CONFIRM': 'Would you like to reset the game? This will reset your bankroll and rules of the game.',
   'RESET_COMPLETED': 'You have $5000. Say bet to start a new game.',

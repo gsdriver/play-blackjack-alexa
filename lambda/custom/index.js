@@ -20,6 +20,7 @@ const Select = require('./intents/Select');
 const Training = require('./intents/Training');
 const Unhandled = require('./intents/Unhandled');
 const Purchase = require('./intents/Purchase');
+const Refund = require('./intents/Refund');
 const gameService = require('./GameService');
 const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
@@ -40,6 +41,7 @@ const selectGameHandlers = Alexa.CreateStateHandler('SELECTGAME', {
   'GameIntent': Select.handleYesIntent,
   'SelectIntent': Select.handleNoIntent,
   'PurchaseIntent': Purchase.handleIntent,
+  'RefundIntent': Refund.handleIntent,
   'AMAZON.YesIntent': Select.handleYesIntent,
   'AMAZON.NextIntent': Select.handleNoIntent,
   'AMAZON.NoIntent': Select.handleNoIntent,
@@ -64,6 +66,7 @@ const suggestHandlers = Alexa.CreateStateHandler('SUGGESTION', {
   'DisableTrainingIntent': Training.handleDisableIntent,
   'RulesIntent': Rules.handleIntent,
   'PurchaseIntent': Purchase.handleIntent,
+  'RefundIntent': Refund.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.FallbackIntent': Repeat.handleIntent,
   'AMAZON.YesIntent': TakeSuggestion.handleYesIntent,
@@ -86,6 +89,7 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
   'PurchaseIntent': Purchase.handleIntent,
+  'RefundIntent': Refund.handleIntent,
   'AMAZON.FallbackIntent': Reset.handleRepeat,
   'AMAZON.RepeatIntent': Reset.handleRepeat,
   'AMAZON.HelpIntent': Reset.handleRepeat,
@@ -109,11 +113,36 @@ const purchaseHandlers = Alexa.CreateStateHandler('CONFIRMPURCHASE', {
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
   'PurchaseIntent': Purchase.handleYesIntent,
+  'RefundIntent': Refund.handleIntent,
   'AMAZON.FallbackIntent': Purchase.handleRepeatIntent,
   'AMAZON.RepeatIntent': Purchase.handleRepeatIntent,
   'AMAZON.HelpIntent': Purchase.handleRepeatIntent,
   'AMAZON.YesIntent': Purchase.handleYesIntent,
   'AMAZON.NoIntent': Purchase.handleNoIntent,
+  'AMAZON.StopIntent': Exit.handleIntent,
+  'AMAZON.CancelIntent': Exit.handleIntent,
+  'Unhandled': Unhandled.handleIntent,
+  'SessionEndedRequest': function() {
+    saveState(this.event.session.user.userId, this.attributes);
+  },
+});
+
+const refundHandlers = Alexa.CreateStateHandler('CONFIRMREFUND', {
+  'NewSession': function() {
+    this.handler.state = '';
+    this.emitWithState('NewSession');
+  },
+  'LaunchRequest': Refund.handleNoIntent,
+  'HighScoreIntent': HighScore.handleIntent,
+  'EnableTrainingIntent': Training.handleEnableIntent,
+  'DisableTrainingIntent': Training.handleDisableIntent,
+  'PurchaseIntent': Purchase.handleIntent,
+  'RefundIntent': Refund.handleIntent,
+  'AMAZON.FallbackIntent': Refund.handleRepeatIntent,
+  'AMAZON.RepeatIntent': Refund.handleRepeatIntent,
+  'AMAZON.HelpIntent': Refund.handleRepeatIntent,
+  'AMAZON.YesIntent': Refund.handleYesIntent,
+  'AMAZON.NoIntent': Refund.handleNoIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'Unhandled': Unhandled.handleIntent,
@@ -139,6 +168,7 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'DisableTrainingIntent': Training.handleDisableIntent,
   'SelectIntent': Select.handleIntent,
   'PurchaseIntent': Purchase.handleIntent,
+  'RefundIntent': Refund.handleIntent,
   'AMAZON.YesIntent': Betting.handleIntent,
   'AMAZON.NoIntent': Exit.handleIntent,
   'AMAZON.FallbackIntent': Repeat.handleIntent,
@@ -169,6 +199,7 @@ const firstTimeHandlers = Alexa.CreateStateHandler('FIRSTTIMEPLAYER', {
   'DisableTrainingIntent': Training.handleDisableIntent,
   'SelectIntent': Select.handleIntent,
   'PurchaseIntent': Purchase.handleIntent,
+  'RefundIntent': Refund.handleIntent,
   'AMAZON.YesIntent': Betting.handleIntent,
   'AMAZON.NoIntent': Exit.handleIntent,
   'AMAZON.FallbackIntent': Repeat.handleIntent,
@@ -194,6 +225,7 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
   'PurchaseIntent': Purchase.handleIntent,
+  'RefundIntent': Refund.handleIntent,
   'AMAZON.YesIntent': TakeInsurance.handleIntent,
   'AMAZON.NoIntent': DeclineInsurance.handleIntent,
   'AMAZON.FallbackIntent': Repeat.handleIntent,
@@ -220,6 +252,7 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
   'PurchaseIntent': Purchase.handleIntent,
+  'RefundIntent': Refund.handleIntent,
   'AMAZON.FallbackIntent': Repeat.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
@@ -242,6 +275,7 @@ const joinHandlers = Alexa.CreateStateHandler('JOINTOURNAMENT', {
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
   'PurchaseIntent': Purchase.handleIntent,
+  'RefundIntent': Refund.handleIntent,
   'AMAZON.YesIntent': tournament.handleJoin,
   'AMAZON.NoIntent': tournament.handlePass,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -294,6 +328,7 @@ const handlers = {
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
   'PurchaseIntent': Purchase.handleIntent,
+  'RefundIntent': Refund.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -346,7 +381,7 @@ function runGame(event, context, callback) {
     event.session.attributes.userId = event.session.user.userId;
     bjUtils.readSuggestions(event.session.attributes, () => {
       alexa.registerHandlers(handlers, resetHandlers, newGameHandlers, firstTimeHandlers,
-        insuranceHandlers, joinHandlers, inGameHandlers,
+        insuranceHandlers, joinHandlers, inGameHandlers, refundHandlers,
         purchaseHandlers, suggestHandlers, selectGameHandlers);
       alexa.execute();
     });

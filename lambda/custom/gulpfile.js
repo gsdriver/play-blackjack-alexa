@@ -12,7 +12,7 @@ gulp.task('lint', () =>
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.format(reporter, (results) => {
-      fs.writeFileSync(path.join(__dirname, 'build/lint-report.html'), results);
+      fs.writeFileSync(path.join(__dirname, '../../build/lint-report.html'), results);
     }))
     .pipe(eslint.failAfterError())
 );

@@ -16,28 +16,39 @@ module.exports = {
     let speech;
     let reprompt;
 
-    if (availableGames.length < 2) {
-      // Sorry, no games available to select
-      speech = res.strings.SELECT_ONE_GAME;
-      reprompt = res.strings.ERROR_REPROMPT;
+    // If they don't have Spanish 21, upsell
+    if (availableGames.indexOf('spanish') == -1) {
+      const directive = {
+        name: 'Upsell',
+        id: 'spanish',
+        token: 'SELECTGAME',
+        upsellMessage: res.strings.SELECT_SPANISH_UPSELL,
+      };
+      bjUtils.sendBuyResponse(this, directive);
     } else {
-      // Sort these with current game last
-      availableGames.push(this.attributes.currentGame);
-      const i = availableGames.indexOf(this.attributes.currentGame);
-      availableGames.splice(i, 1);
+      if (availableGames.length < 2) {
+        // Sorry, no games available to select
+        speech = res.strings.SELECT_ONE_GAME;
+        reprompt = res.strings.ERROR_REPROMPT;
+      } else {
+        // Sort these with current game last
+        availableGames.push(this.attributes.currentGame);
+        const i = availableGames.indexOf(this.attributes.currentGame);
+        availableGames.splice(i, 1);
 
-      this.attributes.choices = availableGames;
-      this.attributes.originalChoices = availableGames;
-      this.handler.state = 'SELECTGAME';
+        this.attributes.choices = availableGames;
+        this.attributes.originalChoices = availableGames;
+        this.handler.state = 'SELECTGAME';
 
-      speech = res.strings.SELECT_GAMES
-        .replace('{0}', speechUtils.and(availableGames.map((x) => res.sayGame(x)),
-            {locale: this.event.request.locale}));
-      reprompt = res.strings.SELECT_REPROMPT.replace('{0}', res.sayGame(availableGames[0]));
-      speech += reprompt;
+        speech = res.strings.SELECT_GAMES
+          .replace('{0}', speechUtils.and(availableGames.map((x) => res.sayGame(x)),
+              {locale: this.event.request.locale}));
+        reprompt = res.strings.SELECT_REPROMPT.replace('{0}', res.sayGame(availableGames[0]));
+        speech += reprompt;
+      }
+
+      bjUtils.emitResponse(this, null, null, speech, reprompt);
     }
-
-    bjUtils.emitResponse(this, null, null, speech, reprompt);
   },
   handleYesIntent: function() {
     // Great, they picked a game

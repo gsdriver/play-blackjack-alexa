@@ -18,8 +18,7 @@ const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 const https = require('https');
 
 module.exports = {
-  emitResponse: function(context, error, response, speech, reprompt,
-      cardTitle, cardText, productId) {
+  emitResponse: function(context, error, response, speech, reprompt, cardTitle, cardText) {
     const formData = {};
 
     // Async call to save state and logs if necessary
@@ -31,7 +30,7 @@ module.exports = {
       });
     }
 
-    if (response || productId) {
+    if (response) {
       formData.savedb = JSON.stringify({
         userId: context.event.session.user.userId,
         attributes: context.event.session.attributes,
@@ -51,22 +50,7 @@ module.exports = {
       });
     }
 
-    if (productId) {
-      console.log('Purchase response received!');
-      context.response.shouldEndSession(true);
-      context.response._addDirective({
-        'type': 'Connections.SendRequest',
-        'name': 'Buy',
-        'payload': {
-          'InSkillProduct': {
-            'productId': productId,
-          },
-        },
-        'token': 'correlationToken',
-      });
-      context.emit(':responseReady');
-      return;
-    } else if (error) {
+    if (error) {
       const res = require('./' + context.event.request.locale + '/resources');
       console.log('Speech error: ' + error);
       context.response.speak(error)
@@ -85,6 +69,53 @@ module.exports = {
     displayTable(context, () => {
       context.emit(':responseReady');
     });
+  },
+  // We need to hand-roll the buy response
+  sendBuyResponse: function(context, product) {
+    const res = require('./' + context.event.request.locale + '/resources');
+    let productId;
+    context.attributes.inSkillProducts.forEach((item) => {
+      if (item.referenceName == product.id) {
+        productId = item.productId;
+      }
+    });
+
+    if (productId) {
+      // First save state
+      const formData = {};
+      formData.savedb = JSON.stringify({
+        userId: context.event.session.user.userId,
+        attributes: context.event.session.attributes,
+      });
+      const params = {
+        url: process.env.SERVICEURL + 'blackjack/saveState',
+        formData: formData,
+      };
+      request.post(params, (err, res, body) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+
+      // Add a SendRequest directive
+      console.log('Purchase directive!');
+      context.response.shouldEndSession(true);
+      context.response._addDirective({
+        'type': 'Connections.SendRequest',
+        'name': product.name,
+        'payload': {
+          'InSkillProduct': {
+            'productId': productId,
+            'upsellMessage': product.upsellMessage,
+          },
+        },
+        'token': (product.token ? product.token : product.name),
+      });
+      context.emit(':responseReady');
+    } else {
+      // Something went wrong
+      module.exports.emitResponse(context, res.strings.INTERNAL_ERROR);
+    }
   },
   // Figures out what state of the game we're in
   getState: function(attributes) {
@@ -325,17 +356,16 @@ module.exports = {
             const inSkillProductInfo = JSON.parse(returnData);
             if (Array.isArray(inSkillProductInfo.inSkillProducts)) {
               // Let's see what they paid for (for now we only support Spanish 21)
-              const paidList = [];
               context.attributes.inSkillProducts = inSkillProductInfo.inSkillProducts;
               inSkillProductInfo.inSkillProducts.forEach((product) => {
                 if ((product.type == 'ENTITLEMENT') && (product.entitled == 'ENTITLED')) {
                   // Add to the list
-                  paidList.push(product.referenceName);
+                  if (!context.attributes.paid) {
+                    context.attributes.paid = {};
+                  }
+                  context.attributes.paid[product.referenceName] = product.productId;
                 }
               });
-              if (paidList.length) {
-                context.attributes.paid = paidList;
-              }
             } else {
               context.attributes.inSkillProducts = [];
             }

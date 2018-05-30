@@ -266,6 +266,19 @@
           ]
         },
         {
+          "name": "RefundIntent",
+          "slots": [
+            {
+              "name": "Product",
+              "type": "LIST_OF_PRODUCTS"
+            }
+          ],
+          "samples": [
+            "return {Product}",
+            "refund {Product}"
+          ]
+        },
+        {
           "name": "HighScoreIntent",
           "samples": [
             "read high scores",
