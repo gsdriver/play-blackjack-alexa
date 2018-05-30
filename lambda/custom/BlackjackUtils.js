@@ -52,7 +52,7 @@ module.exports = {
     }
 
     if (productId) {
-      console.log('Purchase response!');
+      console.log('Purchase response received!');
       context.response.speak('Nothing');
       context.response.addDirective({
         'type': 'Connections.SendRequest',
