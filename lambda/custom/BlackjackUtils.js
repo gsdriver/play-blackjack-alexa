@@ -53,8 +53,8 @@ module.exports = {
 
     if (productId) {
       console.log('Purchase response received!');
-      context.response.speak('Nothing');
-      context.response.addDirective({
+      context.response.shouldEndSession(true);
+      context.response._addDirective({
         'type': 'Connections.SendRequest',
         'name': 'Buy',
         'payload': {
