@@ -8,6 +8,7 @@ const AWS = require('aws-sdk');
 const Alexa = require('alexa-sdk');
 // utility methods for creating Image and TextField objects
 const makePlainText = Alexa.utils.TextUtils.makePlainText;
+const makeRichText = Alexa.utils.TextUtils.makeRichText;
 const makeImage = Alexa.utils.ImageUtils.makeImage;
 AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
@@ -74,6 +75,7 @@ module.exports = {
   sendBuyResponse: function(context, product) {
     const res = require('./' + context.event.request.locale + '/resources');
     let productId;
+
     context.attributes.inSkillProducts.forEach((item) => {
       if (item.referenceName == product.id) {
         productId = item.productId;
@@ -106,8 +108,8 @@ module.exports = {
         'payload': {
           'InSkillProduct': {
             'productId': productId,
-            'upsellMessage': product.upsellMessage,
           },
+          'upsellMessage': product.upsellMessage,
         },
         'token': (product.token ? product.token : product.name),
       });
@@ -321,69 +323,60 @@ module.exports = {
     return achievementScore;
   },
   getPurchasedProducts: function(context, callback) {
-    // Invoke the entitlement API to load products only if not already cached
-    if (!context.attributes.paid) {
-      context.attributes.inSkillProducts = [];
-      const apiEndpoint = 'api.amazonalexa.com';
-      const token = 'bearer ' + context.event.context.System.apiAccessToken;
-      const language = context.event.request.locale;
-      const apiPath = '/v1/users/~current/skills/~current/inSkillProducts';
-      const options = {
-        host: apiEndpoint,
-        path: apiPath,
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept-Language': language,
-          'Authorization': token,
-        },
-      };
+    // Invoke the entitlement API to load products
+    context.attributes.inSkillProducts = [];
+    const apiEndpoint = 'api.amazonalexa.com';
+    const token = 'bearer ' + context.event.context.System.apiAccessToken;
+    const language = context.event.request.locale;
+    const apiPath = '/v1/users/~current/skills/~current/inSkillProducts';
+    const options = {
+      host: apiEndpoint,
+      path: apiPath,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept-Language': language,
+        'Authorization': token,
+      },
+    };
 
-      // Call the API
-      const req = https.get(options, (res) => {
-        let returnData = '';
-        res.setEncoding('utf8');
-        if (res.statusCode != 200) {
-          console.log('inSkillProducts returned status code ' + res.statusCode);
-          callback(res.statusCode);
-        } else {
-          res.on('data', (chunk) => {
-            console.log('Chunk:' + chunk);
-            returnData += chunk;
-          });
+    // Call the API
+    const req = https.get(options, (res) => {
+      let returnData = '';
+      res.setEncoding('utf8');
+      if (res.statusCode != 200) {
+        console.log('inSkillProducts returned status code ' + res.statusCode);
+        callback(res.statusCode);
+      } else {
+        res.on('data', (chunk) => {
+          returnData += chunk;
+        });
 
-          res.on('end', () => {
-            const inSkillProductInfo = JSON.parse(returnData);
-            if (Array.isArray(inSkillProductInfo.inSkillProducts)) {
-              // Let's see what they paid for (for now we only support Spanish 21)
-              context.attributes.inSkillProducts = inSkillProductInfo.inSkillProducts;
-              inSkillProductInfo.inSkillProducts.forEach((product) => {
-                if ((product.type == 'ENTITLEMENT') && (product.entitled == 'ENTITLED')) {
-                  // Add to the list
-                  if (!context.attributes.paid) {
-                    context.attributes.paid = {};
-                  }
-                  context.attributes.paid[product.referenceName] = product.productId;
-                }
-              });
-            } else {
-              context.attributes.inSkillProducts = [];
-            }
+        res.on('end', () => {
+          const inSkillProductInfo = JSON.parse(returnData);
+          if (Array.isArray(inSkillProductInfo.inSkillProducts)) {
+            // Let's see what they paid for
+            context.attributes.inSkillProducts = inSkillProductInfo.inSkillProducts;
+            context.attributes.paid = {};
+            inSkillProductInfo.inSkillProducts.forEach((product) => {
+              if ((product.type == 'ENTITLEMENT') && (product.entitled == 'ENTITLED')) {
+                // Add to the list
+                context.attributes.paid[product.referenceName] = true;
+              }
+            });
+          } else {
+            context.attributes.inSkillProducts = [];
+          }
 
-            callback();
-          });
-        }
-      });
+          callback();
+        });
+      }
+    });
 
-      req.on('error', (err) => {
-        console.log('Error calling inSkillProducts API: ' + err.message);
-        callback(err);
-      });
-    } else {
-      console.log('Product info already loaded.');
-      callback();
-      return;
-    }
+    req.on('error', (err) => {
+      console.log('Error calling inSkillProducts API: ' + err.message);
+      callback(err);
+    });
   },
 };
 
@@ -411,7 +404,7 @@ function displayTable(context, callback) {
         });
 
         const listItems = listItemBuilder.build();
-        listTemplate = listTemplateBuilder
+        const listTemplate = listTemplateBuilder
           .setToken('listToken')
           .setTitle(res.strings.SELECT_GAME_TITLE)
           .setListItems(listItems)

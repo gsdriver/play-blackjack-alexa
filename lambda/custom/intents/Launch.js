@@ -21,9 +21,18 @@ module.exports = {
     // Try to keep it simple
     const launchWelcome = JSON.parse(res.strings.LAUNCH_WELCOME);
     launchSpeech = launchWelcome[this.attributes.currentGame];
-    if (this.attributes.tournamentResult) {
-      launchSpeech = this.attributes.tournamentResult + launchSpeech;
-      this.attributes.tournamentResult = undefined;
+    if (this.attributes.prependLaunch) {
+      launchSpeech = this.attributes.prependLaunch + launchSpeech;
+      this.attributes.prependLaunch = undefined;
+    }
+
+    if (!this.attributes.newUser &&
+      (!this.attributes.prompts || !this.attributes.prompts.sellSpanish)) {
+      launchSpeech += res.strings.LAUNCH_SELL_SPANISH;
+      if (!this.attributes.prompts) {
+        this.attributes.prompts = {};
+      }
+      this.attributes.prompts.sellSpanish = true;
     }
 
     // Figure out what the current game state is - give them option to reset

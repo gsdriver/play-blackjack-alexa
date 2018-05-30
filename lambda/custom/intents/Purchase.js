@@ -10,15 +10,11 @@ module.exports = {
   handleIntent: function() {
     const res = require('../' + this.event.request.locale + '/resources');
 
-    // We only offer Spanish 21 - let's see if they already have it
     if (this.event.request.intent.slots && this.event.request.intent.slots.Product
       && this.event.request.intent.slots.Product.value) {
       // They specified a product - we'll assume it's Spanish 21
+      // since that's all we support for now
       bjUtils.sendBuyResponse(this, {name: 'Buy', id: 'spanish'});
-    } else if (this.attributes.paid && this.attributes.paid.spanish) {
-      // We only offer Spanish 21, and they already have it
-      bjUtils.emitResponse(this, null, null,
-        res.strings.PURCHASE_ONLY_SPANISH, res.strings.PURCHASE_REPROMPT);
     } else {
       // Prompt them
       this.handler.state = 'CONFIRMPURCHASE';

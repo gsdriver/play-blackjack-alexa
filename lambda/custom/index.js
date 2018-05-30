@@ -21,6 +21,7 @@ const Training = require('./intents/Training');
 const Unhandled = require('./intents/Unhandled');
 const Purchase = require('./intents/Purchase');
 const Refund = require('./intents/Refund');
+const ProductResponse = require('./intents/ProductResponse');
 const gameService = require('./GameService');
 const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
@@ -37,6 +38,7 @@ const selectGameHandlers = Alexa.CreateStateHandler('SELECTGAME', {
     this.handler.state = '';
     this.emitWithState('NewSession');
   },
+  'LaunchRequest': Select.handleIntent,
   'ElementSelected': Select.handleYesIntent,
   'GameIntent': Select.handleYesIntent,
   'SelectIntent': Select.handleNoIntent,
@@ -301,10 +303,12 @@ const handlers = {
           });
         } else {
           if (result && (result.length > 0)) {
-            this.attributes.tournamentResult = result;
+            this.attributes.prependLaunch = result;
           }
           if (this.event.request.type === 'IntentRequest') {
             this.emit(this.event.request.intent.name);
+          } else if (this.event.request.type === 'Connections.Response') {
+            this.emit('ProductResponse');
           } else {
             this.emit('LaunchRequest');
           }
@@ -314,6 +318,7 @@ const handlers = {
   },
   // Some intents don't make sense for a new session - so just launch instead
   'LaunchRequest': Launch.handleIntent,
+  'ProductResponse': ProductResponse.handleIntent,
   'SuggestIntent': Launch.handleIntent,
   'ResetIntent': Launch.handleIntent,
   'ChangeRulesIntent': Launch.handleIntent,
@@ -393,11 +398,14 @@ function initialize(context, callback) {
   const locale = context.event.request.locale;
   const userId = context.event.session.user.userId;
 
-  // Some initiatlization
+  // Some initialization
   attributes.playerLocale = locale;
   attributes.numRounds = (attributes.numRounds + 1) || 1;
   attributes.newUser = newUser;
-  attributes.temp = {firsthand: true};
+  if (!attributes.temp) {
+    attributes.temp = {};
+  }
+  attributes.temp.firsthand = true;
 
   // Load purchased products
   bjUtils.getPurchasedProducts(context, () => {

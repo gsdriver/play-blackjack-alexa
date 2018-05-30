@@ -17,7 +17,8 @@ module.exports = {
     let reprompt;
 
     // If they don't have Spanish 21, upsell
-    if (availableGames.indexOf('spanish') == -1) {
+    if (!this.attributes.temp.noUpsell &&
+        (availableGames.indexOf('spanish') == -1)) {
       const directive = {
         name: 'Upsell',
         id: 'spanish',
@@ -71,7 +72,7 @@ module.exports = {
   },
 };
 
-function selectedGame(context, placeBet) {
+function selectedGame(context) {
   const res = require('../' + context.event.request.locale + '/resources');
   const attributes = context.attributes;
 
