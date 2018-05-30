@@ -157,7 +157,7 @@ module.exports = {
           games.push(game);
         }
       } else if (game == 'spanish') {
-        if (attributes.paidSpanish) {
+        if (attributes.paid && attributes.paid.spanish) {
           games.push(game);
         }
       } else {

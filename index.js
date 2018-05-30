@@ -19,6 +19,7 @@ const Reset = require('./intents/Reset');
 const Select = require('./intents/Select');
 const Training = require('./intents/Training');
 const Unhandled = require('./intents/Unhandled');
+const Purchase = require('./intents/Purchase');
 const gameService = require('./GameService');
 const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
@@ -38,6 +39,7 @@ const selectGameHandlers = Alexa.CreateStateHandler('SELECTGAME', {
   'ElementSelected': Select.handleYesIntent,
   'GameIntent': Select.handleYesIntent,
   'SelectIntent': Select.handleNoIntent,
+  'PurchaseIntent': Purchase.handleIntent,
   'AMAZON.YesIntent': Select.handleYesIntent,
   'AMAZON.NextIntent': Select.handleNoIntent,
   'AMAZON.NoIntent': Select.handleNoIntent,
@@ -61,6 +63,7 @@ const suggestHandlers = Alexa.CreateStateHandler('SUGGESTION', {
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
   'RulesIntent': Rules.handleIntent,
+  'PurchaseIntent': Purchase.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.FallbackIntent': Repeat.handleIntent,
   'AMAZON.YesIntent': TakeSuggestion.handleYesIntent,
@@ -82,11 +85,35 @@ const resetHandlers = Alexa.CreateStateHandler('CONFIRMRESET', {
   'HighScoreIntent': HighScore.handleIntent,
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
+  'PurchaseIntent': Purchase.handleIntent,
   'AMAZON.FallbackIntent': Reset.handleRepeat,
   'AMAZON.RepeatIntent': Reset.handleRepeat,
   'AMAZON.HelpIntent': Reset.handleRepeat,
   'AMAZON.YesIntent': Reset.handleYesReset,
   'AMAZON.NoIntent': Reset.handleNoReset,
+  'AMAZON.StopIntent': Exit.handleIntent,
+  'AMAZON.CancelIntent': Exit.handleIntent,
+  'Unhandled': Unhandled.handleIntent,
+  'SessionEndedRequest': function() {
+    saveState(this.event.session.user.userId, this.attributes);
+  },
+});
+
+const purchaseHandlers = Alexa.CreateStateHandler('CONFIRMPURCHASE', {
+  'NewSession': function() {
+    this.handler.state = '';
+    this.emitWithState('NewSession');
+  },
+  'LaunchRequest': Purchase.handleNoIntent,
+  'HighScoreIntent': HighScore.handleIntent,
+  'EnableTrainingIntent': Training.handleEnableIntent,
+  'DisableTrainingIntent': Training.handleDisableIntent,
+  'PurchaseIntent': Purchase.handleYesIntent,
+  'AMAZON.FallbackIntent': Purchase.handleRepeatIntent,
+  'AMAZON.RepeatIntent': Purchase.handleRepeatIntent,
+  'AMAZON.HelpIntent': Purchase.handleRepeatIntent,
+  'AMAZON.YesIntent': Purchase.handleYesIntent,
+  'AMAZON.NoIntent': Purchase.handleNoIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
   'AMAZON.CancelIntent': Exit.handleIntent,
   'Unhandled': Unhandled.handleIntent,
@@ -111,6 +138,7 @@ const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
   'SelectIntent': Select.handleIntent,
+  'PurchaseIntent': Purchase.handleIntent,
   'AMAZON.YesIntent': Betting.handleIntent,
   'AMAZON.NoIntent': Exit.handleIntent,
   'AMAZON.FallbackIntent': Repeat.handleIntent,
@@ -140,6 +168,7 @@ const firstTimeHandlers = Alexa.CreateStateHandler('FIRSTTIMEPLAYER', {
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
   'SelectIntent': Select.handleIntent,
+  'PurchaseIntent': Purchase.handleIntent,
   'AMAZON.YesIntent': Betting.handleIntent,
   'AMAZON.NoIntent': Exit.handleIntent,
   'AMAZON.FallbackIntent': Repeat.handleIntent,
@@ -164,6 +193,7 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'HighScoreIntent': HighScore.handleIntent,
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
+  'PurchaseIntent': Purchase.handleIntent,
   'AMAZON.YesIntent': TakeInsurance.handleIntent,
   'AMAZON.NoIntent': DeclineInsurance.handleIntent,
   'AMAZON.FallbackIntent': Repeat.handleIntent,
@@ -189,6 +219,7 @@ const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'HighScoreIntent': HighScore.handleIntent,
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
+  'PurchaseIntent': Purchase.handleIntent,
   'AMAZON.FallbackIntent': Repeat.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
@@ -210,6 +241,7 @@ const joinHandlers = Alexa.CreateStateHandler('JOINTOURNAMENT', {
   'LaunchRequest': tournament.handlePass,
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
+  'PurchaseIntent': Purchase.handleIntent,
   'AMAZON.YesIntent': tournament.handleJoin,
   'AMAZON.NoIntent': tournament.handlePass,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -223,7 +255,7 @@ const joinHandlers = Alexa.CreateStateHandler('JOINTOURNAMENT', {
 // Handlers for our skill
 const handlers = {
   'NewSession': function() {
-    initialize(this.attributes, this.event.request.locale, this.event.session.user.userId, () => {
+    initialize(this, () => {
       tournament.getTournamentComplete(this.event.request.locale, this.attributes, (result) => {
         // If there is an active tournament, go to the start tournament state
         if (tournament.canEnterTournament(this.attributes)) {
@@ -261,6 +293,7 @@ const handlers = {
   'HighScoreIntent': HighScore.handleIntent,
   'EnableTrainingIntent': Training.handleEnableIntent,
   'DisableTrainingIntent': Training.handleDisableIntent,
+  'PurchaseIntent': Purchase.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
   'AMAZON.HelpIntent': Help.handleIntent,
   'AMAZON.StopIntent': Exit.handleIntent,
@@ -313,74 +346,82 @@ function runGame(event, context, callback) {
     event.session.attributes.userId = event.session.user.userId;
     bjUtils.readSuggestions(event.session.attributes, () => {
       alexa.registerHandlers(handlers, resetHandlers, newGameHandlers, firstTimeHandlers,
-        insuranceHandlers, joinHandlers, inGameHandlers, suggestHandlers, selectGameHandlers);
+        insuranceHandlers, joinHandlers, inGameHandlers,
+        purchaseHandlers, suggestHandlers, selectGameHandlers);
       alexa.execute();
     });
   }
 }
 
-function initialize(attributes, locale, userId, callback) {
+function initialize(context, callback) {
+  const attributes = context.attributes;
+  const locale = context.event.request.locale;
+  const userId = context.event.session.user.userId;
+
   // Some initiatlization
   attributes.playerLocale = locale;
   attributes.numRounds = (attributes.numRounds + 1) || 1;
   attributes.newUser = newUser;
   attributes.temp = {firsthand: true};
 
-  // If they don't have a game, create one
-  if (!attributes.currentGame) {
-    gameService.initializeGame('standard', attributes, userId);
+  // Load purchased products
+  bjUtils.getPurchasedProducts(context, () => {
+    // If they don't have a game, create one
+    if (!attributes.currentGame) {
+      gameService.initializeGame('standard', attributes, userId);
 
-    // Now read the progressive jackpot amount
-    bjUtils.getProgressivePayout(attributes, (jackpot) => {
-      attributes[attributes.currentGame].progressiveJackpot = jackpot;
-      callback();
-    });
-  } else {
-    // Standard should have progressive; some customers will have this game
-    // without progressive, so set it for them
-    const game = attributes[attributes.currentGame];
-    if (attributes.currentGame === 'standard') {
-      if (!game.progressive) {
-        game.progressive = {bet: 5, starting: 2500, jackpotRate: 1.25};
-
-        // Also stuff sidebet in as a possible action if bet is there
-        if (game.possibleActions &&
-          (game.possibleActions.indexOf('bet') >= 0) &&
-          (game.possibleActions.indexOf('sidebet') < 0)) {
-          game.possibleActions.push('sidebet');
-        }
-      }
-
-      // You should also be able to reset the standard game
-      game.canReset = true;
-      game.canChangeRules = true;
-    }
-    game.bankroll = Math.floor(game.bankroll);
-
-    // It's possible you are stuck in shuffle state if you ran out of cards
-    // and money at the same time - if so, let's fix that here
-    if (attributes && attributes.standard && attributes.standard.possibleActions
-      && (attributes.standard.possibleActions.indexOf('shuffle') > -1)) {
-      console.log('Player stuck in shuffle state!');
-      playgame.playBlackjackAction(attributes, locale, userId, {action: 'shuffle'}, () => {
-        getProgressive();
+      // Now read the progressive jackpot amount
+      bjUtils.getProgressivePayout(attributes, (jackpot) => {
+        attributes[attributes.currentGame].progressiveJackpot = jackpot;
+        callback();
       });
     } else {
-      getProgressive();
-    }
+      // Standard should have progressive; some customers will have this game
+      // without progressive, so set it for them
+      const game = attributes[attributes.currentGame];
+      if (attributes.currentGame === 'standard') {
+        if (!game.progressive) {
+          game.progressive = {bet: 5, starting: 2500, jackpotRate: 1.25};
 
-    function getProgressive() {
-      // Now read the progressive jackpot amount
-      if (game.progressive) {
-        bjUtils.getProgressivePayout(attributes, (jackpot) => {
-          game.progressiveJackpot = jackpot;
-          callback();
+          // Also stuff sidebet in as a possible action if bet is there
+          if (game.possibleActions &&
+            (game.possibleActions.indexOf('bet') >= 0) &&
+            (game.possibleActions.indexOf('sidebet') < 0)) {
+            game.possibleActions.push('sidebet');
+          }
+        }
+
+        // You should also be able to reset the standard game
+        game.canReset = true;
+        game.canChangeRules = true;
+      }
+      game.bankroll = Math.floor(game.bankroll);
+
+      // It's possible you are stuck in shuffle state if you ran out of cards
+      // and money at the same time - if so, let's fix that here
+      if (attributes && attributes.standard && attributes.standard.possibleActions
+        && (attributes.standard.possibleActions.indexOf('shuffle') > -1)) {
+        console.log('Player stuck in shuffle state!');
+        playgame.playBlackjackAction(attributes, locale, userId, {action: 'shuffle'}, () => {
+          getProgressive();
         });
       } else {
-        callback();
+        getProgressive();
+      }
+
+      function getProgressive() {
+        // Now read the progressive jackpot amount
+        if (game.progressive) {
+          bjUtils.getProgressivePayout(attributes, (jackpot) => {
+            game.progressiveJackpot = jackpot;
+            callback();
+          });
+        } else {
+          callback();
+        }
       }
     }
-  }
+  });
 }
 
 function saveState(userId, attributes) {

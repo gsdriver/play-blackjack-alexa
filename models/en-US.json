@@ -245,6 +245,27 @@
           ]
         },
         {
+          "name": "PurchaseIntent",
+          "slots": [
+            {
+              "name": "Product",
+              "type": "LIST_OF_PRODUCTS"
+            }
+          ],
+          "samples": [
+            "what can I buy",
+            "what can I shop for",
+            "tell me what I can buy",
+            "what can I pay for",
+            "tell what what I can pay for",
+            "I want to buy {Product}",
+            "I want {Product}",
+            "give me {Product}",
+            "buy {Product}",
+            "pay for {Product}"
+          ]
+        },
+        {
           "name": "HighScoreIntent",
           "samples": [
             "read high scores",
@@ -395,6 +416,21 @@
             }
           ],
           "name": "LIST_OF_ACTIONS"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "value": "spanish 21"
+              }
+            },
+            {
+              "name": {
+                "value": "spanish"
+              }
+            }
+          ],
+          "name": "LIST_OF_PRODUCTS"
         },
         {
           "values": [

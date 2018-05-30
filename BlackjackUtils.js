@@ -15,9 +15,11 @@ const speechUtils = require('alexa-speech-utils')();
 const querystring = require('querystring');
 const request = require('request');
 const s3 = new AWS.S3({apiVersion: '2006-03-01'});
+const https = require('https');
 
 module.exports = {
-  emitResponse: function(context, error, response, speech, reprompt, cardTitle, cardText) {
+  emitResponse: function(context, error, response, speech, reprompt,
+      cardTitle, cardText, productId) {
     const formData = {};
 
     // Async call to save state and logs if necessary
@@ -28,7 +30,8 @@ module.exports = {
         result: result,
       });
     }
-    if (response) {
+
+    if (response || productId) {
       formData.savedb = JSON.stringify({
         userId: context.event.session.user.userId,
         attributes: context.event.session.attributes,
@@ -48,7 +51,22 @@ module.exports = {
       });
     }
 
-    if (error) {
+    if (productId) {
+      console.log('Purchase response!');
+      context.response.speak('Nothing');
+      context.response.addDirective({
+        'type': 'Connections.SendRequest',
+        'name': 'Buy',
+        'payload': {
+          'InSkillProduct': {
+            'productId': productId,
+          },
+        },
+        'token': 'correlationToken',
+      });
+      context.emit(':responseReady');
+      return;
+    } else if (error) {
       const res = require('./' + context.event.request.locale + '/resources');
       console.log('Speech error: ' + error);
       context.response.speak(error)
@@ -270,6 +288,72 @@ module.exports = {
     }
 
     return achievementScore;
+  },
+  getPurchasedProducts: function(context, callback) {
+    // Invoke the entitlement API to load products only if not already cached
+    if (!context.attributes.paid) {
+      context.attributes.inSkillProducts = [];
+      const apiEndpoint = 'api.amazonalexa.com';
+      const token = 'bearer ' + context.event.context.System.apiAccessToken;
+      const language = context.event.request.locale;
+      const apiPath = '/v1/users/~current/skills/~current/inSkillProducts';
+      const options = {
+        host: apiEndpoint,
+        path: apiPath,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Language': language,
+          'Authorization': token,
+        },
+      };
+
+      // Call the API
+      const req = https.get(options, (res) => {
+        let returnData = '';
+        res.setEncoding('utf8');
+        if (res.statusCode != 200) {
+          console.log('inSkillProducts returned status code ' + res.statusCode);
+          callback(res.statusCode);
+        } else {
+          res.on('data', (chunk) => {
+            console.log('Chunk:' + chunk);
+            returnData += chunk;
+          });
+
+          res.on('end', () => {
+            const inSkillProductInfo = JSON.parse(returnData);
+            if (Array.isArray(inSkillProductInfo.inSkillProducts)) {
+              // Let's see what they paid for (for now we only support Spanish 21)
+              const paidList = [];
+              context.attributes.inSkillProducts = inSkillProductInfo.inSkillProducts;
+              inSkillProductInfo.inSkillProducts.forEach((product) => {
+                if ((product.type == 'ENTITLEMENT') && (product.entitled == 'ENTITLED')) {
+                  // Add to the list
+                  paidList.push(product.referenceName);
+                }
+              });
+              if (paidList.length) {
+                context.attributes.paid = paidList;
+              }
+            } else {
+              context.attributes.inSkillProducts = [];
+            }
+
+            callback();
+          });
+        }
+      });
+
+      req.on('error', (err) => {
+        console.log('Error calling inSkillProducts API: ' + err.message);
+        callback(err);
+      });
+    } else {
+      console.log('Product info already loaded.');
+      callback();
+      return;
+    }
   },
 };
 

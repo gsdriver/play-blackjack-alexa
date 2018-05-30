@@ -4,7 +4,7 @@
       "skill_id": "amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce",
       "was_cloned": true,
       "merge": {
-        "skillManifest": {
+        "manifest": {
           "apis": {
             "custom": {
               "endpoint": {
@@ -13,7 +13,14 @@
             }
           }
         }
-      }
+      },
+      "in_skill_products": [
+        {
+          "deploy_status": "Update",
+          "filePath": "isps\\entitlement\\spanish.json",
+          "productId": "amzn1.adg.product.48f3cc52-c32e-459a-b7b5-eb36ebe6c86a"
+        }
+      ]
     }
   }
 }

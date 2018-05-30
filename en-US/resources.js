@@ -49,6 +49,12 @@ const resources = {
   'LAUNCH_START_HIGH_SCORES': 'read high scores to hear the leader board',
   'LAUNCH_START_RESET': 'reset game to reset to the default rules and bankroll',
   'LAUNCH_START_PROMPT': ' <break time=\'300ms\'/>Now, what can I help you with?',
+  // From Purchase.js
+  'PURCHASE_ONLY_SPANISH': 'We only offer the Spanish 21 expansion product, and you\'ve already purchased it. What else can I help you with?',
+  'PURCHASE_SPANISH': 'We have a Spanish 21 game available for purchase. Would you like to buy it? ',
+  'PURCHASE_CONFIRM_REPROMPT': 'Say yes to buy Spanish 21',
+  'PURCHASE_PRODUCT_NOT_FOUND': 'Sorry, I wasn\'t able to complete the transaction. What else can I help you with?',
+  'PURCHASE_REPROMPT': 'What else can I help you with?',
   // From Reset.js
   'RESET_CONFIRM': 'Would you like to reset the game? This will reset your bankroll and rules of the game.',
   'RESET_COMPLETED': 'You have $5000. Say bet to start a new game.',
