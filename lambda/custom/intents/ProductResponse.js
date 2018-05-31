@@ -40,13 +40,12 @@ module.exports = {
         }
         break;
       case 'Cancel':
-        // If they accepted the cancel, delete their progress on spanish
-        // It may take time for them to process the refund - don't check API
-        // (this is undone with a new purchase)
+        // Don't delete their progress until the API tells us the refund was processed
+        // Switch them instead to the standard game
         console.log('Cancel response');
         if (this.event.request.payload &&
             (this.event.request.payload.purchaseResult == 'ACCEPTED')) {
-          this.attributes.spanish = undefined;
+          this.attributes.paid.spanish.state = 'REFUND_PENDING';
           selectedGame(this, 'standard');
           return;
         }
@@ -76,6 +75,7 @@ function selectedGame(context, gameToPlay) {
   let launchSpeech = launchWelcome[context.attributes.currentGame];
   launchSpeech += res.strings.LAUNCH_START_GAME;
   playgame.readCurrentHand(context.attributes, context.event.request.locale, (speech, reprompt) => {
+    context.handler.state = bjUtils.getState(context.attributes);
     bjUtils.emitResponse(context, null, null, launchSpeech, reprompt);
   });
 }

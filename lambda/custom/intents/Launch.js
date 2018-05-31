@@ -26,7 +26,8 @@ module.exports = {
       this.attributes.prependLaunch = undefined;
     }
 
-    if (!this.attributes.newUser &&
+    if (!this.attributes.newUser && this.attributes.paid
+      && (this.attributes.paid.spanish == 'AVAILABLE') &&
       (!this.attributes.prompts || !this.attributes.prompts.sellSpanish)) {
       launchSpeech += res.strings.LAUNCH_SELL_SPANISH;
       if (!this.attributes.prompts) {

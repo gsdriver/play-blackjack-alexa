@@ -125,7 +125,7 @@ module.exports = {
 
     if (availableGames[game]) {
       newGame = JSON.parse(JSON.stringify(availableGames[game]));
-      game.userID = userID;
+      newGame.userID = userID;
 
       // Set timestamp for tournament to avoid extra achievement points
       if (game == 'tournament') {
@@ -157,7 +157,9 @@ module.exports = {
           games.push(game);
         }
       } else if (game == 'spanish') {
-        if (attributes.paid && attributes.paid.spanish) {
+        if (attributes.paid && attributes.paid.spanish &&
+              ((attributes.paid.spanish.state == 'PURCHASED')
+              || (attributes.paid.spanish.state == 'REFUND_PENDING'))) {
           games.push(game);
         }
       } else {

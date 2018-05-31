@@ -400,6 +400,19 @@ function tellResult(attributes, locale, action, oldGame) {
     } else {
       result += resources.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll);
     }
+
+    // If it's non-tournament play and that was 5 or more cards to a 21,
+    // let them know about Spanish 21
+    if ((attributes.currentGame !== 'tournament')
+      && attributes.paid && attributes.paid.spanish && (attributes.paid.spanish.state == 'AVAILABLE')
+      && !attributes.temp.noUpsell) {
+      if ((game.playerHands.length == 1) && (game.playerHands[0].cards.length > 4)
+        && (handTotal(game.playerHands[0].cards) == 21)) {
+        // Let them know about Spanish 21!
+        result += resources.strings.LONG21_SELL_SPANISH;
+        attributes.temp.noUpsell = true;
+      }
+    }
   }
 
   return result;
@@ -810,6 +823,11 @@ function readHandNumber(game, handNumber) {
 function rulesToText(locale, rules, changeRules) {
   let text = '';
 
+  // Is this Spanish 21?
+  if (rules.pay21) {
+    text += resources.strings.RULES_SPANISH21;
+  }
+
   // If old rules were passed in, only state what's set in changeRules
   // As that would be the elements that changed
   // Say the decks and betting range
@@ -868,4 +886,30 @@ function rulesToText(locale, rules, changeRules) {
   }
 
   return text;
+}
+
+function handTotal(cards) {
+  let retval = 0;
+  let hasAces = false;
+
+  for (let i = 0; i < cards.length; i++) {
+    if (cards[i].rank > 10) {
+      retval += 10;
+    } else {
+      retval += cards[i].rank;
+    }
+
+    // Note if there's an ace
+    if (cards[i].rank == 1) {
+      hasAces = true;
+    }
+  }
+
+  // If there are aces, add 10 to the total (unless it would go over 21)
+  // Note that in this case the hand is soft
+  if ((retval <= 11) && hasAces) {
+    retval += 10;
+  }
+
+  return retval;
 }

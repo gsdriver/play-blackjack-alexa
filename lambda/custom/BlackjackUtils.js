@@ -76,13 +76,23 @@ module.exports = {
     const res = require('./' + context.event.request.locale + '/resources');
     let productId;
 
-    context.attributes.inSkillProducts.forEach((item) => {
-      if (item.referenceName == product.id) {
-        productId = item.productId;
-      }
-    });
+    if (context.attributes.paid && context.attributes.paid[product.id]) {
+      productId = context.attributes.paid[product.id].productId;
+    }
 
     if (productId) {
+      // Set the state for this node - either purchase or refund pending
+      let state;
+      if (product.name == 'Cancel') {
+        // Will get set to REFUND_PENDING if they confirm they want a refund
+        state = context.attributes.paid[product.id].state;
+      } else if (context.attributes.paid[product.id].state == 'REFUND_PENDING') {
+        state = 'REFUND_PENDING';
+      } else {
+        state = 'PURCHASE_PENDING';
+      }
+      context.attributes.paid[product.id].state = state;
+
       // First save state
       const formData = {};
       formData.savedb = JSON.stringify({
@@ -323,60 +333,107 @@ module.exports = {
     return achievementScore;
   },
   getPurchasedProducts: function(context, callback) {
-    // Invoke the entitlement API to load products
-    context.attributes.inSkillProducts = [];
-    const apiEndpoint = 'api.amazonalexa.com';
-    const token = 'bearer ' + context.event.context.System.apiAccessToken;
-    const language = context.event.request.locale;
-    const apiPath = '/v1/users/~current/skills/~current/inSkillProducts';
-    const options = {
-      host: apiEndpoint,
-      path: apiPath,
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept-Language': language,
-        'Authorization': token,
-      },
-    };
+    // First check whether we can use cached data
+    const availableProducts = ['spanish'];
+    let check;
 
-    // Call the API
-    const req = https.get(options, (res) => {
-      let returnData = '';
-      res.setEncoding('utf8');
-      if (res.statusCode != 200) {
-        console.log('inSkillProducts returned status code ' + res.statusCode);
-        callback(res.statusCode);
-      } else {
-        res.on('data', (chunk) => {
-          returnData += chunk;
-        });
-
-        res.on('end', () => {
-          const inSkillProductInfo = JSON.parse(returnData);
-          if (Array.isArray(inSkillProductInfo.inSkillProducts)) {
-            // Let's see what they paid for
-            context.attributes.inSkillProducts = inSkillProductInfo.inSkillProducts;
-            context.attributes.paid = {};
-            inSkillProductInfo.inSkillProducts.forEach((product) => {
-              if ((product.type == 'ENTITLEMENT') && (product.entitled == 'ENTITLED')) {
-                // Add to the list
-                context.attributes.paid[product.referenceName] = true;
-              }
-            });
-          } else {
-            context.attributes.inSkillProducts = [];
+    // Purchased products is only for US customers
+    if (context.event.request.locale !== 'en-US') {
+      check = false;
+      context.attributes.paid = undefined;
+    } else if (context.attributes.paid) {
+      // Do they have all products accounted for?
+      availableProducts.forEach((product) => {
+        if (!context.attributes.paid[product]) {
+          // New product, need to check
+          check = true;
+        } else {
+          if ((context.attributes.paid[product].state == 'PURCHASE_PENDING') ||
+            (context.attributes.paid[product].state == 'REFUND_PENDING')) {
+            // Purchase or refund in progress - need to check
+            check = true;
           }
+        }
+      });
+    } else {
+      // Nothing here, so check the API
+      check = true;
+    }
 
-          callback();
-        });
-      }
-    });
+    if (check) {
+      // Invoke the entitlement API to load products
+      const apiEndpoint = 'api.amazonalexa.com';
+      const token = 'bearer ' + context.event.context.System.apiAccessToken;
+      const language = context.event.request.locale;
+      const apiPath = '/v1/users/~current/skills/~current/inSkillProducts';
+      const options = {
+        host: apiEndpoint,
+        path: apiPath,
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-Language': language,
+          'Authorization': token,
+        },
+      };
 
-    req.on('error', (err) => {
-      console.log('Error calling inSkillProducts API: ' + err.message);
-      callback(err);
-    });
+      // Call the API
+      const req = https.get(options, (res) => {
+        let returnData = '';
+        res.setEncoding('utf8');
+        if (res.statusCode != 200) {
+          console.log('inSkillProducts returned status code ' + res.statusCode);
+          callback(res.statusCode);
+        } else {
+          res.on('data', (chunk) => {
+            returnData += chunk;
+          });
+
+          res.on('end', () => {
+            const inSkillProductInfo = JSON.parse(returnData);
+            if (Array.isArray(inSkillProductInfo.inSkillProducts)) {
+              // Let's see what they paid for
+              if (!context.attributes.paid) {
+                context.attributes.paid = {};
+              }
+
+              inSkillProductInfo.inSkillProducts.forEach((product) => {
+                let state;
+
+                if ((product.type == 'ENTITLEMENT') && (product.entitled == 'ENTITLED')) {
+                  // State is purchased unless a refund was in progress
+                  state = (context.attributes.paid[product.referenceName] &&
+                      (context.attributes.paid[product.referenceName].state == 'REFUND_PENDING'))
+                      ? 'REFUND_PENDING' : 'PURCHASED';
+                } else {
+                  // Just in case, we should clear the spanish game if it's not purchased
+                  state = 'AVAILABLE';
+                  context.attributes.spanish = undefined;
+                  if (context.attributes.currentGame == 'spanish') {
+                    context.attributes.currentGame = 'standard';
+                  }
+                }
+
+                context.attributes.paid[product.referenceName] = {
+                  productId: product.productId,
+                  state: state,
+                };
+              });
+            }
+
+            callback();
+          });
+        }
+      });
+
+      req.on('error', (err) => {
+        console.log('Error calling inSkillProducts API: ' + err.message);
+        callback(err);
+      });
+    } else {
+      // No need to check - can just return without error
+      callback();
+    }
   },
 };
 

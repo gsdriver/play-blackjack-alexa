@@ -58,16 +58,23 @@ module.exports = {
   },
   handleNoIntent: function() {
     // OK, pop this choice and go to the next one - if no other choices, we'll go with the last one
-    this.attributes.choices.shift();
-    if (this.attributes.choices.length === 1) {
-      // OK, we're going with this one
-      this.handler.state = 'NEWGAME';
-      selectedGame(this);
-    } else {
-      const res = require('../' + this.event.request.locale + '/resources');
-      const speech = res.strings.SELECT_REPROMPT.replace('{0}', res.sayGame(this.attributes.choices[0]));
+    if (this.attributes.choices) {
+      this.attributes.choices.shift();
+      if (this.attributes.choices.length === 1) {
+        // OK, we're going with this one
+        this.handler.state = 'NEWGAME';
+        selectedGame(this);
+      } else {
+        const res = require('../' + this.event.request.locale + '/resources');
+        const speech = res.strings.SELECT_REPROMPT.replace('{0}', res.sayGame(this.attributes.choices[0]));
 
-      bjUtils.emitResponse(this, null, null, speech, speech);
+        bjUtils.emitResponse(this, null, null, speech, speech);
+      }
+    } else {
+      // Um ... must have been in the upsell path
+      this.handler.state = 'NEWGAME';
+      this.attributes.currentGame = 'standard';
+      this.emitWithState('AMAZON.RepeatIntent');
     }
   },
 };

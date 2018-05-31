@@ -118,6 +118,7 @@ const resources = {
   'READHAND_PLAYER_TOTAL_END': 'You had {0} for a total of {1}.  ',
   'READHAND_DEALER_ACTIVE': 'I have {0} showing.',
   'READHAND_DEALER_DONE': 'I had {0} showing. ',
+  'RULES_SPANISH21': 'Spanish 21 has bonus payouts for a 21 with five or more cards and other special rules you can hear by saying Help. ',
   'RULES_DECKS': '{0} deck game. ',
   'RULES_BET_RANGE': 'Bet from ${0} to ${1}. ',
   'RULES_HIT_SOFT17': 'Dealer hits on soft 17. ',
