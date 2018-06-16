@@ -10,6 +10,11 @@ function ssmlToText(ssml) {
   // Replace break with ...
   text = text.replace(/<break[^>]+>/g, ' ... ');
 
+  // Some specific Alexa text
+  text = text.replace('Check the Alexa companion app for rules you can change.', '');
+  text = text.replace('Check the Alexa companion app for available rules you can change.', '');
+  text = text.replace('Check the Alexa companion application for the full set of rules.', '');
+
   // Remove all other angle brackets
   text = text.replace(/<\/?[^>]+(>|$)/g, '');
   text = text.replace(/\s+/g, ' ').trim();
@@ -84,7 +89,7 @@ function passToAlexa(intentRequest, intentName, callback) {
   // Do we have Alexa attributes
   if (!intentRequest.sessionAttributes || !intentRequest.sessionAttributes.alexa) {
     lambda.session.new = true;
-    lambda.request.locale = 'en-CA';
+    lambda.request.locale = 'en-US';
   } else {
     const attributes = JSON.parse(intentRequest.sessionAttributes.alexa);
     for (game in attributes) {
@@ -167,8 +172,8 @@ function dispatch(intentRequest, callback) {
     'Blackjack_HighScore': 'HighScoreIntent', 'Blackjack_No': 'AMAZON.NoIntent', 'Blackjack_Launch': 'LaunchRequest',
     'Blackjack': 'BlackjackIntent', 'Blackjack_Yes': 'AMAZON.YesIntent', 'Blackjack_PlaceSideBet': 'PlaceSideBetIntent',
     'Blackjack_RemoveSideBet': 'RemoveSideBetIntent', 'ChangeRules': 'ChangeRulesIntent', 'DisableTraining': 'DisableTrainingIntent',
-    'EnableTraining': 'EnableTrainingIntent', 'Reset': 'ResetIntent', 'Rules': 'RulesIntent', 'Select': 'SelectIntent',
-    'Suggest': 'SuggestIntent',
+    'EnableTraining': 'EnableTrainingIntent', 'Reset': 'ResetIntent', 'Rules': 'RulesIntent', 'Suggest': 'SuggestIntent',
+    'Blackjack_Repeat': 'AMAZON.RepeatIntent',
   };
   const alexaIntent = mapping[intentName];
 

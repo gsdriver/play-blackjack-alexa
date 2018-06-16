@@ -16,10 +16,14 @@ module.exports = {
 
     // Tell them how much money they are leaving with
     exitSpeech = res.strings.EXIT_BANKROLL.replace('{0}', game.bankroll) + ' ';
-    ads.getAd(this.attributes, 'blackjack', this.event.request.locale, (adText) => {
-      exitSpeech += tournament.getReminderText(this.event.request.locale);
-      exitSpeech += (adText + ' ' + res.strings.EXIT_GOODBYE);
+    if (this.attributes.bot) {
       bjUtils.emitResponse(this, null, exitSpeech);
-    });
+    } else {
+      ads.getAd(this.attributes, 'blackjack', this.event.request.locale, (adText) => {
+        exitSpeech += tournament.getReminderText(this.event.request.locale);
+        exitSpeech += (adText + ' ' + res.strings.EXIT_GOODBYE);
+        bjUtils.emitResponse(this, null, exitSpeech);
+      });
+    }
   },
 };

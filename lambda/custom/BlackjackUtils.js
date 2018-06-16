@@ -338,7 +338,7 @@ module.exports = {
     let check;
 
     // Purchased products is only for US customers
-    if (context.event.request.locale !== 'en-US') {
+    if (context.attributes.bot || (context.event.request.locale !== 'en-US')) {
       check = false;
       context.attributes.paid = undefined;
     } else if (context.attributes.paid) {
