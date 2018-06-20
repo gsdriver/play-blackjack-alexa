@@ -10,7 +10,6 @@ const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 const bjUtils = require('./BlackjackUtils');
-const gameService = require('./GameService');
 
 module.exports = {
   getTournamentComplete: function(locale, attributes, callback) {
@@ -147,6 +146,8 @@ module.exports = {
 
     if (!game) {
       // New player
+      const gameService = require('./GameService');
+
       this.attributes.tournamentsPlayed = (this.attributes.tournamentsPlayed + 1) || 1;
       gameService.initializeGame('tournament', this.attributes, this.event.session.user.userId);
       speech = res.strings.TOURNAMENT_WELCOME_NEWPLAYER
