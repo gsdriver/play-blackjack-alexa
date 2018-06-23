@@ -126,6 +126,60 @@ function BuildEvent(argv)
        },
     };
 
+    const canFulfill = {
+     "session":{
+       "new": true,
+       "sessionId":"SessionId.12",
+       "application":{
+         "applicationId":"amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce"
+       },
+       "attributes":{
+         "key": "string value"
+       },
+       "user":{
+         "userId": USERID,
+       }
+     },
+     "request":{
+       "type":"CanFulfillIntentRequest",
+       "requestId":"EdwRequestId.12",
+       "intent":{
+         "name":"ChangeRulesIntent",
+         "slots":{
+           "Change":{
+             "name":"Change",
+             "value":"decks"
+           },
+           "ChangeOption":{
+             "name":"ChangeOption",
+             "value":"4"
+           },
+         }
+       },
+       "locale":"en-US",
+       "timestamp":"2017-10-03T22:02:29Z"
+     },
+     "context":{
+       "AudioPlayer":{
+         "playerActivity":"IDLE"
+       },
+       "System":{
+         "application":{
+           "applicationId":"amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce"
+         },
+         "user":{
+           "userId":USERID,
+         },
+         "device":{
+           "supportedInterfaces":{
+
+           }
+         }
+       }
+     },
+     "version":"1.0"
+    };
+
     // If there is an attributes.txt file, read the attributes from there
     const fs = require('fs');
     if (fs.existsSync(attributeFile)) {
@@ -139,6 +193,10 @@ function BuildEvent(argv)
     if ((argv.length <= 2) || (argv[2] == "rules"))
     {
         lambda.request.intent = readRulesIntent;
+    }
+    else if (argv[2] == "canfulfill")
+    {
+        return canFulfill;
     }
     else if (argv[2] == "suggest")
     {
@@ -227,26 +285,30 @@ function myResponse(appId) {
 }
 
 myResponse.succeed = function(result) {
-  if (result.response.outputSpeech.ssml) {
-    console.log('AS SSML: ' + result.response.outputSpeech.ssml);
+  if (!result.response || !result.response.outputSpeech) {
+    console.log(JSON.stringify(result));
   } else {
-    console.log(result.response.outputSpeech.text);
-  }
-  if (result.response.card && result.response.card.content) {
-    console.log('Card Content: ' + result.response.card.content);
-  }
-  console.log('The session ' + ((!result.response.shouldEndSession) ? 'stays open.' : 'closes.'));
-  if (result.sessionAttributes && !process.env.NOLOG) {
-    console.log('"attributes": ' + JSON.stringify(result.sessionAttributes));
-  }
-  if (result.sessionAttributes) {
-    // Output the attributes too
-    const fs = require('fs');
-    fs.writeFile(attributeFile, JSON.stringify(result.sessionAttributes), (err) => {
-      if (err) {
-        console.log(err);
-      }
-    });
+    if (result.response.outputSpeech.ssml) {
+      console.log('AS SSML: ' + result.response.outputSpeech.ssml);
+    } else {
+      console.log(result.response.outputSpeech.text);
+    }
+    if (result.response.card && result.response.card.content) {
+      console.log('Card Content: ' + result.response.card.content);
+    }
+    console.log('The session ' + ((!result.response.shouldEndSession) ? 'stays open.' : 'closes.'));
+    if (result.sessionAttributes && !process.env.NOLOG) {
+      console.log('"attributes": ' + JSON.stringify(result.sessionAttributes));
+    }
+    if (result.sessionAttributes) {
+      // Output the attributes too
+      const fs = require('fs');
+      fs.writeFile(attributeFile, JSON.stringify(result.sessionAttributes), (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+    }
   }
 }
 

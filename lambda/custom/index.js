@@ -1,6 +1,7 @@
 'use strict';
 
 const Alexa = require('alexa-sdk');
+const CanFulfill = require('./intents/CanFulfill');
 const Launch = require('./intents/Launch');
 const Blackjack = require('./intents/Blackjack');
 const Betting = require('./intents/Betting');
@@ -355,6 +356,12 @@ function runGame(event, context, callback) {
   const alexa = Alexa.handler(event, context);
   if (!process.env.NOLOG) {
     console.log(JSON.stringify(event));
+  }
+
+  // If this is a CanFulfill, handle this separately
+  if (event.request && (event.request.type == 'CanFulfillIntentRequest')) {
+    context.succeed(CanFulfill.check(event));
+    return;
   }
 
   alexa.appId = APP_ID;

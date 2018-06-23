@@ -17,8 +17,9 @@ module.exports = {
     let reprompt;
 
     // If they don't have Spanish 21, upsell
-    if (!this.attributes.temp.noUpsell &&
-        (availableGames.indexOf('spanish') == -1)) {
+    if (this.attributes.paid && this.attributes.paid.spanish &&
+        (!this.attributes.temp.noUpsell &&
+        (availableGames.indexOf('spanish') == -1))) {
       const directive = {
         name: 'Upsell',
         id: 'spanish',
