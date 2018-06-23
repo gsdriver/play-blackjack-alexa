@@ -479,6 +479,7 @@ function displayTable(context, callback) {
           dealer: JSON.stringify(game.dealerHand.cards),
           player: JSON.stringify(playerCards),
           nextCards: JSON.stringify(game.deck.cards.slice(0, 4)),
+          table: context.attributes.currentGame,
         };
         if (game.activePlayer == 'none') {
           formData.showHoleCard = 'true';
