@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "type": "ENTITLEMENT",
+  "referenceName": "spanish",
+  "publishingInformation": {
+    "locales": {
+      "en-US": {
+        "name": "Spanish 21",
+        "smallIconUri": "http://garrettvargas.com/img/Spanish108.png",
+        "largeIconUri": "http://garrettvargas.com/img/Spanish512.png",
+        "summary": "Play the popular Blackjack variant Spanish 21",
+        "description": "This expansion pack includes Spanish 21, a popular Blackjack variant that features doubling on any number of cards and bonus payouts for hitting 21 with five or more cards.",
+        "examplePhrases": [
+          "Alexa, play Spanish 21",
+          "Alexa, buy Spanish 21"
+        ],
+        "keywords": [
+          "games",
+          "blackjack",
+          "casino",
+          "cards",
+          "Spanish 21"
+        ],
+        "customProductPrompts": {
+          "purchasePromptDescription": "Spanish 21 allows you to play this popular Blackjack variant featuring doubling on any number of cards and bonus payouts for hitting 21 with five or more cards.",
+          "boughtCardDescription": "Enjoy Spanish 21 by asking Alexa to select a new game."
+        }
+      }
+    },
+    "distributionCountries": [
+      "US"
+    ],
+    "pricing": {
+      "amazon.com": {
+        "releaseDate": "2018-05-28",
+        "defaultPriceListing": {
+          "price": 1.99,
+          "currency": "USD"
+        }
+      }
+    },
+    "taxInformation": {
+      "category": "SOFTWARE"
+    }
+  },
+  "privacyAndCompliance": {
+    "locales": {
+      "en-US": {
+        "privacyPolicyUrl": "http://garrettvargas.com/privacy.html"
+      }
+    }
+  },
+  "testingInstructions": "After purchasing Spanish 21, you can say 'Select a new game' which will allow you to switch between normal Blackjack and the Blackjack variant Spanish 21.",
+  "purchasableState": "PURCHASABLE"
+}

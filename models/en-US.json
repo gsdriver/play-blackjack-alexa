@@ -224,6 +224,61 @@
           ]
         },
         {
+          "name": "SelectIntent",
+          "slots": [],
+          "samples": [
+            "pick a different game",
+            "pick a new game",
+            "pick another game",
+            "change to a different game",
+            "change to a new game",
+            "change to another game",
+            "select a different game",
+            "select a new game",
+            "select another game",
+            "choose a different game",
+            "choose a new game",
+            "choose another game",
+            "switch to a different game",
+            "switch to a new game",
+            "switch to another game"
+          ]
+        },
+        {
+          "name": "PurchaseIntent",
+          "slots": [
+            {
+              "name": "Product",
+              "type": "LIST_OF_PRODUCTS"
+            }
+          ],
+          "samples": [
+            "what can I buy",
+            "what can I shop for",
+            "tell me what I can buy",
+            "what can I pay for",
+            "tell what what I can pay for",
+            "I want to buy {Product}",
+            "I want {Product}",
+            "give me {Product}",
+            "buy {Product}",
+            "pay for {Product}"
+          ]
+        },
+        {
+          "name": "RefundIntent",
+          "slots": [
+            {
+              "name": "Product",
+              "type": "LIST_OF_PRODUCTS"
+            }
+          ],
+          "samples": [
+            "return {Product}",
+            "refund {Product}"
+          ]
+        },
+        {
           "name": "HighScoreIntent",
           "samples": [
             "read high scores",
@@ -234,6 +289,10 @@
             "say high scores",
             "say leader board"
           ]
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
         },
         {
           "name": "AMAZON.HelpIntent",
@@ -374,6 +433,21 @@
             }
           ],
           "name": "LIST_OF_ACTIONS"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "value": "spanish 21"
+              }
+            },
+            {
+              "name": {
+                "value": "spanish"
+              }
+            }
+          ],
+          "name": "LIST_OF_PRODUCTS"
         },
         {
           "values": [
