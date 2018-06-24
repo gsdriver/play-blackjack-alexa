@@ -320,8 +320,8 @@ function tellResult(attributes, locale, action, oldGame) {
     const oldHand = game.playerHands[oldGame.currentPlayerHand];
 
     // I don't want to re-read this hand if they just stood, so let's make sure they busted
-    // or split Aces (which only draws on card) or did a double before we read this hand.
-    if ((oldHand.total > 21) ||
+    // or split Aces (which only draws one card) or did a double before we read this hand.
+    if ((oldHand.total >= 21) ||
       (oldHand.bet > game.playerHands[game.currentPlayerHand].bet)) {
       if (oldHand.total > 21) {
         result = resources.strings.RESULT_AFTER_HIT_BUST

@@ -194,6 +194,14 @@ function BuildEvent(argv)
     {
         lambda.request.intent = readRulesIntent;
     }
+    else if (argv[2] == "seed") {
+      if (fs.existsSync("seed.txt")) {
+        data = fs.readFileSync("seed.txt", 'utf8');
+        if (data) {
+          return JSON.parse(data);
+        }
+      }
+    }
     else if (argv[2] == "canfulfill")
     {
         return canFulfill;
