@@ -7,17 +7,36 @@
 const gameService = require('../GameService');
 const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
+const request = require('request');
 
 module.exports = {
   handleIntent: function() {
+    // Record that we got a purchase response
+    if (this.event.request.payload) {
+      const params = {
+        url: process.env.SERVICEURL + 'blackjack/purchaseResult',
+        formData: {
+          payload: JSON.stringify(this.event.request.payload),
+          userId: JSON.stringify(this.event.session.user.userId),
+          event: this.event.request.name,
+        },
+      };
+      request.post(params);
+    }
+
     switch (this.event.request.name) {
       case 'Buy':
         console.log('Buy response');
-        if (this.event.request.payload &&
-            (this.event.request.payload.purchaseResult == 'ACCEPTED')) {
-          // OK, flip them to Spanish 21
-          selectedGame(this, 'spanish');
-          return;
+        if (this.event.request.payload) {
+          if (this.event.request.payload.purchaseResult == 'ACCEPTED') {
+            // OK, flip them to Spanish 21
+            selectedGame(this, 'spanish');
+            return;
+          } else if (this.event.request.payload.purchaseResult == 'ERROR') {
+            if (this.attributes.prompts) {
+              this.attributes.prompts.sellSpanish = undefined;
+            }
+          }
         }
         break;
       case 'Upsell':

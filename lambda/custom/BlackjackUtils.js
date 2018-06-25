@@ -440,7 +440,9 @@ module.exports = {
 function displayTable(context, callback) {
   const res = require('./' + context.event.request.locale + '/resources');
 
-  if (context.event.context &&
+  if (context.event.context && context.event.context.System &&
+      context.event.context.System.device &&
+      context.event.context.System.device.supportedInterfaces &&
       context.event.context.System.device.supportedInterfaces.Display) {
     if ((context.attributes.temp && context.attributes.temp.drawBoard)
         || !(context.attributes.temp && context.attributes.temp.imageUrl)) {
