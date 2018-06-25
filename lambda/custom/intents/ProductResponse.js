@@ -16,9 +16,9 @@ module.exports = {
       const params = {
         url: process.env.SERVICEURL + 'blackjack/purchaseResult',
         formData: {
-          payload: JSON.stringify(this.event.request.payload),
-          userId: JSON.stringify(this.event.session.user.userId),
-          event: this.event.request.name,
+          subject: 'Product response',
+          body: this.event.request.name + ' was ' + this.event.request.payload.purchaseResult
+              + ' by user ' + this.event.session.user.userId,
         },
       };
       request.post(params);
