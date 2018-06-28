@@ -32,6 +32,7 @@ module.exports = {
         // Sorry, no games available to select
         speech = res.strings.SELECT_ONE_GAME;
         reprompt = res.strings.ERROR_REPROMPT;
+        this.handler.state = bjUtils.getState(this.attributes);
       } else {
         // Sort these with current game last
         availableGames.push(this.attributes.currentGame);
