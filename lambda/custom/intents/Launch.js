@@ -4,6 +4,7 @@
 
 'use strict';
 
+const gameService = require('../GameService');
 const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
 
@@ -31,7 +32,11 @@ module.exports = {
     if (process.env.SPANISHTRIAL) {
       // If they aren't a new user, then let them know a trial is underway
       if (!this.attributes.newUser && !this.attributes.spanish) {
-        launchSpeech += res.strings.LAUNCH_SPANISH_TRIAL;
+        const availableGames = gameService.getAvailableGames(this.attributes);
+
+        if (availableGames.indexOf('spanish') > -1) {
+          launchSpeech += res.strings.LAUNCH_SPANISH_TRIAL;
+        }
       }
     } else if (this.attributes.spanish && (spanishState == 'AVAILABLE')) {
       // They were playing Spanish 21 but the trial has ended
