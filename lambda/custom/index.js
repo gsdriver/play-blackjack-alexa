@@ -413,6 +413,9 @@ function initialize(context, callback) {
     attributes.temp = {};
   }
   attributes.temp.firsthand = true;
+  if (!attributes.prompts) {
+    attributes.prompts = {};
+  }
 
   // Load purchased products
   bjUtils.getPurchasedProducts(context, () => {

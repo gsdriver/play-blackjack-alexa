@@ -84,6 +84,7 @@ module.exports = {
 function selectedGame(context) {
   const res = require('../' + context.event.request.locale + '/resources');
   const attributes = context.attributes;
+  let launchInitialText = '';
 
   // First let's see if they selected an element via touch
   const index = getSelectedIndex(context);
@@ -95,6 +96,8 @@ function selectedGame(context) {
   }
 
   if (!attributes[attributes.currentGame]) {
+    const launchInitialWelcome = JSON.parse(res.strings.LAUNCH_INITIAL_WELCOME);
+    launchInitialText = launchInitialWelcome[attributes.currentGame];
     gameService.initializeGame(attributes.currentGame, attributes,
         context.event.session.user.userId);
   }
@@ -103,6 +106,7 @@ function selectedGame(context) {
 
   const launchWelcome = JSON.parse(res.strings.LAUNCH_WELCOME);
   let launchSpeech = launchWelcome[context.attributes.currentGame];
+  launchSpeech += launchInitialText;
   launchSpeech += res.strings.LAUNCH_START_GAME;
   playgame.readCurrentHand(context.attributes, context.event.request.locale, (speech, reprompt) => {
     bjUtils.emitResponse(context, null, null, launchSpeech, reprompt);

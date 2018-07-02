@@ -21,18 +21,27 @@ module.exports = {
     // Try to keep it simple
     const launchWelcome = JSON.parse(res.strings.LAUNCH_WELCOME);
     launchSpeech = launchWelcome[this.attributes.currentGame];
-    if (this.attributes.prependLaunch) {
-      launchSpeech = this.attributes.prependLaunch + launchSpeech;
-      this.attributes.prependLaunch = undefined;
+
+    // First let's eee if a free trial is underway - or has ended
+    let spanishState;
+    if (this.attributes.paid && this.attributes.paid.spanish) {
+      spanishState = this.attributes.paid.spanish.state;
     }
 
-    if (!this.attributes.newUser && this.attributes.paid && this.attributes.paid.spanish
-      && (this.attributes.paid.spanish.state == 'AVAILABLE') &&
+    if (process.env.SPANISHTRIAL) {
+      // If they aren't a new user, then let them know a trial is underway
+      if (!this.attributes.newUser && !this.attributes.spanish) {
+        launchSpeech += res.strings.LAUNCH_SPANISH_TRIAL;
+      }
+    } else if (this.attributes.spanish && (spanishState == 'AVAILABLE')) {
+      // They were playing Spanish 21 but the trial has ended
+      this.attributes.spanish = undefined;
+      this.attributes.currentGame = 'standard';
+      launchSpeech = launchWelcome['standard'];
+      launchSpeech += res.strings.LAUNCH_SPANISH_TRIAL_OVER;
+    } else if (!this.attributes.newUser && (spanishState == 'AVAILABLE') &&
       (!this.attributes.prompts || !this.attributes.prompts.sellSpanish)) {
       launchSpeech += res.strings.LAUNCH_SELL_SPANISH;
-      if (!this.attributes.prompts) {
-        this.attributes.prompts = {};
-      }
       this.attributes.prompts.sellSpanish = true;
     }
 
@@ -45,6 +54,10 @@ module.exports = {
         launchSpeech += res.strings.LAUNCH_START_GAME;
       }
 
+      if (this.attributes.prependLaunch) {
+        launchSpeech = this.attributes.prependLaunch + launchSpeech;
+        this.attributes.prependLaunch = undefined;
+      }
       this.handler.state = bjUtils.getState(this.attributes);
       bjUtils.emitResponse(this, null, null, launchSpeech, reprompt);
     });

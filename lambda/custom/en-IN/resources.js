@@ -42,6 +42,7 @@ const resources = {
   'HELP_ACHIEVEMENT_CARD_TEXT': '\nYou earn achievement points as you play which is how the high score board is determined. You earn points as follows:\n - 100 achievement points each time you win the Tuesday Tournament\n - 10 points each day you play\n - 5 points for a natural winning blackjack\n - N points for each streak of N winning hands more than one.\n',
   // From Launch.js
   'LAUNCH_WELCOME': '{"standard":"Welcome to Blackjack Game. ","tournament":"Welcome to the tournament round of Blackjack Game. ","spanish":"Welcome to Spanish 21. "}',
+  'LAUNCH_INITIAL_WELCOME': '{"standard":"","tournament":"You can play up to 100 hands to get the highest bankroll in the tournament. ","spanish":"This game features redoubling <break time=\'200ms\'/> bonus payouts for 21 with 5 or more cards <break time=\'200ms\'/> and a super bonus for three suited sevens against a dealer seven. "}',
   'LAUNCH_START_GAME': 'Say bet to start a new game',
   'LAUNCH_ENABLE_TRAINING': 'say enable training mode',
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet $5 towards the jackpot',

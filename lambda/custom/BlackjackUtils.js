@@ -407,10 +407,13 @@ module.exports = {
                       ? 'REFUND_PENDING' : 'PURCHASED';
                 } else {
                   // Just in case, we should clear the spanish game if it's not purchased
+                  // Skip this though if a trial is underway
                   state = 'AVAILABLE';
-                  context.attributes.spanish = undefined;
-                  if (context.attributes.currentGame == 'spanish') {
-                    context.attributes.currentGame = 'standard';
+                  if (!process.env.SPANISHTRIAL) {
+                    context.attributes.spanish = undefined;
+                    if (context.attributes.currentGame == 'spanish') {
+                      context.attributes.currentGame = 'standard';
+                    }
                   }
                 }
 

@@ -43,6 +43,7 @@ const resources = {
   'HELP_ACHIEVEMENT_CARD_TEXT': '\nYou earn achievement points as you play which is how the high score board is determined. You earn points as follows:\n - 100 achievement points each time you win the Tuesday Tournament\n - 10 points each day you play\n - 5 points for a natural winning blackjack\n - N points for each streak of N winning hands more than one.\n',
   // From Launch.js
   'LAUNCH_WELCOME': '{"standard":"Welcome to Blackjack Game. ","tournament":"Welcome to the tournament round of Blackjack Game. ","spanish":"Welcome to Spanish 21. "}',
+  'LAUNCH_INITIAL_WELCOME': '{"standard":"","tournament":"You can play up to 100 hands to get the highest bankroll in the tournament. ","spanish":"In this game a player 21 always wins <break time=\'200ms\'/> you can redouble <break time=\'200ms\'/> 21 with 5 or more cards wins a bonus payout <break time=\'200ms\'/> and there are special suited bonuses. "}',
   'LAUNCH_START_GAME': 'Say bet to start a new game',
   'LAUNCH_ENABLE_TRAINING': 'say enable training mode',
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet $5 towards the jackpot',
@@ -51,6 +52,8 @@ const resources = {
   'LAUNCH_START_RESET': 'reset game to reset to the default rules and bankroll',
   'LAUNCH_START_PROMPT': ' <break time=\'300ms\'/>Now, what can I help you with?',
   'LAUNCH_SELL_SPANISH': 'We now have Spanish 21 available for purchase. Say buy Spanish 21 to buy it. ',
+  'LAUNCH_SPANISH_TRIAL': 'For a limited time, we have a free trial version of Spanish 21 to play. Say select a new game to play Spanish 21. ',
+  'LAUNCH_SPANISH_TRIAL_OVER': 'The free trial of Spanish 21 is over. If you would like to continue to play Spanish 21, say buy Spanish 21. ',
   // From Purchase.js
   'PURCHASE_ONLY_SPANISH': 'We only offer the Spanish 21 expansion product, and you\'ve already purchased it. What else can I help you with?',
   'PURCHASE_SPANISH': 'We have a Spanish 21 game available for purchase. Would you like to buy it? ',

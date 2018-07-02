@@ -34,9 +34,6 @@ module.exports = {
 
       // If they aren't in training mode, and they haven't already heard
       // about training mode, then let them know about this feature
-      if (!attributes.prompts) {
-        attributes.prompts = {};
-      }
       if (!attributes.prompts.training) {
         attributes.prompts.training = true;
         if (!game.training) {
@@ -580,9 +577,6 @@ function readGameResult(attributes) {
 
     // If this isn't the first time earning points, prompt about the leader board
     if (!noPoints) {
-      if (!attributes.prompts) {
-        attributes.prompts = {};
-      }
       if (!attributes.prompts.leaderBoard) {
         attributes.prompts.leaderBoard = true;
         outcome += resources.strings.PROMPT_LEADER_BOARD;

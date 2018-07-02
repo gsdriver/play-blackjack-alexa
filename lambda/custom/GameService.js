@@ -161,6 +161,8 @@ module.exports = {
               ((attributes.paid.spanish.state == 'PURCHASED')
               || (attributes.paid.spanish.state == 'REFUND_PENDING'))) {
           games.push(game);
+        } else if ((attributes.playerLocale == 'en-US') && process.env.SPANISHTRIAL) {
+          games.push(game);
         }
       } else {
         games.push(game);
