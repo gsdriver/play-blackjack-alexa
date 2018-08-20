@@ -9,7 +9,7 @@ const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
   handleIntent: function() {
-    const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../resources')(this.event.request.locale);
 
     playgame.readRules(this.attributes, this.event.request.locale, (speech, reprompt) => {
       bjUtils.emitResponse(this, null, null,

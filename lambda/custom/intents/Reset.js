@@ -11,7 +11,7 @@ const playgame = require('../PlayGame');
 module.exports = {
   handleIntent: function() {
     // We will ask them if they want to reset
-    const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../resources')(this.event.request.locale);
     let speech;
     let reprompt;
     const game = this.attributes[this.attributes.currentGame];
@@ -28,7 +28,7 @@ module.exports = {
     bjUtils.emitResponse(this, null, null, speech, reprompt);
   },
   handleYesReset: function() {
-    const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../resources')(this.event.request.locale);
 
     // Confirmed - let's reset but preserve the timestamp
     const timestamp = this.attributes[this.attributes.currentGame].timestamp;
@@ -40,7 +40,7 @@ module.exports = {
   },
   handleNoReset: function() {
     // Nope, they are not going to reset - so go back to start a new game
-    const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../resources')(this.event.request.locale);
 
     this.handler.state = 'NEWGAME';
     bjUtils.emitResponse(this, null, null,
@@ -48,7 +48,7 @@ module.exports = {
   },
   handleRepeat: function() {
     // Just repeat the reset instruction
-    const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../resources')(this.event.request.locale);
     const reprompt = playgame.getContextualHelp(this);
     const speech = res.strings.RESET_CONFIRM + ' ' + reprompt;
 

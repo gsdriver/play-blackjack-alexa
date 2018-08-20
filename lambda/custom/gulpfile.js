@@ -6,6 +6,10 @@ const reporter = require('eslint-html-reporter');
 const path = require('path');
 const fs = require('fs');
 
+gulp.task('clean', () => {
+  return del(['build/']);
+});
+
 // task to run es lint.
 gulp.task('lint', () =>
   gulp.src(['*.js', '*/**/*.js', '!test/**', '!build/**', '!node_modules/**', '!analyze/**', '!ext/**'])
@@ -17,9 +21,5 @@ gulp.task('lint', () =>
     .pipe(eslint.failAfterError())
 );
 
-gulp.task('clean', () => {
-  return del(['build/']);
-});
-
-gulp.task('build', ['clean', 'lint']);
-gulp.task('default', ['lint']);
+gulp.task('build', gulp.series('clean', 'lint'));
+gulp.task('default', gulp.series('lint'));

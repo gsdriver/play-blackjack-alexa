@@ -10,7 +10,7 @@ const bjUtils = require('../BlackjackUtils');
 module.exports = {
   handleIntent: function() {
     let amount = 0;
-    const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../resources')(this.event.request.locale);
     const game = this.attributes[this.attributes.currentGame];
 
     // Curious what language is betting...

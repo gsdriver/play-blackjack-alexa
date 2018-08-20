@@ -14,7 +14,7 @@ module.exports = {
     if (this.attributes.currentGame === 'tournament') {
       tournament.readHelp(this, this.attributes);
     } else {
-      const res = require('../' + this.event.request.locale + '/resources');
+      const res = require('../resources')(this.event.request.locale);
       const game = this.attributes[this.attributes.currentGame];
       let speech = playgame.getContextualHelp(this, !this.attributes.bot);
       if (!speech) {

@@ -7,7 +7,7 @@ AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 const USERID = 'not-amazon';
 const DEVICEID = 'not-amazon';
-const LOCALE = 'en-US';
+const LOCALE = 'en-GB';
 
 function BuildEvent(argv)
 {
@@ -232,7 +232,7 @@ function BuildEvent(argv)
         changeRulesIntent.slots.ChangeOption.value = (argv.length > 4) ? argv[4] : "on";
         lambda.request.intent = changeRulesIntent;
     }
-    else if (argv[2] == "open")
+    else if (argv[2] == "launch")
     {
         // Return the launch request
         return openEvent;

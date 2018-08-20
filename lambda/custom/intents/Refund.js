@@ -8,7 +8,7 @@ const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
   handleIntent: function() {
-    const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../resources')(this.event.request.locale);
 
     // We only offer Spanish 21 so let's kick into that flow
     this.handler.state = 'CONFIRMREFUND';

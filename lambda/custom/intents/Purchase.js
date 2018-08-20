@@ -8,7 +8,7 @@ const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
   handleIntent: function() {
-    const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../resources')(this.event.request.locale);
 
     if (this.event.request.intent.slots && this.event.request.intent.slots.Product
       && this.event.request.intent.slots.Product.value) {

@@ -12,7 +12,7 @@ const speechUtils = require('alexa-speech-utils')();
 module.exports = {
   handleIntent: function() {
     const availableGames = gameService.getAvailableGames(this.attributes);
-    const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../resources')(this.event.request.locale);
     let speech;
     let reprompt;
 
@@ -67,7 +67,7 @@ module.exports = {
         this.handler.state = 'NEWGAME';
         selectedGame(this);
       } else {
-        const res = require('../' + this.event.request.locale + '/resources');
+        const res = require('../resources')(this.event.request.locale);
         const speech = res.strings.SELECT_REPROMPT.replace('{0}', res.sayGame(this.attributes.choices[0]));
 
         bjUtils.emitResponse(this, null, null, speech, speech);
@@ -82,7 +82,7 @@ module.exports = {
 };
 
 function selectedGame(context) {
-  const res = require('../' + context.event.request.locale + '/resources');
+  const res = require('../resources')(context.event.request.locale);
   const attributes = context.attributes;
   let launchInitialText = '';
 

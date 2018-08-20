@@ -12,7 +12,7 @@ module.exports = {
   handleIntent: function() {
     // Echo back the action that we heard, why this isn't valid at this time,
     // and what the possible actions are for them to say
-    const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../resources')(this.event.request.locale);
 
     if (!this.event.request.intent) {
       // Something we really don't handle

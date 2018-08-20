@@ -6,7 +6,7 @@ const bjUtils = require('../BlackjackUtils');
 module.exports = {
   handleIntent: function() {
     // First make sure we have an action
-    const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../resources')(this.event.request.locale);
     const actionSlot = this.event.request.intent.slots.Action;
 
     if (!actionSlot) {

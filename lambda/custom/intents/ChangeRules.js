@@ -13,7 +13,7 @@ module.exports = {
     const changeSlot = this.event.request.intent.slots.Change;
     const optionSlot = this.event.request.intent.slots.ChangeOption;
     let ruleError;
-    const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../resources')(this.event.request.locale);
 
     if (!this.attributes[this.attributes.currentGame].canChangeRules) {
       // Sorry, you can't reset this or change the rules

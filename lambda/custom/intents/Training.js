@@ -9,7 +9,7 @@ const playgame = require('../PlayGame');
 
 module.exports = {
   handleEnableIntent: function() {
-    const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../resources')(this.event.request.locale);
     const reprompt = playgame.getContextualHelp(this);
     const speech = res.strings.TRAINING_ON + reprompt;
     const game = this.attributes[this.attributes.currentGame];
@@ -18,7 +18,7 @@ module.exports = {
     bjUtils.emitResponse(this, null, null, speech, reprompt);
   },
   handleDisableIntent: function() {
-    const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../resources')(this.event.request.locale);
     const reprompt = playgame.getContextualHelp(this);
     const speech = res.strings.TRAINING_OFF + reprompt;
     const game = this.attributes[this.attributes.currentGame];

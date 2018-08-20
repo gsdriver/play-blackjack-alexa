@@ -10,7 +10,7 @@ const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
   handleIntent: function() {
-    const res = require('../' + this.event.request.locale + '/resources');
+    const res = require('../resources')(this.event.request.locale);
     const game = this.attributes[this.attributes.currentGame];
     let exitSpeech = '';
 

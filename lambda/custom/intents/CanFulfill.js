@@ -31,7 +31,7 @@ module.exports = {
     if (noSlotIntents.indexOf(event.request.intent.name) > -1) {
       valid = true;
     } else {
-      const res = require('../' + event.request.locale + '/resources');
+      const res = require('../resources')(event.request.locale);
 
       if (event.request.intent.name == 'BettingIntent') {
         let amount = 0;

@@ -52,7 +52,7 @@ module.exports = {
     }
 
     if (error) {
-      const res = require('./' + context.event.request.locale + '/resources');
+      const res = require('./resources')(context.event.request.locale);
       console.log('Speech error: ' + error);
       context.response.speak(error)
         .listen(res.strings.ERROR_REPROMPT);
@@ -73,7 +73,7 @@ module.exports = {
   },
   // We need to hand-roll the buy response
   sendBuyResponse: function(context, product) {
-    const res = require('./' + context.event.request.locale + '/resources');
+    const res = require('./resources')(context.event.request.locale);
     let productId;
 
     if (context.attributes.paid && context.attributes.paid[product.id]) {
@@ -148,7 +148,7 @@ module.exports = {
     }
   },
   readBankroll: function(locale, attributes) {
-    const res = require('./' + locale + '/resources');
+    const res = require('./resources')(locale);
     const game = attributes[attributes.currentGame];
     let text;
     const achievementScore = module.exports.getAchievementScore(attributes.achievements);
@@ -226,7 +226,7 @@ module.exports = {
     });
   },
   readLeaderBoard: function(locale, userId, attributes, callback) {
-    const res = require('./' + locale + '/resources');
+    const res = require('./resources')(locale);
     const game = attributes[attributes.currentGame];
     const scoreType = (attributes.currentGame === 'tournament') ? 'bankroll' : 'achievement';
     let leaderURL = process.env.SERVICEURL + 'blackjack/leaders';
@@ -441,7 +441,7 @@ module.exports = {
 };
 
 function displayTable(context, callback) {
-  const res = require('./' + context.event.request.locale + '/resources');
+  const res = require('./resources')(context.event.request.locale);
 
   if (context.event.context && context.event.context.System &&
       context.event.context.System.device &&
@@ -532,7 +532,7 @@ function displayTable(context, callback) {
 }
 
 function roundPlayers(locale, playerCount) {
-  const res = require('./' + locale + '/resources');
+  const res = require('./resources')(locale);
 
   if (playerCount < 200) {
     return playerCount;

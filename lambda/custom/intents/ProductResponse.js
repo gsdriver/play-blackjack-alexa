@@ -81,7 +81,7 @@ module.exports = {
 };
 
 function selectedGame(context, gameToPlay) {
-  const res = require('../' + context.event.request.locale + '/resources');
+  const res = require('../resources')(context.event.request.locale);
   const attributes = context.attributes;
 
   attributes.currentGame = gameToPlay;
