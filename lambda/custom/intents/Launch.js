@@ -29,7 +29,7 @@ module.exports = {
       spanishState = this.attributes.paid.spanish.state;
     }
 
-    if (process.env.SPANISHTRIAL) {
+    if (process.env.SPANISHTRIAL && (this.attributes.platform !== 'google')) {
       // If they aren't a new user, then let them know a trial is underway
       if (!this.attributes.newUser && !this.attributes.spanish) {
         const availableGames = gameService.getAvailableGames(this.attributes);

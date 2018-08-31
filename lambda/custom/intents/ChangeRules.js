@@ -58,6 +58,12 @@ module.exports = {
     if (ruleError) {
       let cardText = '';
 
+      if ((this.attributes.platform === 'google') || this.attributes.bot) {
+        ruleError = ruleError.replace('{2}', '');
+      } else {
+        ruleError = ruleError.replace('{2}', res.strings.CHANGERULES_ERR_CHECKAPP);
+      }
+
       // Prepare card text with a full set of rules that can be changed
       playgame.readRules(this.attributes, this.event.request.locale, (speech, reprompt) => {
         if (speech) {

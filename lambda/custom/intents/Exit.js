@@ -16,7 +16,7 @@ module.exports = {
 
     // Tell them how much money they are leaving with
     exitSpeech = res.strings.EXIT_BANKROLL.replace('{0}', game.bankroll) + ' ';
-    if (this.attributes.bot) {
+    if (this.attributes.bot || (this.attributes.platform === 'google')) {
       bjUtils.emitResponse(this, null, exitSpeech);
     } else {
       ads.getAd(this.attributes, 'blackjack', this.event.request.locale, (adText) => {

@@ -221,7 +221,10 @@ module.exports = {
 
       // If this is shuffle, we'll do the shuffle for them
       const reprompt = resources.strings.CHANGERULES_REPROMPT;
-      speech += resources.strings.CHANGERULES_CHECKAPP;
+      if ((attributes.platform !== 'google') && !attributes.bot) {
+        speech += resources.strings.CHANGERULES_CHECKAPP;
+      }
+      speech += resources.strings.CHANGERULES_CHECKAPP_BET;
       sendUserCallback(attributes, error, null, speech, reprompt, callback);
     });
   },

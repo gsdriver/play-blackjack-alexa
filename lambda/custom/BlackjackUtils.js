@@ -337,8 +337,9 @@ module.exports = {
     const availableProducts = ['spanish'];
     let check;
 
-    // Purchased products is only for US customers
-    if (context.attributes.bot || (context.event.request.locale !== 'en-US')) {
+    // Purchased products is only for US Alexa customers
+    if (context.attributes.bot || (context.attributes.platform === 'google') ||
+      (context.event.request.locale !== 'en-US')) {
       check = false;
       context.attributes.paid = undefined;
     } else if (context.attributes.paid) {

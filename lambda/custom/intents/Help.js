@@ -16,7 +16,8 @@ module.exports = {
     } else {
       const res = require('../resources')(this.event.request.locale);
       const game = this.attributes[this.attributes.currentGame];
-      let speech = playgame.getContextualHelp(this, !this.attributes.bot);
+      let speech = playgame.getContextualHelp(this,
+        !(this.attributes.bot || (this.attributes.platform === 'google')));
       if (!speech) {
         speech = res.strings.HELP_GENERIC_HELP;
       }

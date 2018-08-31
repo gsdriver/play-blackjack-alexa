@@ -7,7 +7,7 @@ AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 const USERID = 'not-amazon';
 const DEVICEID = 'not-amazon';
-const LOCALE = 'en-GB';
+const LOCALE = 'en-US';
 
 function BuildEvent(argv)
 {
