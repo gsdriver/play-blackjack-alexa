@@ -88,6 +88,11 @@ module.exports = {
           }
         }
 
+        // If this was the first hand, or they specified a value, tell them how much they bet
+        if ((action.action === 'bet') && (action.firsthand || (action.amount !== game.lastBet))) {
+          speechQuestion += resources.strings.YOU_BET_TEXT.replace('{0}', betAmount);
+        }
+
         // If there was a suggestion, remove it as we have taken a play
         game.suggestion = undefined;
         gameService.userAction(attributes, action.action, betAmount, (speechError) => {
@@ -107,11 +112,6 @@ module.exports = {
               && (game.activePlayer == 'player')
               && (game.playerHands[0].cards.length == 2)
               && (game.playerHands[0].total == 21));
-
-            // If this was the first hand, or they specified a value, tell them how much they bet
-            if ((action.action === 'bet') && (action.firsthand || (action.amount > 0))) {
-              speechQuestion += resources.strings.YOU_BET_TEXT.replace('{0}', betAmount);
-            }
 
             // If this is tournament mode and the hand is over, special rules apply
             if (((oldGame.activePlayer == 'player') && (game.activePlayer != 'player'))
