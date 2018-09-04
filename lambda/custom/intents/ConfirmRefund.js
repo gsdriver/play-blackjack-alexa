@@ -1,10 +1,9 @@
 //
-// Handles purchasing of premium content
+// Handles refund of premium content
 //
 
 'use strict';
 
-const bjUtils = require('../BlackjackUtils');
 const Repeat = require('./Repeat');
 
 module.exports = {
@@ -12,16 +11,14 @@ module.exports = {
     const request = handlerInput.requestEnvelope.request;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
-    if (attributes.temp.confirmPurchase) {
+    if (attributes.temp.confirmRefund) {
       const handledIntents = ['AMAZON.FallbackIntent', 'AMAZON.RepeatIntent',
-        'AMAZON.HelpIntent', 'AMAZON.YesIntent', 'AMAZON.NoIntent', 'PurchaseIntent'];
+        'AMAZON.HelpIntent', 'AMAZON.YesIntent', 'AMAZON.NoIntent', 'RefundIntent'];
 
       if (request.type === 'IntentRequest') {
         return (handledIntents.indexOf(request.intent.name) > -1);
-      } else {
-        return (request.type === 'LaunchRequest');
       }
-      attributes.temp.confirmPurchase = undefined;
+      attributes.temp.confirmRefund = undefined;
     }
 
     return false;
@@ -32,9 +29,9 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const res = require('../resources')(event.request.locale);
 
-    if ((request.intent.name === 'PurchaseIntent')
+    if ((request.intent.name === 'RefundIntent')
       || (request.intent.name === 'AMAZON.YesIntent')) {
-      const purchase = bjUtils.getPurchaseDirective(event, attributes, {name: 'Buy', id: 'spanish'});
+      const purchase = bjUtils.getPurchaseDirective(event, attributes, {name: 'Cancel', id: 'spanish'});
       if (purchase) {
         return handlerInput.responseBuilder
           .addDirective(purchase)
@@ -49,7 +46,7 @@ module.exports = {
       }
     } else {
       // Get out of purchase flow and repeat
-      attributes.temp.confirmPurchase = undefined;
+      attributes.temp.confirmRefund = undefined;
       return Repeat.handle(handlerInput);
     }
   },

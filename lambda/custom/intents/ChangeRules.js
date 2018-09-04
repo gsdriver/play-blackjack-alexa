@@ -8,77 +8,92 @@ const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
-  handleIntent: function() {
-    // Which rule should we change?
-    const changeSlot = this.event.request.intent.slots.Change;
-    const optionSlot = this.event.request.intent.slots.ChangeOption;
-    let ruleError;
-    const res = require('../resources')(this.event.request.locale);
+  canHandle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const game = attributes[attributes.currentGame];
 
-    if (!this.attributes[this.attributes.currentGame].canChangeRules) {
-      // Sorry, you can't reset this or change the rules
-      ruleError = res.strings.TOURNAMENT_NOCHANGERULES;
-    } else if (!changeSlot) {
-      ruleError = res.strings.CHANGERULES_NO_RULE;
-    } else if (!changeSlot.value) {
-      ruleError = res.strings.CHANGERULES_NO_RULE_VALUE.replace('{0}', changeSlot.value);
-    } else if (!optionSlot || !optionSlot.value) {
-      ruleError = res.strings.CHANGERULES_NO_RULE_OPTION.replace('{0}', changeSlot.value);
-    } else {
-      // Build the appropriate rules object and set it
-      const rules = buildRulesObject(res, changeSlot.value, optionSlot.value);
-      if (!rules) {
-        ruleError = res.strings.CHANGERULES_CANT_CHANGE_RULE.replace('{0}', changeSlot.value).replace('{1}', optionSlot.value);
+    return ((game.possibleActions.indexOf('bet') >= 0)
+      && !attributes.temp.joinTournament
+      && (request.type === 'IntentRequest')
+      && (request.intent.name === 'ChangeRulesIntent'));
+  },
+  handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const changeSlot = event.request.intent.slots.Change;
+    const optionSlot = event.request.intent.slots.ChangeOption;
+    let ruleError;
+    const res = require('../resources')(event.request.locale);
+
+    return new Promise((resolve, reject) => {
+      if (!attributes[attributes.currentGame].canChangeRules) {
+        // Sorry, you can't reset this or change the rules
+        ruleError = res.strings.TOURNAMENT_NOCHANGERULES;
+      } else if (!changeSlot) {
+        ruleError = res.strings.CHANGERULES_NO_RULE;
+      } else if (!changeSlot.value) {
+        ruleError = res.strings.CHANGERULES_NO_RULE_VALUE.replace('{0}', changeSlot.value);
+      } else if (!optionSlot || !optionSlot.value) {
+        ruleError = res.strings.CHANGERULES_NO_RULE_OPTION.replace('{0}', changeSlot.value);
       } else {
-        playgame.changeRules(this.attributes,
-          this.event.request.locale, rules,
-          (error, response, speech, reprompt) => {
-          // Now get the full set of rules for the card
-          if (!error) {
-            playgame.readRules(this.attributes, this.event.request.locale,
-                      (readSpeech, readPrompt) => {
+        // Build the appropriate rules object and set it
+        const rules = buildRulesObject(res, changeSlot.value, optionSlot.value);
+        if (!rules) {
+          ruleError = res.strings.CHANGERULES_CANT_CHANGE_RULE.replace('{0}', changeSlot.value).replace('{1}', optionSlot.value);
+        } else {
+          playgame.changeRules(attributes,
+            event.request.locale, rules,
+            (error, response, speech, reprompt) => {
+            // Now get the full set of rules for the card
+            if (!error) {
+              const output = playgame.readRules(attributes, event.request.locale);
               let cardText = '';
 
-              if (readSpeech) {
-                cardText = res.strings.FULL_RULES.replace('{0}', readSpeech);
+              if (output.speech) {
+                cardText = res.strings.FULL_RULES.replace('{0}', output.speech);
               }
 
-              bjUtils.emitResponse(this, null, null,
-                      speech, res.strings.ERROR_REPROMPT,
-                      res.strings.CHANGERULES_CARD_TITLE, cardText);
-            });
-          } else {
-            bjUtils.emitResponse(this, error, response, speech, reprompt);
-          }
-        });
-      }
-    }
-
-    // If there was a rule error, then let's get the rules and display those
-    if (ruleError) {
-      let cardText = '';
-
-      if ((this.attributes.platform === 'google') || this.attributes.bot) {
-        ruleError = ruleError.replace('{2}', '');
-      } else {
-        ruleError = ruleError.replace('{2}', res.strings.CHANGERULES_ERR_CHECKAPP);
+              resolve(handlerInput.responseBuilder
+                .speak(speech)
+                .reprompt(res.strings.ERROR_REPROMPT)
+                .withSimpleCard(res.strings.CHANGERULES_CARD_TITLE, cardText)
+                .getResponse());
+            } else {
+              resolve(bjUtils.getResponse(handlerInput, error, response, speech, reprompt));
+            }
+          });
+        }
       }
 
-      // Prepare card text with a full set of rules that can be changed
-      playgame.readRules(this.attributes, this.event.request.locale, (speech, reprompt) => {
-        if (speech) {
-          cardText = res.strings.FULL_RULES.replace('{0}', speech);
+      // If there was a rule error, then let's get the rules and display those
+      if (ruleError) {
+        let cardText = '';
+
+        if ((attributes.platform === 'google') || attributes.bot) {
+          ruleError = ruleError.replace('{2}', '');
+        } else {
+          ruleError = ruleError.replace('{2}', res.strings.CHANGERULES_ERR_CHECKAPP);
+        }
+
+        // Prepare card text with a full set of rules that can be changed
+        const output = playgame.readRules(attributes, event.request.locale);
+        if (output.speech) {
+          cardText = res.strings.FULL_RULES.replace('{0}', output.speech);
           cardText += '\n';
         }
 
-        if (this.attributes[this.attributes.currentGame].canReset) {
+        if (attributes[attributes.currentGame].canReset) {
           cardText += res.strings.CHANGE_CARD_TEXT;
         }
-        bjUtils.emitResponse(this, null, null,
-                ruleError, res.strings.ERROR_REPROMPT,
-                res.strings.CHANGERULES_CARD_TITLE, cardText);
-      });
-    }
+
+        resolve(handlerInput.responseBuilder
+          .speak(ruleError)
+          .reprompt(res.strings.ERROR_REPROMPT)
+          .withSimpleCard(res.strings.CHANGERULES_CARD_TITLE, cardText)
+          .getResponse());
+      }
+    });
   },
 };
 

@@ -8,7 +8,7 @@
           "apis": {
             "custom": {
               "endpoint": {
-                "uri": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v10"
+                "uri": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_Test"
               }
             }
           }
@@ -20,7 +20,40 @@
           "filePath": "isps\\entitlement\\spanish.json",
           "productId": "amzn1.adg.product.48f3cc52-c32e-459a-b7b5-eb36ebe6c86a"
         }
-      ]
+      ],
+      "resources": {
+        "manifest": {
+          "eTag": "f4820295703fb4b1d36aba1db84e4659"
+        },
+        "interactionModel": {
+          "en-AU": {
+            "eTag": "3f1cac455b466e0193520b2d70f1235a"
+          },
+          "en-CA": {
+            "eTag": "3f1cac455b466e0193520b2d70f1235a"
+          },
+          "en-IN": {
+            "eTag": "3f1cac455b466e0193520b2d70f1235a"
+          },
+          "en-GB": {
+            "eTag": "6e37a2c7db6521f1f20a4f75f2b1981f"
+          },
+          "en-US": {
+            "eTag": "2e92de194824ad8afab80d5741f0c2c1"
+          }
+        },
+        "lambda": [
+          {
+            "arn": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_Test",
+            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_Test",
+            "awsRegion": "us-east-1",
+            "alexaUsage": [
+              "custom/default"
+            ],
+            "revisionId": "2dec74d4-14c4-4042-ad9e-c8851d9f1f69"
+          }
+        ]
+      }
     }
   }
 }

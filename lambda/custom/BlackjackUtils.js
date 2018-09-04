@@ -17,6 +17,9 @@ const https = require('https');
 module.exports = {
   getResponse: function(handlerInput, error, response, speech, reprompt) {
     if (error) {
+      const event = handlerInput.requestEnvelope;
+      const res = require('./resources')(event.request.locale);
+
       return handlerInput.responseBuilder
         .speak(error)
         .reprompt(res.strings.ERROR_REPROMPT)

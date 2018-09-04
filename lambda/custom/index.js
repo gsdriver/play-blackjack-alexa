@@ -21,6 +21,7 @@ const Exit = require('./intents/Exit');
 const Reset = require('./intents/Reset');
 const ConfirmReset = require('./intents/ConfirmReset');
 const ConfirmPurchase = require('./intents/ConfirmPurchase');
+const ConfirmRefund = require('./intents/ConfirmRefund');
 const ConfirmSelect = require('./intents/ConfirmSelect');
 const Select = require('./intents/Select');
 const Training = require('./intents/Training');
@@ -216,14 +217,18 @@ function runGame(event, context, callback) {
       ProductResponse,
       ConfirmReset,
       ConfirmPurchase,
+      ConfirmRefund,
+      ConfirmSelect,
       TakeSuggestion,
       Help,
       Exit,
       Reset,
       Purchase,
+      Refund,
       Suggest,
       Select,
       Rules,
+      ChangeRules,
       Training,
       Betting,
       SideBet,
@@ -244,64 +249,3 @@ function runGame(event, context, callback) {
     callback(err, response);
   });
 }
-
-/*
-const selectGameHandlers = Alexa.CreateStateHandler('SELECTGAME', {
-  'LaunchRequest': Select.handleIntent,
-  'ElementSelected': Select.handleYesIntent,
-  'GameIntent': Select.handleYesIntent,
-  'SelectIntent': Select.handleNoIntent,
-  'RefundIntent': Refund.handleIntent,
-  'AMAZON.YesIntent': Select.handleYesIntent,
-  'AMAZON.NextIntent': Select.handleNoIntent,
-  'AMAZON.NoIntent': Select.handleNoIntent,
-});
-
-const suggestHandlers = Alexa.CreateStateHandler('SUGGESTION', {
-  'LaunchRequest': TakeSuggestion.handleNoIntent,
-  'RulesIntent': Rules.handleIntent,
-  'RefundIntent': Refund.handleIntent,
-  'AMAZON.RepeatIntent': Repeat.handleIntent,
-  'AMAZON.FallbackIntent': Repeat.handleIntent,
-  'AMAZON.YesIntent': TakeSuggestion.handleYesIntent,
-  'AMAZON.NoIntent': TakeSuggestion.handleNoIntent,
-});
-
-const refundHandlers = Alexa.CreateStateHandler('CONFIRMREFUND', {
-  'LaunchRequest': Refund.handleNoIntent,
-  'RefundIntent': Refund.handleIntent,
-  'AMAZON.FallbackIntent': Refund.handleRepeatIntent,
-  'AMAZON.RepeatIntent': Refund.handleRepeatIntent,
-  'AMAZON.HelpIntent': Refund.handleRepeatIntent,
-  'AMAZON.YesIntent': Refund.handleYesIntent,
-  'AMAZON.NoIntent': Refund.handleNoIntent,
-});
-
-const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
-  'LaunchRequest': Launch.handleIntent,
-  'RulesIntent': Rules.handleIntent,
-  'ChangeRulesIntent': ChangeRules.handleIntent,
-  'SelectIntent': Select.handleIntent,
-  'RefundIntent': Refund.handleIntent,
-  'AMAZON.YesIntent': Betting.handleIntent,
-});
-
-const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
-  'LaunchRequest': Launch.handleIntent,
-  'RulesIntent': Rules.handleIntent,
-  'RefundIntent': Refund.handleIntent,
-});
-
-const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
-  'LaunchRequest': Launch.handleIntent,
-  'RulesIntent': Rules.handleIntent,
-  'RefundIntent': Refund.handleIntent,
-  'AMAZON.YesIntent': Blackjack.handleYesIntent,
-});
-
-// Handlers for our skill
-const handlers = {
-  'RulesIntent': Rules.handleIntent,
-  'RefundIntent': Refund.handleIntent,
-};
-*/
