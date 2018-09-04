@@ -102,9 +102,6 @@ module.exports = {
             error = resources.mapServerError(speechError);
           } else {
             // Player took an action - the board will need to be redrawn
-            if (!attributes.temp) {
-              attributes.temp = {};
-            }
             attributes.temp.drawBoard = true;
 
             // Special case - give a full read-out if this is a natural blackjack

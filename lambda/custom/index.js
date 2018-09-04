@@ -211,10 +211,10 @@ function runGame(event, context, callback) {
   }
 
   const skillFunction = skillBuilder.addRequestHandlers(
+      ProductResponse,
       OfferTournament,
       TournamentJoin,
       Launch,
-      ProductResponse,
       ConfirmReset,
       ConfirmPurchase,
       ConfirmRefund,

@@ -404,6 +404,7 @@ module.exports = {
         event.context.System.device.supportedInterfaces &&
         event.context.System.device.supportedInterfaces.Display) {
       if ((attributes.temp && attributes.temp.drawBoard)
+          || attributes.originalChoices
           || !(attributes.temp && attributes.temp.imageUrl)) {
         if (!attributes.temp) {
           attributes.temp = {};

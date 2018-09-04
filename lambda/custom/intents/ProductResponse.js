@@ -8,6 +8,7 @@ const gameService = require('../GameService');
 const playgame = require('../PlayGame');
 const request = require('request');
 const Launch = require('./Launch');
+const Select = require('./Select');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -19,7 +20,7 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
     // Record that we got a purchase response
-    if (event.request.payload) {
+    if (event.request.payload && process.env.SERVICEURL) {
       const params = {
         url: process.env.SERVICEURL + 'blackjack/purchaseResult',
         formData: {
@@ -58,8 +59,7 @@ module.exports = {
         if (event.request.token == 'SELECTGAME') {
           // Kick them back into SelectGame mode
           console.log('Selecting game');
-          attributes.temp.selectingGame = true;
-          return Launch.handle(handlerInput);
+          return Select.handle(handlerInput);
         }
         break;
       case 'Cancel':

@@ -86,6 +86,7 @@ function selectedGame(handlerInput) {
   }
   attributes.choices = undefined;
   attributes.originalChoices = undefined;
+  attributes.temp.drawBoard = true;
 
   const launchWelcome = JSON.parse(res.strings.LAUNCH_WELCOME);
   let launchSpeech = launchWelcome[attributes.currentGame];

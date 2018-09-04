@@ -15,6 +15,7 @@ module.exports = {
 
     return ((game.possibleActions.indexOf('bet') >= 0)
       && !attributes.temp.joinTournament
+      && !attributes.temp.selectingGame
       && (request.type === 'IntentRequest')
       && ((request.intent.name === 'BettingIntent')
         || (request.intent.name === 'AMAZON.YesIntent')));

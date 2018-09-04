@@ -14,6 +14,8 @@ module.exports = {
 
     // Can only do while waiting to join a tournament
     return (attributes.temp.joinTournament &&
+      !attributes.temp.confirmPurchase &&
+      !attributes.temp.confirmRefund &&
       (request.type === 'IntentRequest') &&
       ((request.intent.name === 'AMAZON.YesIntent')));
   },
@@ -42,7 +44,8 @@ module.exports = {
           .getResponse();
         resolve(response);
       } else {
-        speech = res.strings.TOURNAMENT_WELCOME_BACK.replace('{0}', game.maxHands - game.hands);
+        speech = res.strings.TOURNAMENT_WELCOME_BACK
+          .replace('{0}', (game.hands) ? (game.maxHands - game.hands) : game.maxHands);
         tournament.readStanding(event.request.locale, attributes, (standing) => {
           if (standing) {
             speech += standing;
