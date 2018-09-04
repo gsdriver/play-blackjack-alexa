@@ -13,8 +13,7 @@ const Suggest = require('./intents/Suggest');
 const TakeSuggestion = require('./intents/TakeSuggestion');
 const Rules = require('./intents/Rules');
 const ChangeRules = require('./intents/ChangeRules');
-const TakeInsurance = require('./intents/TakeInsurance');
-const DeclineInsurance = require('./intents/DeclineInsurance');
+const Insurance = require('./intents/Insurance');
 const Repeat = require('./intents/Repeat');
 const HighScore = require('./intents/HighScore');
 const Help = require('./intents/Help');
@@ -22,6 +21,7 @@ const Exit = require('./intents/Exit');
 const Reset = require('./intents/Reset');
 const ConfirmReset = require('./intents/ConfirmReset');
 const ConfirmPurchase = require('./intents/ConfirmPurchase');
+const ConfirmSelect = require('./intents/ConfirmSelect');
 const Select = require('./intents/Select');
 const Training = require('./intents/Training');
 const Unhandled = require('./intents/Unhandled');
@@ -216,14 +216,18 @@ function runGame(event, context, callback) {
       ProductResponse,
       ConfirmReset,
       ConfirmPurchase,
+      TakeSuggestion,
       Help,
       Exit,
       Reset,
       Purchase,
       Suggest,
+      Select,
+      Rules,
       Training,
       Betting,
       SideBet,
+      Insurance,
       Blackjack,
       Repeat,
       HighScore,
@@ -286,8 +290,6 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
   'LaunchRequest': Launch.handleIntent,
   'RulesIntent': Rules.handleIntent,
   'RefundIntent': Refund.handleIntent,
-  'AMAZON.YesIntent': TakeInsurance.handleIntent,
-  'AMAZON.NoIntent': DeclineInsurance.handleIntent,
 });
 
 const inGameHandlers = Alexa.CreateStateHandler('INGAME', {

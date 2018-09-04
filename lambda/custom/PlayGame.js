@@ -147,14 +147,14 @@ module.exports = {
     }
   },
   // Reads back the rules in play
-  readRules: function(attributes, locale, callback) {
+  readRules: function(attributes, locale) {
     resources = require('./resources')(locale);
     const game = attributes[attributes.currentGame];
 
     const reprompt = listValidActions(game, locale, 'full');
     const speech = rulesToText(locale, game.rules) + reprompt;
 
-    callback(speech, reprompt);
+    return {speech: speech, reprompt: reprompt};
   },
   // Reads back the current hand and game state
   readCurrentHand: function(attributes, locale) {

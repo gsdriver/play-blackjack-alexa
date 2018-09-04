@@ -49,7 +49,7 @@ module.exports = {
         actionObj = {action: res.getBlackjackAction(actionSlot)};
         if (!actionObj.action) {
           // What did they specify?
-          console.log('NULL ACTION: ' + JSON.stringify(this.event.request));
+          console.log('NULL ACTION: ' + JSON.stringify(event.request));
           actionObj.action = actionSlot.value;
         }
       }
