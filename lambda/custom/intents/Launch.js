@@ -11,12 +11,27 @@ module.exports = {
   canHandle: function(handlerInput) {
     // Intents that will drop to Launch
     const request = handlerInput.requestEnvelope.request;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
     const intents = ['SuggestIntent', 'ChangeRulesIntent', 'AMAZON.YesIntent', 'AMAZON.NoIntent'];
 
-    return ((request.type === 'LaunchRequest')
+    if ((request.type === 'LaunchRequest')
       || (handlerInput.requestEnvelope.session.new
         && (request.type === 'IntentRequest')
-        && (intents.indexOf(request.intent.name) > -1)));
+        && (intents.indexOf(request.intent.name) > -1))) {
+      return true;
+    }
+
+    // If they declined to join the tournament, we also handle that
+    if (attributes.temp.joinTournament && (request.type === 'IntentRequest')
+      && (request.intent.name === 'AMAZON.NoIntent')) {
+      attributes.temp.joinTournament = undefined;
+      if (attributes.currentGame === 'tournament') {
+        attributes.currentGame = 'standard';
+      }
+      return true;
+    }
+
+    return false;
   },
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;

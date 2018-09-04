@@ -4,6 +4,7 @@ const Alexa = require('ask-sdk');
 const CanFulfill = require('./intents/CanFulfill');
 const Launch = require('./intents/Launch');
 const OfferTournament = require('./intents/OfferTournament');
+const TournamentJoin = require('./intents/TournamentJoin');
 const SessionEnd = require('./intents/SessionEnd');
 const Blackjack = require('./intents/Blackjack');
 const Betting = require('./intents/Betting');
@@ -210,6 +211,7 @@ function runGame(event, context, callback) {
 
   const skillFunction = skillBuilder.addRequestHandlers(
       OfferTournament,
+      TournamentJoin,
       Launch,
       ProductResponse,
       ConfirmReset,
@@ -220,7 +222,9 @@ function runGame(event, context, callback) {
       Purchase,
       Suggest,
       Training,
+      Betting,
       SideBet,
+      Blackjack,
       Repeat,
       HighScore,
       Unhandled
@@ -251,7 +255,6 @@ const selectGameHandlers = Alexa.CreateStateHandler('SELECTGAME', {
 
 const suggestHandlers = Alexa.CreateStateHandler('SUGGESTION', {
   'LaunchRequest': TakeSuggestion.handleNoIntent,
-  'BlackjackIntent': Blackjack.handleIntent,
   'RulesIntent': Rules.handleIntent,
   'RefundIntent': Refund.handleIntent,
   'AMAZON.RepeatIntent': Repeat.handleIntent,
@@ -272,7 +275,6 @@ const refundHandlers = Alexa.CreateStateHandler('CONFIRMREFUND', {
 
 const newGameHandlers = Alexa.CreateStateHandler('NEWGAME', {
   'LaunchRequest': Launch.handleIntent,
-  'BettingIntent': Betting.handleIntent,
   'RulesIntent': Rules.handleIntent,
   'ChangeRulesIntent': ChangeRules.handleIntent,
   'SelectIntent': Select.handleIntent,
@@ -290,26 +292,14 @@ const insuranceHandlers = Alexa.CreateStateHandler('INSURANCEOFFERED', {
 
 const inGameHandlers = Alexa.CreateStateHandler('INGAME', {
   'LaunchRequest': Launch.handleIntent,
-  'BlackjackIntent': Blackjack.handleIntent,
   'RulesIntent': Rules.handleIntent,
   'RefundIntent': Refund.handleIntent,
   'AMAZON.YesIntent': Blackjack.handleYesIntent,
 });
 
-// These states are only accessible during tournament play
-const joinHandlers = Alexa.CreateStateHandler('JOINTOURNAMENT', {
-  'LaunchRequest': tournament.handlePass,
-  'RefundIntent': Refund.handleIntent,
-  'AMAZON.YesIntent': tournament.handleJoin,
-  'AMAZON.NoIntent': tournament.handlePass,
-});
-
 // Handlers for our skill
 const handlers = {
-  'BettingIntent': Betting.handleIntent,
-  'BlackjackIntent': Blackjack.handleIntent,
   'RulesIntent': Rules.handleIntent,
   'RefundIntent': Refund.handleIntent,
-  'AMAZON.RepeatIntent': Repeat.handleIntent,
 };
 */

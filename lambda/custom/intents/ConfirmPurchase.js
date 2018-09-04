@@ -12,7 +12,7 @@ module.exports = {
     const request = handlerInput.requestEnvelope.request;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
-    if (attributes.temp.confirmReset) {
+    if (attributes.temp.confirmPurchase) {
       const handledIntents = ['AMAZON.FallbackIntent', 'AMAZON.RepeatIntent',
         'AMAZON.HelpIntent', 'AMAZON.YesIntent', 'AMAZON.NoIntent'];
 
@@ -21,7 +21,7 @@ module.exports = {
       } else {
         return (request.type === 'LaunchRequest');
       }
-      attributes.temp.confirmReset = undefined;
+      attributes.temp.confirmPurchase = undefined;
     }
 
     return false;

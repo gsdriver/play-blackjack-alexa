@@ -14,6 +14,9 @@ module.exports = {
       tournament.canEnterTournament(attributes));
   },
   handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+
     return new Promise((resolve, reject) => {
       attributes.temp.joinTournament = true;
       tournament.promptToEnter(event.request.locale,

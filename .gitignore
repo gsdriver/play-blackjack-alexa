@@ -10,3 +10,5 @@ src/test.json
 summary.csv
 attributes.txt
 seed.txt
+lastResponse.txt
+lastaction.txt

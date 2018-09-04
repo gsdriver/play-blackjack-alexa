@@ -127,7 +127,7 @@ module.exports = {
 
     speech = res.strings.TOURNAMENT_HELP;
     speech += res.strings.TOURNAMENT_BANKROLL.replace('{0}', game.bankroll).replace('{1}', game.maxHands - (game.hands ? game.hands : 0));
-    readStanding(locale, attributes, (standing) => {
+    module.exports.readStanding(locale, attributes, (standing) => {
       speech += standing;
       speech += reprompt;
       callback(handlerInput.responseBuilder
@@ -138,46 +138,29 @@ module.exports = {
          .getResponse());
     });
   },
-  handleJoin: function() {
-    // Welcome to the tournament!
-    const res = require('./resources')(this.event.request.locale);
-    let speech;
-    const reprompt = res.strings.TOURNAMENT_WELCOME_REPROMPT;
-    const game = this.attributes['tournament'];
+  readStanding: function(locale, attributes, callback) {
+    const res = require('./resources')(locale);
+    const game = attributes['tournament'];
 
-    this.attributes.currentGame = 'tournament';
-    this.handler.state = 'NEWGAME';
-
-    if (!game) {
-      // New player
-      const gameService = require('./GameService');
-
-      this.attributes.tournamentsPlayed = (this.attributes.tournamentsPlayed + 1) || 1;
-      gameService.initializeGame('tournament', this.attributes, this.event.session.user.userId);
-      speech = res.strings.TOURNAMENT_WELCOME_NEWPLAYER
-            .replace('{0}', this.attributes['tournament'].bankroll)
-            .replace('{1}', this.attributes['tournament'].maxHands);
-      speech += reprompt;
-      bjUtils.emitResponse(this, null, null, speech, reprompt);
+    if (!game.hands) {
+      // No need to say anything
+      callback('');
     } else {
-      speech = res.strings.TOURNAMENT_WELCOME_BACK.replace('{0}', game.maxHands - game.hands);
-      readStanding(this.event.request.locale, this.attributes, (standing) => {
-        if (standing) {
-          speech += standing;
+      bjUtils.getHighScore(attributes, (err, high) => {
+        // Let them know the current high score
+        let speech = '';
+
+        if (high) {
+          if (game.bankroll >= high) {
+            speech = res.strings.TOURNAMENT_STANDING_FIRST;
+          } else {
+            speech = res.strings.TOURNAMENT_STANDING_TOGO.replace('{0}', high);
+          }
         }
 
-        speech += reprompt;
-        bjUtils.emitResponse(this, null, null, speech, reprompt);
+        callback(speech);
       });
     }
-  },
-  handlePass: function() {
-    // Nope, they are not going to join the tournament - we will just pass on to Launch
-    if (this.attributes.currentGame === 'tournament') {
-      this.attributes.currentGame = 'standard';
-    }
-
-    this.emit('LaunchRequest');
   },
 };
 
@@ -199,29 +182,4 @@ function isTournamentActive() {
   }
 
   return active;
-}
-
-function readStanding(locale, attributes, callback) {
-  const res = require('./resources')(locale);
-  const game = attributes['tournament'];
-
-  if (!game.hands) {
-    // No need to say anything
-    callback('');
-  } else {
-    bjUtils.getHighScore(attributes, (err, high) => {
-      // Let them know the current high score
-      let speech = '';
-
-      if (high) {
-        if (game.bankroll >= high) {
-          speech = res.strings.TOURNAMENT_STANDING_FIRST;
-        } else {
-          speech = res.strings.TOURNAMENT_STANDING_TOGO.replace('{0}', high);
-        }
-      }
-
-      callback(speech);
-    });
-  }
 }

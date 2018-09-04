@@ -5,6 +5,7 @@
 'use strict';
 
 const tournament = require('../tournament');
+const gameService = require('../GameService');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -17,14 +18,44 @@ module.exports = {
       ((request.intent.name === 'AMAZON.YesIntent')));
   },
   handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const res = require('../resources')(event.request.locale);
+    const game = attributes['tournament'];
+    let speech;
+    const reprompt = res.strings.TOURNAMENT_WELCOME_REPROMPT;
+
     return new Promise((resolve, reject) => {
-      tournament.joinTournament(handlerInput, (speech, reprompt) => {
+      attributes.temp.joinTournament = undefined;
+      attributes.currentGame = 'tournament';
+      if (!game) {
+        // New player
+        attributes.tournamentsPlayed = (attributes.tournamentsPlayed + 1) || 1;
+        gameService.initializeGame('tournament', attributes, event.session.user.userId);
+        speech = res.strings.TOURNAMENT_WELCOME_NEWPLAYER
+              .replace('{0}', attributes['tournament'].bankroll)
+              .replace('{1}', attributes['tournament'].maxHands);
+        speech += reprompt;
         const response = handlerInput.responseBuilder
           .speak(speech)
           .reprompt(reprompt)
           .getResponse();
         resolve(response);
-      });
+      } else {
+        speech = res.strings.TOURNAMENT_WELCOME_BACK.replace('{0}', game.maxHands - game.hands);
+        tournament.readStanding(event.request.locale, attributes, (standing) => {
+          if (standing) {
+            speech += standing;
+          }
+
+          speech += reprompt;
+          const response = handlerInput.responseBuilder
+            .speak(speech)
+            .reprompt(reprompt)
+            .getResponse();
+          resolve(response);
+        });
+      }
     });
   },
 };
