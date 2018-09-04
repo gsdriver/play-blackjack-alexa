@@ -157,25 +157,21 @@ module.exports = {
     callback(speech, reprompt);
   },
   // Reads back the current hand and game state
-  readCurrentHand: function(attributes, locale, callback) {
+  readCurrentHand: function(attributes, locale) {
     resources = require('./resources')(locale);
     const game = attributes[attributes.currentGame];
     const reprompt = listValidActions(game, locale, 'full');
     const speech = readHand(attributes, game, locale) + ' ' + reprompt;
-
-    callback(speech, reprompt);
+    return {speech: speech, reprompt: reprompt};
   },
   // Gets contextual help based on the current state of the game
-  getContextualHelp: function(context, helpPrompt) {
-    const attributes = context.attributes;
-    resources = require('./resources')(context.event.request.locale);
+  getContextualHelp: function(event, attributes, helpPrompt) {
+    resources = require('./resources')(event.request.locale);
     const game = attributes[attributes.currentGame];
     let result = '';
 
-    // In some states, the choices are yes or no
-    if ((context.handler.state == 'CONFIRMRESET') ||
-          (context.handler.state == 'INSURANCEOFFERED') ||
-          (context.handler.state == 'JOINTOURNAMENT')) {
+    if (attributes.temp.joinTournament || attributes.temp.confirmReset
+      || attributes.temp.selectingGame) {
       result = resources.strings.HELP_YOU_CAN_SAY_YESNO;
     } else if (game.possibleActions) {
       // Special case - if there is insurance and noinsurance in the list, then pose as a yes/no
@@ -194,7 +190,7 @@ module.exports = {
         if (helpPrompt && !game.training) {
           actions.push(resources.strings.HELP_YOU_CAN_SAY_ENABLE_TRAINING);
         }
-        result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}', utils.or(actions, {locale: context.event.request.locale}));
+        result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}', utils.or(actions, {locale: event.request.locale}));
       }
     } else if (!helpPrompt) {
       result = resources.strings.TRAINING_REPROMPT;

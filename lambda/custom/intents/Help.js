@@ -9,32 +9,52 @@ const tournament = require('../tournament');
 const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
-  handleIntent: function() {
-    // Help is different for tournament play
-    if (this.attributes.currentGame === 'tournament') {
-      tournament.readHelp(this, this.attributes);
-    } else {
-      const res = require('../resources')(this.event.request.locale);
-      const game = this.attributes[this.attributes.currentGame];
-      let speech = playgame.getContextualHelp(this,
-        !(this.attributes.bot || (this.attributes.platform === 'google')));
-      if (!speech) {
-        speech = res.strings.HELP_GENERIC_HELP;
-      }
-      speech = res.strings.HELP_ACHIEVEMENT_POINTS + speech;
+  canHandle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const state = bjUtils.getState(attributes);
 
-      let cardContent = '';
-      if (game.progressive) {
-        cardContent += res.strings.HELP_CARD_PROGRESSIVE_TEXT;
+    return (((state === 'NEWGAME') || (state === 'INGAME') || (state === 'INSURANCEOFFERED'))
+      && (request.type === 'IntentRequest')
+      && (request.intent.name === 'AMAZON.HelpIntent'));
+  },
+  handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const res = require('../resources')(event.request.locale);
+
+    return new Promise((resolve, reject) => {
+      // Help is different for tournament play
+      if (attributes.currentGame === 'tournament') {
+        tournament.readHelp(event, (response) => {
+          resolve(response);
+        });
+      } else {
+        const game = attributes[attributes.currentGame];
+        let speech = playgame.getContextualHelp(event, attributes,
+          !(attributes.bot || (attributes.platform === 'google')));
+        if (!speech) {
+          speech = res.strings.HELP_GENERIC_HELP;
+        }
+        speech = res.strings.HELP_ACHIEVEMENT_POINTS + speech;
+
+        let cardContent = '';
+        if (game.progressive) {
+          cardContent += res.strings.HELP_CARD_PROGRESSIVE_TEXT;
+        }
+        if (game.superBonus) {
+          cardContent += res.strings.HELP_CARD_SUPERBONUS;
+        }
+        cardContent += res.strings.HELP_ACHIEVEMENT_CARD_TEXT;
+        cardContent += res.strings.HELP_CARD_TEXT;
+
+        const response = handlerInput.responseBuilder
+          .speak(speech)
+          .reprompt(speech)
+          .withSimpleCard(res.strings.HELP_CARD_TITLE, cardContent)
+          .getResponse();
+        resolve(response);
       }
-      if (game.superBonus) {
-        cardContent += res.strings.HELP_CARD_SUPERBONUS;
-      }
-      cardContent += res.strings.HELP_ACHIEVEMENT_CARD_TEXT;
-      cardContent += res.strings.HELP_CARD_TEXT;
-      bjUtils.emitResponse(this, null, null,
-          speech, speech, res.strings.HELP_CARD_TITLE,
-          cardContent);
-    }
+    });
   },
 };

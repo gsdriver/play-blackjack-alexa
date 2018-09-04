@@ -116,9 +116,11 @@ module.exports = {
     attributes['tournament'].finished = true;
     return response;
   },
-  readHelp: function(context, attributes) {
-    const locale = context.event.request.locale;
-    const res = require('./resources')(locale);
+  readHelp: function(handlerInput, callback) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const res = require('../resources')(event.request.locale);
+    const locale = event.request.locale;
     let speech;
     const game = attributes['tournament'];
     const reprompt = res.strings.ERROR_REPROMPT;
@@ -128,10 +130,12 @@ module.exports = {
     readStanding(locale, attributes, (standing) => {
       speech += standing;
       speech += reprompt;
-      bjUtils.emitResponse(context, null, null,
-              speech, reprompt,
-              res.strings.HELP_CARD_TITLE,
-              res.strings.TOURNAMENT_HELP_CARD_TEXT.replace('{0}', game.maxHands));
+      callback(handlerInput.responseBuilder
+         .speak(speech)
+         .reprompt(speech)
+         .withSimpleCard(res.strings.HELP_CARD_TITLE,
+            res.strings.TOURNAMENT_HELP_CARD_TEXT.replace('{0}', game.maxHands))
+         .getResponse());
     });
   },
   handleJoin: function() {

@@ -108,9 +108,8 @@ function selectedGame(context) {
   let launchSpeech = launchWelcome[context.attributes.currentGame];
   launchSpeech += launchInitialText;
   launchSpeech += res.strings.LAUNCH_START_GAME;
-  playgame.readCurrentHand(context.attributes, context.event.request.locale, (speech, reprompt) => {
-    bjUtils.emitResponse(context, null, null, launchSpeech, reprompt);
-  });
+  const output = playgame.readCurrentHand(context.attributes, context.event.request.locale);
+  bjUtils.emitResponse(context, null, null, launchSpeech, output.reprompt);
 }
 
 function getSelectedIndex(context) {
