@@ -4,6 +4,7 @@
 
 'use strict';
 
+const bjUtils = require('../BlackjackUtils');
 const Repeat = require('./Repeat');
 
 module.exports = {
@@ -15,8 +16,9 @@ module.exports = {
       const handledIntents = ['AMAZON.FallbackIntent', 'AMAZON.RepeatIntent',
         'AMAZON.HelpIntent', 'AMAZON.YesIntent', 'AMAZON.NoIntent', 'RefundIntent'];
 
-      if (request.type === 'IntentRequest') {
-        return (handledIntents.indexOf(request.intent.name) > -1);
+      if ((request.type === 'IntentRequest')
+        && (handledIntents.indexOf(request.intent.name) > -1)) {
+        return true;
       }
       attributes.temp.confirmRefund = undefined;
     }

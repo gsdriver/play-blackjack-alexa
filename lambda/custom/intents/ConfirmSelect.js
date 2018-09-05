@@ -7,7 +7,6 @@
 const gameService = require('../GameService');
 const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
-const speechUtils = require('alexa-speech-utils')();
 const Repeat = require('./Repeat');
 
 module.exports = {
@@ -16,11 +15,14 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
     if (attributes.temp.selectingGame) {
-      const handledIntents = ['ElementSelected', 'GameIntent', 'SelectIntent',
-        'AMAZON.NextIntent', 'AMAZON.YesIntent', 'AMAZON.NoIntent'];
+      const handledIntents = ['SelectIntent', 'AMAZON.NextIntent',
+        'AMAZON.YesIntent', 'AMAZON.NoIntent'];
 
       if (request.type === 'IntentRequest') {
         return (handledIntents.indexOf(request.intent.name) > -1);
+      }
+      if (request.type === 'Display.ElementSelected') {
+        return true;
       }
     }
 
@@ -30,40 +32,46 @@ module.exports = {
     const request = handlerInput.requestEnvelope.request;
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('../resources')(event.request.locale);
 
-    if ((request.intent.name === 'ElementSelected') || (request.intent.name === 'GameIntent')
-      || (request.intent.name === 'AMAZON.YesIntent')) {
-      // Great, they picked a game
-      attributes.temp.selectingGame = undefined;
-      return selectedGame(handlerInput);
-    } else {
-      // OK, pop this choice and go to the next one - if no other choices, we'll go with the last one
-      if (attributes.choices) {
-        attributes.choices.shift();
-        if (attributes.choices.length === 1) {
-          // OK, we're going with this one
-          attributes.temp.selectingGame = undefined;
-          return selectedGame(handlerInput);
-        } else {
-          const res = require('../resources')(event.request.locale);
-          const speech = res.strings.SELECT_REPROMPT.replace('{0}', res.sayGame(attributes.choices[0]));
-          return handlerInput.responseBuilder
-            .speak(speech)
-            .reprompt(speech)
-            .getResponse();
-        }
-      } else {
-        // Um ... must have been in the upsell path
+    return new Promise((resolve, reject) => {
+      if ((request.type === 'Display.ElementSelected')
+        || (request.intent.name === 'AMAZON.YesIntent')) {
+        // Great, they picked a game
         attributes.temp.selectingGame = undefined;
-        attributes.currentGame = 'standard';
-        return Repeat.handle(handlerInput);
+        selectedGame(handlerInput, (response) => {
+          resolve(response);
+        });
+      } else {
+        // OK, pop this choice and go to the next one
+        // if no other choices, we'll go with the last one
+        if (attributes.choices) {
+          attributes.choices.shift();
+          if (attributes.choices.length === 1) {
+            // OK, we're going with this one
+            attributes.temp.selectingGame = undefined;
+            selectedGame(handlerInput, (response) => {
+              resolve(response);
+            });
+          } else {
+            const res = require('../resources')(event.request.locale);
+            const speech = res.strings.SELECT_REPROMPT.replace('{0}', res.sayGame(attributes.choices[0]));
+            resolve(handlerInput.responseBuilder
+              .speak(speech)
+              .reprompt(speech)
+              .getResponse());
+          }
+        } else {
+          // Um ... must have been in the upsell path
+          attributes.temp.selectingGame = undefined;
+          attributes.currentGame = 'standard';
+          resolve(Repeat.handle(handlerInput));
+        }
       }
-    }
+    });
   },
 };
 
-function selectedGame(handlerInput) {
+function selectedGame(handlerInput, callback) {
   const event = handlerInput.requestEnvelope;
   const attributes = handlerInput.attributesManager.getSessionAttributes();
   const res = require('../resources')(event.request.locale);
@@ -88,15 +96,17 @@ function selectedGame(handlerInput) {
   attributes.originalChoices = undefined;
   attributes.temp.drawBoard = true;
 
-  const launchWelcome = JSON.parse(res.strings.LAUNCH_WELCOME);
-  let launchSpeech = launchWelcome[attributes.currentGame];
-  launchSpeech += launchInitialText;
-  launchSpeech += res.strings.LAUNCH_START_GAME;
-  const output = playgame.readCurrentHand(attributes, event.request.locale);
-  return handlerInput.responseBuilder
-    .speak(launchSpeech)
-    .reprompt(output.reprompt)
-    .getResponse();
+  const format = JSON.parse(res.strings.LAUNCH_WELCOME)[attributes.currentGame];
+  bjUtils.getWelcome(event, attributes, format, (greeting) => {
+    let launchSpeech = greeting;
+    launchSpeech += launchInitialText;
+    launchSpeech += res.strings.LAUNCH_START_GAME;
+    const output = playgame.readCurrentHand(attributes, event.request.locale);
+    callback(handlerInput.responseBuilder
+      .speak(launchSpeech)
+      .reprompt(output.reprompt)
+      .getResponse());
+  });
 }
 
 function getSelectedIndex(event) {

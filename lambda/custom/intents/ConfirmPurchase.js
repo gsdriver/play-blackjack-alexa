@@ -16,10 +16,11 @@ module.exports = {
       const handledIntents = ['AMAZON.FallbackIntent', 'AMAZON.RepeatIntent',
         'AMAZON.HelpIntent', 'AMAZON.YesIntent', 'AMAZON.NoIntent', 'PurchaseIntent'];
 
-      if (request.type === 'IntentRequest') {
-        return (handledIntents.indexOf(request.intent.name) > -1);
-      } else {
-        return (request.type === 'LaunchRequest');
+      if ((request.type === 'IntentRequest')
+        && (handledIntents.indexOf(request.intent.name) > -1)) {
+        return true;
+      } else if (request.type === 'LaunchRequest') {
+        return true;
       }
       attributes.temp.confirmPurchase = undefined;
     }

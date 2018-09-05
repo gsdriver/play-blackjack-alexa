@@ -11,6 +11,7 @@ module.exports = {
     const game = attributes[attributes.currentGame];
 
     return ((game.possibleActions.indexOf('bet') >= 0)
+      && !attributes.temp.joinTournament
       && (request.type === 'IntentRequest')
       && (request.intent.name === 'ResetIntent'));
   },

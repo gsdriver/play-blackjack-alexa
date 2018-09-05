@@ -16,10 +16,11 @@ module.exports = {
       const handledIntents = ['AMAZON.FallbackIntent', 'AMAZON.RepeatIntent',
         'AMAZON.HelpIntent', 'AMAZON.YesIntent', 'AMAZON.NoIntent'];
 
-      if (request.type === 'IntentRequest') {
-        return (handledIntents.indexOf(request.intent.name) > -1);
-      } else {
-        return (request.type === 'LaunchRequest');
+      if ((request.type === 'IntentRequest')
+        && (handledIntents.indexOf(request.intent.name) > -1)) {
+        return true;
+      } else if (request.type === 'LaunchRequest') {
+        return true;
       }
       attributes.temp.confirmReset = undefined;
     }
@@ -40,7 +41,7 @@ module.exports = {
       attributes.temp.confirmReset = undefined;
       speech = res.strings.RESET_ABORTED;
       reprompt = res.strings.RESET_REPROMPT;
-    } else if (request.type === 'AMAZON.YesIntent') {
+    } else if (request.intent.name === 'AMAZON.YesIntent') {
       // Confirmed - let's reset but preserve the timestamp
       const timestamp = attributes[attributes.currentGame].timestamp;
       gameService.initializeGame(attributes, event.session.user.userId);

@@ -84,22 +84,24 @@ module.exports = {
 
     return reminder;
   },
-  promptToEnter: function(locale, attributes, callback) {
+  promptToEnter: function(event, attributes, callback) {
     // If there is an active tournament, we need to either inform them
     // or if they are participating in the tournament, allow them to leave
-    const res = require('./resources')(locale);
-    let speech;
+    const res = require('./resources')(event.request.locale);
     let reprompt;
 
+    let format;
     if (attributes['tournament']) {
-      speech = res.strings.TOURNAMENT_LAUNCH_WELCOMEBACK;
+      format = res.strings.TOURNAMENT_LAUNCH_WELCOMEBACK;
       reprompt = res.strings.TOURNAMENT_LAUNCH_WELCOMEBACK_REPROMPT;
     } else {
-      speech = res.strings.TOURNAMENT_LAUNCH_INFORM;
+      format = res.strings.TOURNAMENT_LAUNCH_INFORM;
       reprompt = res.strings.TOURNAMENT_LAUNCH_INFORM_REPROMPT;
     }
 
-    callback(speech, reprompt);
+    bjUtils.getWelcome(event, attributes, format, (speech) => {
+      callback(speech, reprompt);
+    });
   },
   outOfMoney: function(locale, attributes, speech) {
     const res = require('./resources')(locale);

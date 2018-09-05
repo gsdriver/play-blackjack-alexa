@@ -13,8 +13,36 @@ const querystring = require('querystring');
 const request = require('request');
 const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 const https = require('https');
+const moment = require('moment-timezone');
+const seedrandom = require('seedrandom');
 
 module.exports = {
+  getWelcome: function(event, attributes, format, callback) {
+    const res = require('./resources')(event.request.locale);
+    let greeting = '';
+
+    getUserTimezone(event, (timezone) => {
+      if (timezone) {
+        const hour = moment.tz(Date.now(), timezone).format('H');
+        if ((hour > 5) && (hour < 12)) {
+          greeting = res.strings.GOOD_MORNING;
+        } else if ((hour >= 12) && (hour < 18)) {
+          greeting = res.strings.GOOD_AFTERNOON;
+        } else {
+          greeting = res.strings.GOOD_EVENING;
+        }
+      }
+
+      const game = attributes[attributes.currentGame];
+      const options = format.split('|');
+      const randomValue = seedrandom(game.userID + (game.timestamp ? game.timestamp : ''))();
+      let j = Math.floor(randomValue * options.length);
+      if (j == options.length) {
+        j--;
+      }
+      callback(options[j].replace('{0}', greeting));
+    });
+  },
   getResponse: function(handlerInput, error, response, speech, reprompt) {
     if (error) {
       const event = handlerInput.requestEnvelope;
@@ -504,5 +532,49 @@ function roundPlayers(locale, playerCount) {
   } else {
     // "Over" to the nearest hundred
     return res.strings.MORE_THAN_PLAYERS.replace('{0}', 100 * Math.floor(playerCount / 100));
+  }
+}
+
+function getUserTimezone(event, callback) {
+  if (event.context.System.apiAccessToken) {
+    // Invoke the entitlement API to load timezone
+    const options = {
+      host: 'api.amazonalexa.com',
+      path: '/v2/devices/' + event.context.System.device.deviceId + '/settings/System.timeZone',
+      method: 'GET',
+      timeout: 1000,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept-Language': event.request.locale,
+        'Authorization': 'bearer ' + event.context.System.apiAccessToken,
+      },
+    };
+
+    const req = https.get(options, (res) => {
+      let returnData = '';
+      res.setEncoding('utf8');
+      if (res.statusCode != 200) {
+        console.log('deviceTimezone returned status code ' + res.statusCode);
+        callback();
+      } else {
+        res.on('data', (chunk) => {
+          returnData += chunk;
+        });
+
+        res.on('end', () => {
+          // Strip quotes
+          const timezone = returnData.replace(/['"]+/g, '');
+          callback(moment.tz.zone(timezone) ? timezone : undefined);
+        });
+      }
+    });
+
+    req.on('error', (err) => {
+      console.log('Error calling user settings API: ' + err.message);
+      callback();
+    });
+  } else {
+    // No API token - no user timezone
+    callback();
   }
 }

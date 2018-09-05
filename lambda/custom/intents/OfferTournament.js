@@ -19,8 +19,7 @@ module.exports = {
 
     return new Promise((resolve, reject) => {
       attributes.temp.joinTournament = true;
-      tournament.promptToEnter(event.request.locale,
-          attributes, (speech, reprompt) => {
+      tournament.promptToEnter(event, attributes, (speech, reprompt) => {
         const response = handlerInput.responseBuilder
           .speak(attributes.prependLaunch + speech)
           .reprompt(reprompt)
