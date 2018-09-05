@@ -387,8 +387,8 @@ const utils = (locale) => {
       return names[card.rank];
     },
     mapPlayOption: function(option) {
-      const optionMapping = {'resetbankroll': 'reset game',
-                            'shuffle': 'shuffle',
+      const optionMapping = {'resetbankroll': 'bet',
+                            'shuffle': 'bet',
                             'bet': 'bet',
                             'sidebet': 'place side bet',
                             'nosidebet': 'remove side bet',
