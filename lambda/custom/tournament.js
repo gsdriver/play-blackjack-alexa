@@ -10,6 +10,7 @@ const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 const bjUtils = require('./BlackjackUtils');
+const moment = require('moment-timezone');
 
 module.exports = {
   getTournamentComplete: function(locale, attributes, callback) {
@@ -174,8 +175,9 @@ function isTournamentActive() {
     // Active on Tuesdays PST (Day=2)
     // We actually start the tournament at 9 PM Monday PST
     // for our East Coast friends
+    const tzOffset = moment.tz.zone('America/Los_Angeles').utcOffset(Date.now());
     const d = new Date();
-    d.setHours(d.getHours() - 7);
+    d.setMinutes(d.getMinutes() - tzOffset);
 
     active = (((d.getDay() == 1) && (d.getHours() >= 21))
             || (d.getDay() == 2));
@@ -183,3 +185,4 @@ function isTournamentActive() {
 
   return active;
 }
+
