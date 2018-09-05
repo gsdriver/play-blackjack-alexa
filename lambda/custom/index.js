@@ -236,6 +236,7 @@ function runGame(event, context, callback) {
       Blackjack,
       Repeat,
       HighScore,
+      SessionEnd,
       Unhandled
     )
     .addErrorHandlers(ErrorHandler)
