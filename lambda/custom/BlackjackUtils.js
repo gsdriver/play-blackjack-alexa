@@ -5,11 +5,7 @@
 'use strict';
 
 const AWS = require('aws-sdk');
-const Alexa = require('alexa-sdk');
-// utility methods for creating Image and TextField objects
-const makePlainText = Alexa.utils.TextUtils.makePlainText;
-const makeRichText = Alexa.utils.TextUtils.makeRichText;
-const makeImage = Alexa.utils.ImageUtils.makeImage;
+const Alexa = require('ask-sdk');
 AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 const speechUtils = require('alexa-speech-utils')();
@@ -17,67 +13,63 @@ const querystring = require('querystring');
 const request = require('request');
 const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 const https = require('https');
+const moment = require('moment-timezone');
+const seedrandom = require('seedrandom');
 
 module.exports = {
-  emitResponse: function(context, error, response, speech, reprompt, cardTitle, cardText) {
-    const formData = {};
+  getWelcome: function(event, attributes, format, callback) {
+    const res = require('./resources')(event.request.locale);
+    let greeting = '';
 
-    // Async call to save state and logs if necessary
-    if (process.env.SAVELOG) {
-      const result = (error) ? error : ((response) ? response : speech);
-      formData.savelog = JSON.stringify({
-        event: context.event,
-        result: result,
-      });
-    }
-
-    if (response) {
-      formData.savedb = JSON.stringify({
-        userId: context.event.session.user.userId,
-        attributes: context.event.session.attributes,
-      });
-    }
-
-    if (formData.savelog || formData.savedb) {
-      const params = {
-        url: process.env.SERVICEURL + 'blackjack/saveState',
-        formData: formData,
-      };
-
-      request.post(params, (err, res, body) => {
-        if (err) {
-          console.log(err);
+    getUserTimezone(event, (timezone) => {
+      if (timezone) {
+        const hour = moment.tz(Date.now(), timezone).format('H');
+        if ((hour > 5) && (hour < 12)) {
+          greeting = res.strings.GOOD_MORNING;
+        } else if ((hour >= 12) && (hour < 18)) {
+          greeting = res.strings.GOOD_AFTERNOON;
+        } else {
+          greeting = res.strings.GOOD_EVENING;
         }
-      });
-    }
+      }
 
-    if (error) {
-      const res = require('./resources')(context.event.request.locale);
-      console.log('Speech error: ' + error);
-      context.response.speak(error)
-        .listen(res.strings.ERROR_REPROMPT);
-    } else if (response) {
-      context.response.speak(response);
-    } else if (cardTitle) {
-      context.response.speak(speech)
-        .listen(reprompt)
-        .cardRenderer(cardTitle, cardText);
-    } else {
-      context.response.speak(speech)
-        .listen(reprompt);
-    }
-
-    displayTable(context, () => {
-      context.emit(':responseReady');
+      const game = attributes[attributes.currentGame];
+      const options = format.split('|');
+      const randomValue = seedrandom(game.userID + (game.timestamp ? game.timestamp : ''))();
+      let j = Math.floor(randomValue * options.length);
+      if (j == options.length) {
+        j--;
+      }
+      callback(options[j].replace('{0}', greeting));
     });
   },
+  getResponse: function(handlerInput, error, response, speech, reprompt) {
+    if (error) {
+      const event = handlerInput.requestEnvelope;
+      const res = require('./resources')(event.request.locale);
+
+      return handlerInput.responseBuilder
+        .speak(error)
+        .reprompt(res.strings.ERROR_REPROMPT)
+        .getResponse();
+    } else if (response) {
+      return handlerInput.responseBuilder
+        .speak(response)
+        .withShouldEndSession(true)
+        .getResponse();
+    } else {
+      return handlerInput.responseBuilder
+        .speak(speech)
+        .reprompt(reprompt)
+        .getResponse();
+    }
+  },
   // We need to hand-roll the buy response
-  sendBuyResponse: function(context, product) {
-    const res = require('./resources')(context.event.request.locale);
+  getPurchaseDirective: function(event, attributes, product) {
     let productId;
 
-    if (context.attributes.paid && context.attributes.paid[product.id]) {
-      productId = context.attributes.paid[product.id].productId;
+    if (attributes.paid && attributes.paid[product.id]) {
+      productId = attributes.paid[product.id].productId;
     }
 
     if (productId) {
@@ -85,34 +77,17 @@ module.exports = {
       let state;
       if (product.name == 'Cancel') {
         // Will get set to REFUND_PENDING if they confirm they want a refund
-        state = context.attributes.paid[product.id].state;
-      } else if (context.attributes.paid[product.id].state == 'REFUND_PENDING') {
+        state = attributes.paid[product.id].state;
+      } else if (attributes.paid[product.id].state == 'REFUND_PENDING') {
         state = 'REFUND_PENDING';
       } else {
         state = 'PURCHASE_PENDING';
       }
-      context.attributes.paid[product.id].state = state;
-
-      // First save state
-      const formData = {};
-      formData.savedb = JSON.stringify({
-        userId: context.event.session.user.userId,
-        attributes: context.event.session.attributes,
-      });
-      const params = {
-        url: process.env.SERVICEURL + 'blackjack/saveState',
-        formData: formData,
-      };
-      request.post(params, (err, res, body) => {
-        if (err) {
-          console.log(err);
-        }
-      });
+      attributes.paid[product.id].state = state;
 
       // Add a SendRequest directive
       console.log('Purchase directive!');
-      context.response.shouldEndSession(true);
-      context.response._addDirective({
+      return {
         'type': 'Connections.SendRequest',
         'name': product.name,
         'payload': {
@@ -122,11 +97,10 @@ module.exports = {
           'upsellMessage': product.upsellMessage,
         },
         'token': (product.token ? product.token : product.name),
-      });
-      context.emit(':responseReady');
+      };
     } else {
       // Something went wrong
-      module.exports.emitResponse(context, res.strings.INTERNAL_ERROR);
+      return undefined;
     }
   },
   // Figures out what state of the game we're in
@@ -134,10 +108,17 @@ module.exports = {
     const game = attributes[attributes.currentGame];
 
     // New game - ready to start a new game
-    if (game.possibleActions.indexOf('bet') >= 0) {
-      if (attributes.newUser) {
-        return 'FIRSTTIMEPLAYER';
-      }
+    if (attributes.temp.joinTournament) {
+      return 'JOINTOURNAMENT';
+    } else if (attributes.temp.selectingGame) {
+      return 'SELECTGAME';
+    } else if (attributes.temp.confirmReset) {
+      return 'CONFIRMRESET';
+    } else if (attributes.temp.confirmPurchase) {
+      return 'CONFIRMPURCHASE';
+    } else if (attributes.temp.confirmRefund) {
+      return 'CONFIRMREFUND';
+    } else if (game.possibleActions.indexOf('bet') >= 0) {
       return 'NEWGAME';
     } else if (game.suggestion) {
       return 'SUGGESTION';
@@ -332,25 +313,25 @@ module.exports = {
 
     return achievementScore;
   },
-  getPurchasedProducts: function(context, callback) {
+  getPurchasedProducts: function(event, attributes, callback) {
     // First check whether we can use cached data
     const availableProducts = ['spanish'];
     let check;
 
     // Purchased products is only for US Alexa customers
-    if (context.attributes.bot || (context.attributes.platform === 'google') ||
-      (context.event.request.locale !== 'en-US')) {
+    if (attributes.bot || (attributes.platform === 'google') ||
+      (event.request.locale !== 'en-US')) {
       check = false;
-      context.attributes.paid = undefined;
-    } else if (context.attributes.paid) {
+      attributes.paid = undefined;
+    } else if (attributes.paid) {
       // Do they have all products accounted for?
       availableProducts.forEach((product) => {
-        if (!context.attributes.paid[product]) {
+        if (!attributes.paid[product]) {
           // New product, need to check
           check = true;
         } else {
-          if ((context.attributes.paid[product].state == 'PURCHASE_PENDING') ||
-            (context.attributes.paid[product].state == 'REFUND_PENDING')) {
+          if ((attributes.paid[product].state == 'PURCHASE_PENDING') ||
+            (attributes.paid[product].state == 'REFUND_PENDING')) {
             // Purchase or refund in progress - need to check
             check = true;
           }
@@ -364,8 +345,8 @@ module.exports = {
     if (check) {
       // Invoke the entitlement API to load products
       const apiEndpoint = 'api.amazonalexa.com';
-      const token = 'bearer ' + context.event.context.System.apiAccessToken;
-      const language = context.event.request.locale;
+      const token = 'bearer ' + event.context.System.apiAccessToken;
+      const language = event.request.locale;
       const apiPath = '/v1/users/~current/skills/~current/inSkillProducts';
       const options = {
         host: apiEndpoint,
@@ -394,8 +375,8 @@ module.exports = {
             const inSkillProductInfo = JSON.parse(returnData);
             if (Array.isArray(inSkillProductInfo.inSkillProducts)) {
               // Let's see what they paid for
-              if (!context.attributes.paid) {
-                context.attributes.paid = {};
+              if (!attributes.paid) {
+                attributes.paid = {};
               }
 
               inSkillProductInfo.inSkillProducts.forEach((product) => {
@@ -403,22 +384,22 @@ module.exports = {
 
                 if ((product.type == 'ENTITLEMENT') && (product.entitled == 'ENTITLED')) {
                   // State is purchased unless a refund was in progress
-                  state = (context.attributes.paid[product.referenceName] &&
-                      (context.attributes.paid[product.referenceName].state == 'REFUND_PENDING'))
+                  state = (attributes.paid[product.referenceName] &&
+                      (attributes.paid[product.referenceName].state == 'REFUND_PENDING'))
                       ? 'REFUND_PENDING' : 'PURCHASED';
                 } else {
                   // Just in case, we should clear the spanish game if it's not purchased
                   // Skip this though if a trial is underway
                   state = 'AVAILABLE';
                   if (!process.env.SPANISHTRIAL) {
-                    context.attributes.spanish = undefined;
-                    if (context.attributes.currentGame == 'spanish') {
-                      context.attributes.currentGame = 'standard';
+                    attributes.spanish = undefined;
+                    if (attributes.currentGame == 'spanish') {
+                      attributes.currentGame = 'standard';
                     }
                   }
                 }
 
-                context.attributes.paid[product.referenceName] = {
+                attributes.paid[product.referenceName] = {
                   productId: product.productId,
                   state: state,
                 };
@@ -439,98 +420,109 @@ module.exports = {
       callback();
     }
   },
-};
+  drawTable: function(handlerInput, callback) {
+    const response = handlerInput.responseBuilder;
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const res = require('./resources')(event.request.locale);
+    let image;
 
-function displayTable(context, callback) {
-  const res = require('./resources')(context.event.request.locale);
-
-  if (context.event.context && context.event.context.System &&
-      context.event.context.System.device &&
-      context.event.context.System.device.supportedInterfaces &&
-      context.event.context.System.device.supportedInterfaces.Display) {
-    if ((context.attributes.temp && context.attributes.temp.drawBoard)
-        || !(context.attributes.temp && context.attributes.temp.imageUrl)) {
-      if (!context.attributes.temp) {
-        context.attributes.temp = {};
-      }
-      context.attributes.temp.drawBoard = false;
-      context.attributes.display = true;
-
-      if (context.attributes.originalChoices) {
-        const listItemBuilder = new Alexa.templateBuilders.ListItemBuilder();
-        const listTemplateBuilder = new Alexa.templateBuilders.ListTemplate1Builder();
-        let i = 0;
-
-        context.attributes.originalChoices.forEach((choice) => {
-          listItemBuilder.addItem(null, 'game.' + i++,
-            makeRichText('<font size="7">' + res.sayGame(choice) + '</font>'));
-        });
-
-        const listItems = listItemBuilder.build();
-        const listTemplate = listTemplateBuilder
-          .setToken('listToken')
-          .setTitle(res.strings.SELECT_GAME_TITLE)
-          .setListItems(listItems)
-          .setBackButtonBehavior('HIDDEN')
-          .setBackgroundImage(makeImage('http://garrettvargas.com/img/blackjack-background.png'))
-          .build();
-
-        context.response.renderTemplate(listTemplate);
-        callback();
-      } else {
-        const start = Date.now();
-        const game = context.attributes[context.attributes.currentGame];
-        const playerCards = game.playerHands.map((x) => x.cards);
-        const formData = {
-          dealer: JSON.stringify(game.dealerHand.cards),
-          player: JSON.stringify(playerCards),
-          nextCards: JSON.stringify(game.deck.cards.slice(0, 4)),
-          table: context.attributes.currentGame,
-        };
-        if (game.activePlayer == 'none') {
-          formData.showHoleCard = 'true';
+    if (event.context && event.context.System &&
+        event.context.System.device &&
+        event.context.System.device.supportedInterfaces &&
+        event.context.System.device.supportedInterfaces.Display) {
+      if ((attributes.temp && attributes.temp.drawBoard)
+          || attributes.originalChoices
+          || !(attributes.temp && attributes.temp.imageUrl)) {
+        if (!attributes.temp) {
+          attributes.temp = {};
         }
+        attributes.temp.drawBoard = false;
+        attributes.display = true;
 
-        const params = {
-          url: process.env.SERVICEURL + 'blackjack/drawImage',
-          formData: formData,
-          timeout: 3000,
-        };
+        if (attributes.originalChoices) {
+          let i = 0;
+          const listItems = [];
 
-        request.post(params, (err, res, body) => {
-          if (err) {
-            console.log(err);
-            callback(err);
-          } else {
-            context.attributes.temp.imageUrl = JSON.parse(body).file;
-            const end = Date.now();
-            console.log('Drawing table took ' + (end - start) + ' ms');
-            done();
+          attributes.originalChoices.forEach((choice) => {
+            listItems.push({
+              'token': 'game.' + i++,
+              'textContent': {
+                'primaryText': {
+                  'type': 'RichText',
+                  'text': '<font size=\"7\">' + res.sayGame(choice) + '</font>',
+                },
+              },
+            });
+          });
+
+          image = new Alexa.ImageHelper()
+            .addImageInstance('http://garrettvargas.com/img/blackjack-background.png')
+            .getImage();
+          response.addRenderTemplateDirective({
+            type: 'ListTemplate1',
+            token: 'listToken',
+            backButton: 'HIDDEN',
+            title: res.strings.SELECT_GAME_TITLE,
+            backgroundImage: image,
+            listItems: listItems,
+          });
+          callback();
+        } else {
+          const start = Date.now();
+          const game = attributes[attributes.currentGame];
+          const playerCards = game.playerHands.map((x) => x.cards);
+          const formData = {
+            dealer: JSON.stringify(game.dealerHand.cards),
+            player: JSON.stringify(playerCards),
+            nextCards: JSON.stringify(game.deck.cards.slice(0, 4)),
+            table: attributes.currentGame,
+          };
+          if (game.activePlayer == 'none') {
+            formData.showHoleCard = 'true';
           }
+
+          const params = {
+            url: process.env.SERVICEURL + 'blackjack/drawImage',
+            formData: formData,
+            timeout: 3000,
+          };
+
+          request.post(params, (err, res, body) => {
+            if (err) {
+              console.log(err);
+              callback(err);
+            } else {
+              attributes.temp.imageUrl = JSON.parse(body).file;
+              const end = Date.now();
+              console.log('Drawing table took ' + (end - start) + ' ms');
+              done();
+            }
+          });
+        }
+      } else {
+        // Just re-use the image URL from last time
+        done();
+      }
+
+      function done() {
+        image = new Alexa.ImageHelper()
+          .addImageInstance(attributes.temp.imageUrl)
+          .getImage();
+        response.addRenderTemplateDirective({
+          type: 'BodyTemplate6',
+          backButton: 'HIDDEN',
+          title: '',
+          backgroundImage: image,
         });
+        callback();
       }
     } else {
-      // Just re-use the image URL from last time
-      done();
-    }
-
-    function done() {
-      // Use this as the background image
-      const builder = new Alexa.templateBuilders.BodyTemplate6Builder();
-      const template = builder.setTitle('')
-                  .setBackgroundImage(makeImage(context.attributes.temp.imageUrl))
-                  .setTextContent(makePlainText(''))
-                  .setBackButtonBehavior('HIDDEN')
-                  .build();
-
-      context.response.renderTemplate(template);
+      // Not a display device
       callback();
     }
-  } else {
-    // Not a display device
-    callback();
-  }
-}
+  },
+};
 
 function roundPlayers(locale, playerCount) {
   const res = require('./resources')(locale);
@@ -540,5 +532,49 @@ function roundPlayers(locale, playerCount) {
   } else {
     // "Over" to the nearest hundred
     return res.strings.MORE_THAN_PLAYERS.replace('{0}', 100 * Math.floor(playerCount / 100));
+  }
+}
+
+function getUserTimezone(event, callback) {
+  if (event.context.System.apiAccessToken) {
+    // Invoke the entitlement API to load timezone
+    const options = {
+      host: 'api.amazonalexa.com',
+      path: '/v2/devices/' + event.context.System.device.deviceId + '/settings/System.timeZone',
+      method: 'GET',
+      timeout: 1000,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept-Language': event.request.locale,
+        'Authorization': 'bearer ' + event.context.System.apiAccessToken,
+      },
+    };
+
+    const req = https.get(options, (res) => {
+      let returnData = '';
+      res.setEncoding('utf8');
+      if (res.statusCode != 200) {
+        console.log('deviceTimezone returned status code ' + res.statusCode);
+        callback();
+      } else {
+        res.on('data', (chunk) => {
+          returnData += chunk;
+        });
+
+        res.on('end', () => {
+          // Strip quotes
+          const timezone = returnData.replace(/['"]+/g, '');
+          callback(moment.tz.zone(timezone) ? timezone : undefined);
+        });
+      }
+    });
+
+    req.on('error', (err) => {
+      console.log('Error calling user settings API: ' + err.message);
+      callback();
+    });
+  } else {
+    // No API token - no user timezone
+    callback();
   }
 }

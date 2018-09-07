@@ -1,5 +1,5 @@
 //
-// Handles the side bet
+// Handles the intent to process a 'Yes' response
 //
 
 'use strict';
@@ -13,16 +13,16 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const game = attributes[attributes.currentGame];
 
-    return ((game.possibleActions.indexOf('bet') >= 0)
+    return ((game.possibleActions.indexOf('noinsurance') >= 0)
       && (request.type === 'IntentRequest')
-      && ((request.intent.name === 'PlaceSideBetIntent')
-        || (request.intent.name === 'RemoveSideBetIntent')));
+      && ((request.intent.name === 'AMAZON.YesIntent')
+        || (request.intent.name === 'AMAZON.NoIntent')));
   },
   handle: function(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const action = (request.intent.name === 'PlaceSideBetIntent') ? 'sidebet' : 'nosidebet';
+    const action = (request.intent.name === 'AMAZON.YesIntent') ? 'insurance' : 'noinsurance';
 
     return new Promise((resolve, reject) => {
       playgame.playBlackjackAction(attributes, event.request.locale,

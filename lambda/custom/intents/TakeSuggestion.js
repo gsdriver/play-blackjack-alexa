@@ -8,42 +8,49 @@ const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
-  handleYesIntent: function() {
-    // OK, play what was suggested
-    const game = this.attributes[this.attributes.currentGame];
-    const actionObj = {action: game.suggestion.suggestion};
+  canHandle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const game = attributes[attributes.currentGame];
 
-    // Keep track of how often they took a suggestion
-    if (!this.attributes.tookSuggestion) {
-      this.attributes.tookSuggestion = {};
+    if (game.suggestion) {
+      if ((request.type === 'IntentRequest')
+        && ((request.intent.name === 'AMAZON.YesIntent') ||
+          (request.intent.name === 'AMAZON.NoIntent'))) {
+        return true;
+      } else {
+        return (request.type === 'LaunchRequest');
+      }
     }
-    this.attributes.tookSuggestion.yes = (this.attributes.tookSuggestion.yes + 1) || 1;
 
-    playgame.playBlackjackAction(this.attributes,
-      this.event.request.locale,
-      this.event.session.user.userId,
-      actionObj, (error, response, speech, reprompt) => {
-        this.handler.state = bjUtils.getState(this.attributes);
-        bjUtils.emitResponse(this, error, response, speech, reprompt);
-    });
+    return false;
   },
-  handleNoIntent: function() {
-    // Fine, ignore what I said
-    const game = this.attributes[this.attributes.currentGame];
-    const actionObj = {action: game.suggestion.player};
+  handle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const game = attributes[attributes.currentGame];
+    let action;
 
-    // Keep track of how often they didn't take a suggestion
-    if (!this.attributes.tookSuggestion) {
-      this.attributes.tookSuggestion = {};
+    if (!attributes.tookSuggestion) {
+      attributes.tookSuggestion = {};
     }
-    this.attributes.tookSuggestion.no = (this.attributes.tookSuggestion.no + 1) || 1;
 
-    playgame.playBlackjackAction(this.attributes,
-      this.event.request.locale,
-      this.event.session.user.userId,
-      actionObj, (error, response, speech, reprompt) => {
-        this.handler.state = bjUtils.getState(this.attributes);
-        bjUtils.emitResponse(this, error, response, speech, reprompt);
+    if (request.intent.name === 'AMAZON.YesIntent') {
+      // OK, play what was suggested
+      action = game.suggestion.suggestion;
+      attributes.tookSuggestion.yes = (attributes.tookSuggestion.yes + 1) || 1;
+    } else {
+      action = game.suggestion.player;
+      attributes.tookSuggestion.no = (attributes.tookSuggestion.no + 1) || 1;
+    }
+
+    return new Promise((resolve, reject) => {
+      playgame.playBlackjackAction(attributes, event.request.locale,
+        event.session.user.userId, {action: action},
+        (error, response, speech, reprompt) => {
+        resolve(bjUtils.getResponse(handlerInput, error, response, speech, reprompt));
+      });
     });
   },
 };

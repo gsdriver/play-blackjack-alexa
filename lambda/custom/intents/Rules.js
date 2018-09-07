@@ -5,15 +5,24 @@
 'use strict';
 
 const playgame = require('../PlayGame');
-const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
-  handleIntent: function() {
-    const res = require('../resources')(this.event.request.locale);
+  canHandle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
 
-    playgame.readRules(this.attributes, this.event.request.locale, (speech, reprompt) => {
-      bjUtils.emitResponse(this, null, null,
-              speech, reprompt, res.strings.RULES_CARD_TITLE, speech);
-    });
+    return ((request.type === 'IntentRequest')
+      && (request.intent.name === 'RulesIntent'));
+  },
+  handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const res = require('../resources')(event.request.locale);
+
+    const output = playgame.readRules(attributes, event.request.locale);
+    return handlerInput.responseBuilder
+      .speak(output.speech)
+      .reprompt(output.reprompt)
+      .withSimpleCard(res.strings.RULES_CARD_TITLE, output.speech)
+      .getResponse();
   },
 };

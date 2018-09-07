@@ -8,31 +8,46 @@ const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
-  handleIntent: function() {
+  canHandle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const game = attributes[attributes.currentGame];
+
+    return ((game.possibleActions.indexOf('bet') >= 0)
+      && !attributes.temp.joinTournament
+      && !attributes.temp.selectingGame
+      && (request.type === 'IntentRequest')
+      && ((request.intent.name === 'BettingIntent')
+        || (request.intent.name === 'AMAZON.YesIntent')));
+  },
+  handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
     let amount = 0;
-    const game = this.attributes[this.attributes.currentGame];
+    const game = attributes[attributes.currentGame];
 
     // Take the bet
-    amount = getBet(this.event, this.attributes);
-    const action = {action: 'bet', amount: amount, firsthand: this.attributes.temp.firsthand};
-    playgame.playBlackjackAction(this.attributes, this.event.request.locale,
-      this.event.session.user.userId, action,
-      (error, response, speech, reprompt) => {
-      if (!error) {
-        this.attributes.temp.firsthand = undefined;
-        if (game.timestamp) {
-          const lastPlay = new Date(game.timestamp);
-          const now = new Date(Date.now());
-          game.firstDailyHand = (lastPlay.getDate() != now.getDate());
-        } else {
-          game.firstDailyHand = true;
+    return new Promise((resolve, reject) => {
+      amount = getBet(event, attributes);
+      const action = {action: 'bet', amount: amount, firsthand: attributes.temp.firsthand};
+      playgame.playBlackjackAction(attributes, event.request.locale,
+        event.session.user.userId, action,
+        (error, response, speech, reprompt) => {
+        if (!error) {
+          attributes.temp.firsthand = undefined;
+          if (game.timestamp) {
+            const lastPlay = new Date(game.timestamp);
+            const now = new Date(Date.now());
+            game.firstDailyHand = (lastPlay.getDate() != now.getDate());
+          } else {
+            game.firstDailyHand = true;
+          }
+          game.timestamp = Date.now();
+          game.hands = (game.hands) ? (game.hands + 1) : 1;
         }
-        game.timestamp = Date.now();
-        game.hands = (game.hands) ? (game.hands + 1) : 1;
-      }
 
-      this.handler.state = bjUtils.getState(this.attributes);
-      bjUtils.emitResponse(this, error, response, speech, reprompt);
+        resolve(bjUtils.getResponse(handlerInput, error, response, speech, reprompt));
+      });
     });
   },
 };

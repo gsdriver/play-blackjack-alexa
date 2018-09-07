@@ -8,6 +8,7 @@ const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 const USERID = 'not-amazon';
 const DEVICEID = 'not-amazon';
 const LOCALE = 'en-US';
+const fs = require('fs');
 
 function BuildEvent(argv)
 {
@@ -181,7 +182,6 @@ function BuildEvent(argv)
     };
 
     // If there is an attributes.txt file, read the attributes from there
-    const fs = require('fs');
     if (fs.existsSync(attributeFile)) {
       data = fs.readFileSync(attributeFile, 'utf8');
       if (data) {
@@ -286,50 +286,60 @@ function BuildEvent(argv)
     return lambda;
 }
 
+function ssmlToText(ssml) {
+  let text = ssml;
+
+  // Replace break with ...
+  text = text.replace(/<break[^>]+>/g, ' ... ');
+
+  // Remove all other angle brackets
+  text = text.replace(/<\/?[^>]+(>|$)/g, '');
+  text = text.replace(/\s+/g, ' ').trim();
+  return text;
+}
 
 // Simple response - just print out what I'm given
 function myResponse(appId) {
   this._appId = appId;
 }
 
-myResponse.succeed = function(result) {
-  if (!result.response || !result.response.outputSpeech) {
-    console.log(JSON.stringify(result));
-  } else {
-    if (result.response.outputSpeech.ssml) {
-      console.log('AS SSML: ' + result.response.outputSpeech.ssml);
+function myResponse(err, result) {
+  // Write the last action
+  fs.writeFile('lastResponse.txt', JSON.stringify(result), (err2) => {
+    if (err) {
+      console.log('ERROR; ' + err.stack);
+    } else if (!result.response || !result.response.outputSpeech) {
+      console.log('RETURNED ' + JSON.stringify(result));
     } else {
-      console.log(result.response.outputSpeech.text);
+      if (result.response.outputSpeech.ssml) {
+        console.log('AS SSML: ' + result.response.outputSpeech.ssml);
+        console.log('AS TEXT: ' + ssmlToText(result.response.outputSpeech.ssml));
+      } else {
+        console.log(result.response.outputSpeech.text);
+      }
+      if (result.response.card && result.response.card.content) {
+        console.log('Card Content: ' + result.response.card.content);
+      }
+      console.log('The session ' + ((!result.response.shouldEndSession) ? 'stays open.' : 'closes.'));
+      if (result.sessionAttributes && !process.env.NOLOG) {
+        console.log('"attributes": ' + JSON.stringify(result.sessionAttributes));
+      }
+      if (result.sessionAttributes) {
+        // Output the attributes too
+        fs.writeFile(attributeFile, JSON.stringify(result.sessionAttributes), (err) => {
+          if (err) {
+            console.log(err);
+          }
+        });
+      }
     }
-    if (result.response.card && result.response.card.content) {
-      console.log('Card Content: ' + result.response.card.content);
-    }
-    console.log('The session ' + ((!result.response.shouldEndSession) ? 'stays open.' : 'closes.'));
-    if (result.sessionAttributes && !process.env.NOLOG) {
-      console.log('"attributes": ' + JSON.stringify(result.sessionAttributes));
-    }
-    if (result.sessionAttributes) {
-      // Output the attributes too
-      const fs = require('fs');
-      fs.writeFile(attributeFile, JSON.stringify(result.sessionAttributes), (err) => {
-        if (err) {
-          console.log(err);
-        }
-      });
-    }
-  }
-}
-
-myResponse.fail = function(e) {
-  console.log(e);
+  });
 }
 
 // Build the event object and call the app
 if ((process.argv.length == 3) && (process.argv[2] == 'clear')) {
-  const fs = require('fs');
-
   // Clear is a special case - delete this entry from the DB and delete the attributes.txt file
-  dynamodb.deleteItem({TableName: 'PlayBlackjack', Key: { userId: {S: USERID}}}, function (error, data) {
+  dynamodb.deleteItem({TableName: 'PlayBlackjack', Key: { userId: {S: 'not-amazon'}}}, function (error, data) {
     console.log("Deleted " + error);
     if (fs.existsSync(attributeFile)) {
       fs.unlinkSync(attributeFile);
@@ -338,6 +348,6 @@ if ((process.argv.length == 3) && (process.argv[2] == 'clear')) {
 } else {
   var event = BuildEvent(process.argv);
   if (event) {
-      mainApp.handler(event, myResponse);
+      mainApp.handler(event, null, myResponse);
   }
 }

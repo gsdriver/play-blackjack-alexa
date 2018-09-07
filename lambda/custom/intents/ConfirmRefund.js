@@ -1,30 +1,39 @@
 //
-// Handles purchasing of premium content
+// Handles refund of premium content
 //
 
 'use strict';
 
 const bjUtils = require('../BlackjackUtils');
+const Repeat = require('./Repeat');
 
 module.exports = {
   canHandle: function(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
-    return ((request.type === 'IntentRequest')
-      && !attributes.temp.confirmPurchase
-      && (request.intent.name === 'PurchaseIntent'));
+    if (attributes.temp.confirmRefund) {
+      const handledIntents = ['AMAZON.FallbackIntent', 'AMAZON.RepeatIntent',
+        'AMAZON.HelpIntent', 'AMAZON.YesIntent', 'AMAZON.NoIntent', 'RefundIntent'];
+
+      if ((request.type === 'IntentRequest')
+        && (handledIntents.indexOf(request.intent.name) > -1)) {
+        return true;
+      }
+      attributes.temp.confirmRefund = undefined;
+    }
+
+    return false;
   },
   handle: function(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const res = require('../resources')(event.request.locale);
 
-    if (event.request.intent.slots && event.request.intent.slots.Product
-      && event.request.intent.slots.Product.value) {
-      // They specified a product - we'll assume it's Spanish 21
-      // since that's all we support for now
-      const purchase = bjUtils.getPurchaseDirective(event, attributes, {name: 'Buy', id: 'spanish'});
+    if ((request.intent.name === 'RefundIntent')
+      || (request.intent.name === 'AMAZON.YesIntent')) {
+      const purchase = bjUtils.getPurchaseDirective(event, attributes, {name: 'Cancel', id: 'spanish'});
       if (purchase) {
         return handlerInput.responseBuilder
           .addDirective(purchase)
@@ -38,12 +47,9 @@ module.exports = {
           .getResponse();
       }
     } else {
-      // Prompt them
-      attributes.temp.confirmPurchase = true;
-      return handlerInput.responseBuilder
-        .speak(res.strings.PURCHASE_SPANISH)
-        .reprompt(res.strings.PURCHASE_CONFIRM_REPROMPT)
-        .getResponse();
+      // Get out of purchase flow and repeat
+      attributes.temp.confirmRefund = undefined;
+      return Repeat.handle(handlerInput);
     }
   },
 };
