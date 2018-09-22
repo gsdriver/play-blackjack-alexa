@@ -184,6 +184,7 @@ const ErrorHandler = {
     return error.name.startsWith('AskSdk');
   },
   handle(handlerInput, error) {
+    console.log(error.stack);
     return handlerInput.responseBuilder
       .speak('An error was encountered while handling your request. Try again later')
       .getResponse();
@@ -198,7 +199,7 @@ if (process.env.DASHBOTKEY) {
 }
 
 function runGame(event, context, callback) {
-  const skillBuilder = Alexa.SkillBuilders.standard();
+  const skillBuilder = Alexa.SkillBuilders.custom();
 
   if (!process.env.NOLOG) {
     console.log(JSON.stringify(event));
@@ -210,6 +211,12 @@ function runGame(event, context, callback) {
     return;
   }
 
+  const {DynamoDbPersistenceAdapter} = require('ask-sdk-dynamodb-persistence-adapter');
+  const dbAdapter = new DynamoDbPersistenceAdapter({
+    tableName: 'PlayBlackjack',
+    partitionKeyName: 'userId',
+    attributesName: 'mapAttr',
+  });
   const skillFunction = skillBuilder.addRequestHandlers(
       ProductResponse,
       OfferTournament,
@@ -242,8 +249,7 @@ function runGame(event, context, callback) {
     .addErrorHandlers(ErrorHandler)
     .addRequestInterceptors(requestInterceptor)
     .addResponseInterceptors(saveResponseInterceptor)
-    .withTableName('PlayBlackjack')
-    .withAutoCreateTable(true)
+    .withPersistenceAdapter(dbAdapter)
     .withSkillId('amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce')
     .lambda();
   skillFunction(event, context, (err, response) => {

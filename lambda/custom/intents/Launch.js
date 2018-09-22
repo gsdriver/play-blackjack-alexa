@@ -85,6 +85,10 @@ module.exports = {
           launchSpeech += output.speech;
         } else {
           launchSpeech += res.strings.LAUNCH_START_GAME;
+          if (spanishState === 'PURCHASED') {
+            // Let them know they can say select game to switch games
+            launchSpeech += res.strings.LAUNCH_SELECT_GAME;
+          }
         }
 
         if (attributes.prependLaunch) {

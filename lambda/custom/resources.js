@@ -43,6 +43,7 @@ const common = {
   'LAUNCH_INITIAL_WELCOME': '{"standard":"","tournament":"You can play up to 100 hands to get the highest bankroll in the tournament. ","spanish":"In this game a player 21 always wins <break time=\'200ms\'/> you can redouble <break time=\'200ms\'/> 21 with 5 or more cards wins a bonus payout <break time=\'200ms\'/> and there are special suited bonuses. "}',
   'LAUNCH_START_GAME': 'Say bet to start a new game',
   'LAUNCH_ENABLE_TRAINING': 'say enable training mode',
+  'LAUNCH_SELECT_GAME': ' or say select game to change between Spanish 21 and standard blackjack',
   'LAUNCH_START_REMOVE_SIDEBET': 'remove side bet to remove your side bet',
   'LAUNCH_START_HIGH_SCORES': 'read high scores to hear the leader board',
   'LAUNCH_START_RESET': 'reset game to reset to the default rules and bankroll',
