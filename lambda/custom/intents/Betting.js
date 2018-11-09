@@ -25,6 +25,34 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     let amount = 0;
     const game = attributes[attributes.currentGame];
+    const now = Date.now();
+    const res = require('../resources')(event.request.locale);
+
+    // If the last hand was a 5 card 21, upsell them to Spanish 21
+    if (attributes.temp.long21) {
+      attributes.temp.long21 = undefined;
+      if (attributes.paid && attributes.paid.spanish &&
+      (attributes.paid.spanish.state == 'AVAILABLE') &&
+      (!attributes.prompts.long21 || ((now - attributes.prompts.long21) > 2*24*60*60*1000))) {
+        attributes.prompts.long21 = now;
+        const directive = {
+          'type': 'Connections.SendRequest',
+          'name': 'Upsell',
+          'payload': {
+            'InSkillProduct': {
+              productId: attributes.paid.spanish.productId,
+            },
+            'upsellMessage': res.strings.LONG21_SELL_SPANISH,
+          },
+          'token': 'game.spanish.betting',
+        };
+
+        return handlerInput.responseBuilder
+          .addDirective(directive)
+          .withShouldEndSession(true)
+          .getResponse();
+      }
+    }
 
     // Take the bet
     return new Promise((resolve, reject) => {

@@ -74,7 +74,7 @@ module.exports = {
           launchSpeech = launchWelcome['standard'];
           launchSpeech += res.strings.LAUNCH_SPANISH_TRIAL_OVER;
         } else if (!attributes.newUser && (spanishState == 'AVAILABLE') &&
-          (!attributes.prompts.spanish || (now - attributes.prompts.spanish < 2*24*60*60*1000))) {
+          (!attributes.prompts.spanish || ((now - attributes.prompts.spanish) > 2*24*60*60*1000))) {
           launchSpeech = res.pickRandomOption('LAUNCH_SELL_SPANISH');
           attributes.prompts.spanish = now;
           const directive = {
@@ -82,6 +82,7 @@ module.exports = {
             'name': 'Upsell',
             'payload': {
               'InSkillProduct': {
+                productId: attributes.paid.spanish.productId,
               },
               'upsellMessage': launchSpeech,
             },

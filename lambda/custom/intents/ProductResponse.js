@@ -9,6 +9,7 @@ const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
 const Launch = require('./Launch');
 const Select = require('./Select');
+const Betting = require('./Betting');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const SNS = new AWS.SNS();
@@ -115,6 +116,8 @@ module.exports = {
       // And forward to the appropriate next action
       if (nextAction === 'select') {
         return Select.handle(handlerInput);
+      } else if (nextAction === 'betting') {
+        return Betting.handle(handlerInput);
       } else {
         return Launch.handle(handlerInput);
       }

@@ -55,6 +55,7 @@ const common = {
   'PURCHASE_ONLY_SPANISH': 'We only offer the Spanish 21 expansion product, and you\'ve already purchased it. What else can I help you with?',
   'PURCHASE_SPANISH': 'We have a Spanish 21 game available for purchase. Would you like to buy it? ',
   'PURCHASE_CONFIRM_REPROMPT': 'Say yes to buy Spanish 21',
+  'PURCHASE_NO_PURCHASE': 'What else can I help you with?',
   'PURCHASE_REPROMPT': 'What else can I help you with?',
   // From Refund.js
   'REFUND_SPANISH': 'OK, as a reminder you will no longer be able to access Spanish 21 and will lose your progress on that game. Would you like to refund Spanish 21?',
@@ -142,7 +143,7 @@ const common = {
   'LEADER_TOP_BANKROLLS': 'The top {0} bankrolls are ',
   'LEADER_ACHIEVEMENT_HELP': ' <break time=\'300ms\'/> Ask for help to hear how you earn achievement points',
   'MORE_THAN_PLAYERS': 'over {0}',
-  'LONG21_SELL_SPANISH': 'You got a 21 with five or more cards. We have Spanish 21 available for purchase where that pays extra. Say buy Spanish 21 to hear more <break time=\'500ms\'/>  ',
+  'LONG21_SELL_SPANISH': 'You got a 21 with five or more cards on your last hand. We have Spanish 21 available for purchase where that pays extra. Would you like to hear more?',
   // From Tournament.js
   'TOURNAMENT_NOCHANGERULES': 'Sorry, you can\'t change the rules on this game. ',
   'TOURNAMENT_NORESET': 'Sorry, you can\'t reset your bankroll on this game. What else can I help you with?',
