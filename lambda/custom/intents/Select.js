@@ -34,7 +34,7 @@ module.exports = {
       const directive = {
         name: 'Upsell',
         id: 'spanish',
-        token: 'SELECTGAME',
+        token: 'game.spanish.select',
         upsellMessage: res.strings.SELECT_SPANISH_UPSELL,
       };
       const purchase = bjUtils.getPurchaseDirective(event, attributes, directive);

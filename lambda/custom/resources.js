@@ -48,7 +48,7 @@ const common = {
   'LAUNCH_START_HIGH_SCORES': 'read high scores to hear the leader board',
   'LAUNCH_START_RESET': 'reset game to reset to the default rules and bankroll',
   'LAUNCH_START_PROMPT': ' <break time=\'300ms\'/>Now, what can I help you with?',
-  'LAUNCH_SELL_SPANISH': 'We now have Spanish 21 available for purchase. Say buy Spanish 21 to buy it. ',
+  'LAUNCH_SELL_SPANISH': 'We now have Spanish 21 available for purchase. Want to learn more?|We\'re proud to introduce a new way to play blackjack with Spanish 21! Want to hear more about it?|We have the popular blackjack variant Spanish 21 available for purchase. Want to learn more?',
   'LAUNCH_SPANISH_TRIAL': 'For a limited time, we have a free trial version of Spanish 21 to play. Say select a new game to play Spanish 21. ',
   'LAUNCH_SPANISH_TRIAL_OVER': 'The free trial of Spanish 21 is over. If you would like to continue to play Spanish 21, say buy Spanish 21. ',
   // From Purchase.js
