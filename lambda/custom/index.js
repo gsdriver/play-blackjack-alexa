@@ -143,15 +143,12 @@ const requestInterceptor = {
           });
         }).then(() => {
           if (attributes.temp.inSkillProductInfo) {
-            let state;
             attributes.paid = {};
             attributes.temp.inSkillProductInfo.inSkillProducts.forEach((product) => {
-              if ((product.type == 'ENTITLEMENT') && (product.entitled == 'ENTITLED')) {
-                // State is purchased unless a refund was in progress
-                state = (attributes.paid[product.referenceName] &&
-                    (attributes.paid[product.referenceName].state == 'REFUND_PENDING'))
-                    ? 'REFUND_PENDING' : 'PURCHASED';
-              } else {
+              let state;
+              if (product.entitled === 'ENTITLED') {
+                state = 'PURCHASED';
+              } else if (product.purchasable == 'PURCHASABLE') {
                 // Just in case, we should clear the spanish game if it's not purchased
                 // Skip this though if a trial is underway
                 state = 'AVAILABLE';
@@ -163,10 +160,12 @@ const requestInterceptor = {
                 }
               }
 
-              attributes.paid[product.referenceName] = {
-                productId: product.productId,
-                state: state,
-              };
+              if (state) {
+                attributes.paid[product.referenceName] = {
+                  productId: product.productId,
+                  state: state,
+                };
+              }
             });
             attributes.temp.inSkillProductInfo = undefined;
           }

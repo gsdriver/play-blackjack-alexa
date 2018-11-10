@@ -41,7 +41,7 @@ module.exports = {
       Key: 'blackjack-upsell/' + Date.now() + '.txt',
     };
 
-    if (!process.env.SNSTOPIC) {
+    if (process.env.SNSTOPIC) {
       promise = s3.putObject(params).promise().then(() => {
         // Publish to SNS if the action was accepted so we know something happened
         if (event.request.payload.purchaseResult === 'ACCEPTED') {
@@ -55,6 +55,9 @@ module.exports = {
             message += event.request.name + ' was accepted';
           }
           message += ' by user ' + event.session.user.userId;
+          if (attributes.upsellSelection) {
+            message += '\nUpsell variant ' + attributes.upsellSelection + ' was presented. ';
+          }
 
           return SNS.publish({
             Message: message,
@@ -73,37 +76,29 @@ module.exports = {
       const options = event.request.token.split('.');
       let nextAction = 'launch';
 
+      attributes.upsellSelection = undefined;
       switch (event.request.name) {
         case 'Buy':
-          console.log('Buy response');
-          if (event.request.payload) {
-            if (event.request.payload.purchaseResult == 'ACCEPTED') {
-              // OK, flip them to Spanish 21
-              return selectedGame(handlerInput, 'spanish');
-            }
+          if (event.request.payload &&
+            ((event.request.payload.purchaseResult == 'ACCEPTED') ||
+             (event.request.payload.purchaseResult == 'ALREADY_PURCHASED'))) {
+            // OK, flip them to Spanish 21
+            return selectedGame(handlerInput, 'spanish');
           }
           break;
         case 'Upsell':
-          // If they didn't take the upsell offer, don't offer it again this session
-          console.log('Upsell response');
-          attributes.temp.noUpsell = true;
           if (event.request.payload &&
             ((event.request.payload.purchaseResult == 'ACCEPTED') ||
              (event.request.payload.purchaseResult == 'ALREADY_PURCHASED'))) {
             // They either purchased or already had this game, so drop them into it
             return selectedGame(handlerInput, 'spanish');
           }
-          if (options[2] == 'select') {
-            nextAction = 'select';
-          }
+          nextAction = options[2];
           break;
         case 'Cancel':
-          // Don't delete their progress until the API tells us the refund was processed
-          // Switch them instead to the standard game
-          console.log('Cancel response');
           if (event.request.payload &&
               (event.request.payload.purchaseResult == 'ACCEPTED')) {
-            attributes.paid.spanish.state = 'REFUND_PENDING';
+            attributes.spanish = undefined;
             return selectedGame(handlerInput, 'standard');
           }
           break;
@@ -115,10 +110,13 @@ module.exports = {
 
       // And forward to the appropriate next action
       if (nextAction === 'select') {
+        attributes.temp.noUpsellSelect = true;
         return Select.handle(handlerInput);
       } else if (nextAction === 'betting') {
+        attributes.temp.noUpsellBetting = true;
         return Betting.handle(handlerInput);
       } else {
+        attributes.temp.noUpsellLaunch = true;
         return Launch.handle(handlerInput);
       }
     });

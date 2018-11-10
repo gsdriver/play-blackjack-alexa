@@ -73,9 +73,9 @@ module.exports = {
           attributes.currentGame = 'standard';
           launchSpeech = launchWelcome['standard'];
           launchSpeech += res.strings.LAUNCH_SPANISH_TRIAL_OVER;
-        } else if (!attributes.newUser && (spanishState == 'AVAILABLE') &&
+        } else if (!attributes.newUser && !attributes.temp.noUpsellLaunch && (spanishState == 'AVAILABLE') &&
           (!attributes.prompts.spanish || ((now - attributes.prompts.spanish) > 2*24*60*60*1000))) {
-          launchSpeech = res.pickRandomOption('LAUNCH_SELL_SPANISH');
+          launchSpeech += bjUtils.selectUpsellMessage(handlerInput, 'LAUNCH_SELL_SPANISH');
           attributes.prompts.spanish = now;
           const directive = {
             'type': 'Connections.SendRequest',

@@ -26,12 +26,11 @@ module.exports = {
     let amount = 0;
     const game = attributes[attributes.currentGame];
     const now = Date.now();
-    const res = require('../resources')(event.request.locale);
 
     // If the last hand was a 5 card 21, upsell them to Spanish 21
     if (attributes.temp.long21) {
       attributes.temp.long21 = undefined;
-      if (attributes.paid && attributes.paid.spanish &&
+      if (attributes.paid && attributes.paid.spanish && !attributes.temp.noUpsellBetting &&
       (attributes.paid.spanish.state == 'AVAILABLE') &&
       (!attributes.prompts.long21 || ((now - attributes.prompts.long21) > 2*24*60*60*1000))) {
         attributes.prompts.long21 = now;
@@ -42,7 +41,7 @@ module.exports = {
             'InSkillProduct': {
               productId: attributes.paid.spanish.productId,
             },
-            'upsellMessage': res.strings.LONG21_SELL_SPANISH,
+            'upsellMessage': bjUtils.selectUpsellMessage(handlerInput, 'LONG21_SPANISH_UPSELL'),
           },
           'token': 'game.spanish.betting',
         };

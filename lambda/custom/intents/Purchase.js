@@ -4,8 +4,6 @@
 
 'use strict';
 
-const bjUtils = require('../BlackjackUtils');
-
 module.exports = {
   canHandle: function(handlerInput) {
     const request = handlerInput.requestEnvelope.request;

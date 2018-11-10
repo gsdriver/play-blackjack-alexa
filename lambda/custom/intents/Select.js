@@ -29,27 +29,23 @@ module.exports = {
 
     // If they don't have Spanish 21, upsell
     if (attributes.paid && attributes.paid.spanish &&
-        (!attributes.temp.noUpsell &&
-        (availableGames.indexOf('spanish') == -1))) {
+        (!attributes.temp.noUpsellSelect &&
+        (availableGames.indexOf('spanish') === -1))) {
       const directive = {
-        name: 'Upsell',
-        id: 'spanish',
-        token: 'game.spanish.select',
-        upsellMessage: res.strings.SELECT_SPANISH_UPSELL,
+        'type': 'Connections.SendRequest',
+        'name': 'Upsell',
+        'payload': {
+          'InSkillProduct': {
+            productId: attributes.paid.spanish.productId,
+          },
+          'upsellMessage': bjUtils.selectUpsellMessage(handlerInput, 'SELECT_SPANISH_UPSELL'),
+        },
+        'token': 'game.spanish.select',
       };
-      const purchase = bjUtils.getPurchaseDirective(event, attributes, directive);
-      if (purchase) {
-        return handlerInput.responseBuilder
-          .addDirective(purchase)
-          .withShouldEndSession(true)
-          .getResponse();
-      } else {
-        // Something went wrong
-        return handlerInput.responseBuilder
-          .speak(res.strings.INTERNAL_ERROR)
-          .reprompt(res.strings.ERROR_REPROMPT)
-          .getResponse();
-      }
+      return handlerInput.responseBuilder
+        .addDirective(directive)
+        .withShouldEndSession(true)
+        .getResponse();
     } else {
       if (availableGames.length < 2) {
         // Sorry, no games available to select

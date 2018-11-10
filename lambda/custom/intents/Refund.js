@@ -24,9 +24,7 @@ module.exports = {
     return canRefund;
   },
   handle: function(handlerInput) {
-    const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('../resources')(event.request.locale);
 
     // We only offer Spanish 21 so let's kick into that flow
     return handlerInput.responseBuilder

@@ -64,44 +64,19 @@ module.exports = {
         .getResponse();
     }
   },
-  // We need to hand-roll the buy response
-  getPurchaseDirective: function(event, attributes, product) {
-    let productId;
+  selectUpsellMessage(handlerInput, message) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const res = require('./resources')(event.request.locale);
+    let selection;
 
-    if (attributes.paid && attributes.paid[product.id]) {
-      productId = attributes.paid[product.id].productId;
+    const options = res.strings[message].split('|');
+    selection = Math.floor(Math.random() * options.length);
+    if (selection === options.length) {
+      selection--;
     }
-
-    if (productId) {
-      // Set the state for this node - either purchase or refund pending
-      let state;
-      if (product.name == 'Cancel') {
-        // Will get set to REFUND_PENDING if they confirm they want a refund
-        state = attributes.paid[product.id].state;
-      } else if (attributes.paid[product.id].state == 'REFUND_PENDING') {
-        state = 'REFUND_PENDING';
-      } else {
-        state = 'PURCHASE_PENDING';
-      }
-      attributes.paid[product.id].state = state;
-
-      // Add a SendRequest directive
-      console.log('Purchase directive!');
-      return {
-        'type': 'Connections.SendRequest',
-        'name': product.name,
-        'payload': {
-          'InSkillProduct': {
-            'productId': productId,
-          },
-          'upsellMessage': product.upsellMessage,
-        },
-        'token': (product.token ? product.token : product.name),
-      };
-    } else {
-      // Something went wrong
-      return undefined;
-    }
+    attributes.upsellSelection = 'v' + (selection + 1);
+    return options[selection];
   },
   // Figures out what state of the game we're in
   getState: function(attributes) {
