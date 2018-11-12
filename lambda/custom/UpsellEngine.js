@@ -31,9 +31,17 @@ module.exports = {
     if (!attributes.upsell) {
       attributes.upsell = {};
       attributes.upsell.prompts = {};
+      attributes.upsell.newUser = true;
     }
     if (!attributes.upsell[trigger]) {
       attributes.upsell[trigger] = {};
+    }
+
+    // Clear legacy prompts structure
+    if (attributes.prompts) {
+      attributes.prompts.spanish = undefined;
+      attributes.prompts.long21 = undefined;
+      attributes.prompts.sellSpanish = undefined;
     }
 
     // Since we are called on launch, this
@@ -146,9 +154,10 @@ function shouldUpsell(attributes, trigger, now) {
     case 'launch':
       // We will trigger if this is not a new user
       // and we haven't played this upsell in the past 48 hours
-      upsell = (!attributes.newUser &&
+      upsell = (!attributes.upsell.newUser &&
         (!attributes.upsell.prompts.launch ||
           ((now - attributes.upsell.prompts.launch) > 2*24*60*60*1000)));
+      attributes.upsell.newUser = undefined;
       break;
 
     case 'long21':
