@@ -7,9 +7,13 @@
 const gameService = require('../GameService');
 const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
-const request = require('request');
 const Launch = require('./Launch');
 const Select = require('./Select');
+const Betting = require('./Betting');
+const AWS = require('aws-sdk');
+AWS.config.update({region: 'us-east-1'});
+const SNS = new AWS.SNS();
+const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -19,65 +23,83 @@ module.exports = {
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
+    let promise;
 
-    return new Promise((resolve, reject) => {
-      // Record that we got a purchase response
-      if (event.request.payload && process.env.SERVICEURL) {
-        const params = {
-          url: process.env.SERVICEURL + 'blackjack/purchaseResult',
-          formData: {
-            subject: 'Product response',
-            body: event.request.name + ' was ' + event.request.payload.purchaseResult
-                + ' by user ' + event.session.user.userId,
-          },
-        };
-        request.post(params);
-      }
+    // First write out to S3
+    const summary = {
+      token: event.request.token,
+      action: event.request.name,
+      userId: event.session.user.userId,
+      response: event.request.payload.purchaseResult,
+    };
+    if (attributes.upsellSelection) {
+      summary.selection = attributes.upsellSelection;
+    }
+    const params = {
+      Body: JSON.stringify(summary),
+      Bucket: 'garrett-alexa-usage',
+      Key: 'blackjack-upsell/' + Date.now() + '.txt',
+    };
 
+    if (process.env.SNSTOPIC) {
+      promise = s3.putObject(params).promise().then(() => {
+        // Publish to SNS if the action was accepted so we know something happened
+        if (event.request.payload.purchaseResult === 'ACCEPTED') {
+          let message;
+
+          // This message is sent internally so no worries about localizing
+          message = 'For token ' + event.request.token + ', ';
+          if (event.request.payload.message) {
+            message += event.request.payload.message;
+          } else {
+            message += event.request.name + ' was accepted';
+          }
+          message += ' by user ' + event.session.user.userId;
+          if (attributes.upsellSelection) {
+            message += '\nUpsell variant ' + attributes.upsellSelection + ' was presented. ';
+          }
+
+          return SNS.publish({
+            Message: message,
+            TopicArn: process.env.SNSTOPIC,
+            Subject: 'Blackjack Game New Purchase',
+          }).promise();
+        } else {
+          return;
+        }
+      });
+    } else {
+      promise = Promise.resolve();
+    }
+
+    return promise.then(() => {
+      const options = event.request.token.split('.');
+      let nextAction = 'launch';
+
+      attributes.upsellSelection = undefined;
       switch (event.request.name) {
         case 'Buy':
-          console.log('Buy response');
-          if (event.request.payload) {
-            if (event.request.payload.purchaseResult == 'ACCEPTED') {
-              // OK, flip them to Spanish 21
-              selectedGame(handlerInput, 'spanish', (response) => {
-                resolve(response);
-              });
-            } else if (event.request.payload.purchaseResult == 'ERROR') {
-              if (attributes.prompts) {
-                attributes.prompts.sellSpanish = undefined;
-              }
-            }
+          if (event.request.payload &&
+            ((event.request.payload.purchaseResult == 'ACCEPTED') ||
+             (event.request.payload.purchaseResult == 'ALREADY_PURCHASED'))) {
+            // OK, flip them to Spanish 21
+            return selectedGame(handlerInput, 'spanish');
           }
           break;
         case 'Upsell':
-          // If they didn't take the upsell offer, don't offer it again this session
-          console.log('Upsell response');
-          attributes.temp.noUpsell = true;
           if (event.request.payload &&
             ((event.request.payload.purchaseResult == 'ACCEPTED') ||
              (event.request.payload.purchaseResult == 'ALREADY_PURCHASED'))) {
             // They either purchased or already had this game, so drop them into it
-            selectedGame(handlerInput, 'spanish', (response) => {
-              resolve(response);
-            });
+            return selectedGame(handlerInput, 'spanish');
           }
-          if (event.request.token == 'SELECTGAME') {
-            // Kick them back into SelectGame mode
-            console.log('Selecting game');
-            return Select.handle(handlerInput);
-          }
+          nextAction = options[2];
           break;
         case 'Cancel':
-          // Don't delete their progress until the API tells us the refund was processed
-          // Switch them instead to the standard game
-          console.log('Cancel response');
           if (event.request.payload &&
               (event.request.payload.purchaseResult == 'ACCEPTED')) {
-            attributes.paid.spanish.state = 'REFUND_PENDING';
-            selectedGame(handlerInput, 'standard', (response) => {
-              resolve(response);
-            });
+            attributes.spanish = undefined;
+            return selectedGame(handlerInput, 'standard');
           }
           break;
         default:
@@ -86,16 +108,22 @@ module.exports = {
           break;
       }
 
-      // And forward to Launch
-      Launch.handle(handlerInput)
-      .then((response) => {
-        resolve(response);
-      });
+      // And forward to the appropriate next action
+      if (nextAction === 'select') {
+        attributes.temp.noUpsellSelect = true;
+        return Select.handle(handlerInput);
+      } else if (nextAction === 'betting') {
+        attributes.temp.noUpsellBetting = true;
+        return Betting.handle(handlerInput);
+      } else {
+        attributes.temp.noUpsellLaunch = true;
+        return Launch.handle(handlerInput);
+      }
     });
   },
 };
 
-function selectedGame(handlerInput, gameToPlay, callback) {
+function selectedGame(handlerInput, gameToPlay) {
   const event = handlerInput.requestEnvelope;
   const attributes = handlerInput.attributesManager.getSessionAttributes();
   const res = require('../resources')(event.request.locale);
@@ -106,13 +134,15 @@ function selectedGame(handlerInput, gameToPlay, callback) {
         event.session.user.userId);
   }
 
-  const format = JSON.parse(res.strings.LAUNCH_WELCOME)[attributes.currentGame];
-  bjUtils.getWelcome(event, attributes, format, (greeting) => {
-    const launchSpeech = greeting + res.strings.LAUNCH_START_GAME;
-    const output = playgame.readCurrentHand(attributes, event.request.locale);
-    callback(handlerInput.responseBuilder
-      .speak(launchSpeech)
-      .reprompt(output.reprompt)
-      .getResponse());
+  return new Promise((resolve, reject) => {
+    const format = JSON.parse(res.strings.LAUNCH_WELCOME)[attributes.currentGame];
+    bjUtils.getWelcome(event, attributes, format, (greeting) => {
+      const launchSpeech = greeting + res.strings.LAUNCH_START_GAME;
+      const output = playgame.readCurrentHand(attributes, event.request.locale);
+      resolve(handlerInput.responseBuilder
+        .speak(launchSpeech)
+        .reprompt(output.reprompt)
+        .getResponse());
+    });
   });
 }

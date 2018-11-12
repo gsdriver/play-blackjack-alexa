@@ -7,6 +7,7 @@
 const gameService = require('../GameService');
 const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
+const upsell = require('../UpsellEngine');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -72,10 +73,16 @@ module.exports = {
           attributes.currentGame = 'standard';
           launchSpeech = launchWelcome['standard'];
           launchSpeech += res.strings.LAUNCH_SPANISH_TRIAL_OVER;
-        } else if (!attributes.newUser && (spanishState == 'AVAILABLE') &&
-          (!attributes.prompts || !attributes.prompts.sellSpanish)) {
-          launchSpeech += res.strings.LAUNCH_SELL_SPANISH;
-          attributes.prompts.sellSpanish = true;
+        } else if (!attributes.temp.noUpsellLaunch) {
+          const directive = upsell.getUpsell(attributes, 'launch');
+          if (directive) {
+            directive.token = 'game.spanish.launch';
+            resolve(handlerInput.responseBuilder
+              .addDirective(directive)
+              .withShouldEndSession(true)
+              .getResponse());
+            return;
+          }
         }
 
         // Figure out what the current game state is - give them option to reset
