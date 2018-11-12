@@ -5,7 +5,7 @@
 'use strict';
 
 const gameService = require('../GameService');
-const bjUtils = require('../BlackjackUtils');
+const upsell = require('../UpsellEngine');
 const speechUtils = require('alexa-speech-utils')();
 
 module.exports = {
@@ -28,50 +28,42 @@ module.exports = {
     let reprompt;
 
     // If they don't have Spanish 21, upsell
-    if (attributes.paid && attributes.paid.spanish &&
-        (!attributes.temp.noUpsellSelect &&
-        (availableGames.indexOf('spanish') === -1))) {
-      const directive = {
-        'type': 'Connections.SendRequest',
-        'name': 'Upsell',
-        'payload': {
-          'InSkillProduct': {
-            productId: attributes.paid.spanish.productId,
-          },
-          'upsellMessage': bjUtils.selectUpsellMessage(handlerInput, 'SELECT_SPANISH_UPSELL'),
-        },
-        'token': 'game.spanish.select',
-      };
-      return handlerInput.responseBuilder
-        .addDirective(directive)
-        .withShouldEndSession(true)
-        .getResponse();
-    } else {
-      if (availableGames.length < 2) {
-        // Sorry, no games available to select
-        speech = res.strings.SELECT_ONE_GAME;
-        reprompt = res.strings.ERROR_REPROMPT;
-      } else {
-        // Sort these with current game last
-        availableGames.push(attributes.currentGame);
-        const i = availableGames.indexOf(attributes.currentGame);
-        availableGames.splice(i, 1);
-
-        attributes.choices = availableGames;
-        attributes.originalChoices = availableGames;
-        attributes.temp.selectingGame = true;
-
-        speech = res.strings.SELECT_GAMES
-          .replace('{0}', speechUtils.and(availableGames.map((x) => res.sayGame(x)),
-              {locale: event.request.locale}));
-        reprompt = res.strings.SELECT_REPROMPT.replace('{0}', res.sayGame(availableGames[0]));
-        speech += reprompt;
+    if (!attributes.temp.noUpsellSelect &&
+        (availableGames.indexOf('spanish') === -1)) {
+      const directive = upsell.getUpsell(attributes, 'select');
+      if (directive) {
+        directive.token = 'game.spanish.select';
+        return handlerInput.responseBuilder
+          .addDirective(directive)
+          .withShouldEndSession(true)
+          .getResponse();
       }
-
-      return handlerInput.responseBuilder
-        .speak(speech)
-        .reprompt(reprompt)
-        .getResponse();
     }
+
+    if (availableGames.length < 2) {
+      // Sorry, no games available to select
+      speech = res.strings.SELECT_ONE_GAME;
+      reprompt = res.strings.ERROR_REPROMPT;
+    } else {
+      // Sort these with current game last
+      availableGames.push(attributes.currentGame);
+      const i = availableGames.indexOf(attributes.currentGame);
+      availableGames.splice(i, 1);
+
+      attributes.choices = availableGames;
+      attributes.originalChoices = availableGames;
+      attributes.temp.selectingGame = true;
+
+      speech = res.strings.SELECT_GAMES
+        .replace('{0}', speechUtils.and(availableGames.map((x) => res.sayGame(x)),
+            {locale: event.request.locale}));
+      reprompt = res.strings.SELECT_REPROMPT.replace('{0}', res.sayGame(availableGames[0]));
+      speech += reprompt;
+    }
+
+    return handlerInput.responseBuilder
+      .speak(speech)
+      .reprompt(reprompt)
+      .getResponse();
   },
 };

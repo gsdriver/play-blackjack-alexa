@@ -14,7 +14,6 @@ const common = {
   'SELECT_ONE_GAME': 'Sorry, there is only one game available to play. ',
   'SELECT_GAMES': 'We have the following games available to play <break time=\'200ms\'/> {0}. ',
   'SELECT_REPROMPT': 'Would you like to play {0}?',
-  'SELECT_SPANISH_UPSELL': 'You\'ve played standard Blackjack, you can now get the Spanish 21 expansion pack. Want to learn more?|Would you like to hear more about the Spanish 21 expansion pack available for purchase?|We have a Spanish 21 game available for purchase. Want to hear more?',
   // From SideBet.js
   'SIDEBET_REMOVED': 'Side bet removed. ',
   // From Blackjack.js
@@ -48,7 +47,6 @@ const common = {
   'LAUNCH_START_HIGH_SCORES': 'read high scores to hear the leader board',
   'LAUNCH_START_RESET': 'reset game to reset to the default rules and bankroll',
   'LAUNCH_START_PROMPT': ' <break time=\'300ms\'/>Now, what can I help you with?',
-  'LAUNCH_SELL_SPANISH': 'We now have Spanish 21 available for purchase. Want to learn more?|We\'re proud to introduce a new way to play blackjack with Spanish 21! Want to hear more about it?|We have the popular blackjack variant Spanish 21 available for purchase. Want to learn more?',
   'LAUNCH_SPANISH_TRIAL': 'For a limited time, we have a free trial version of Spanish 21 to play. Say select a new game to play Spanish 21. ',
   'LAUNCH_SPANISH_TRIAL_OVER': 'The free trial of Spanish 21 is over. If you would like to continue to play Spanish 21, say buy Spanish 21. ',
   // From Purchase.js
@@ -143,7 +141,6 @@ const common = {
   'LEADER_TOP_BANKROLLS': 'The top {0} bankrolls are ',
   'LEADER_ACHIEVEMENT_HELP': ' <break time=\'300ms\'/> Ask for help to hear how you earn achievement points',
   'MORE_THAN_PLAYERS': 'over {0}',
-  'LONG21_SPANISH_UPSELL': 'You got a 21 with five or more cards on your last hand. We have Spanish 21 available for purchase where that pays extra. Would you like to hear more?|Good job getting 21 the hard way. With Spanish 21 that would have paid extra. Would you like to hear more about it?|Getting 21 with that many cards isn\'t easy. In Spanish 21, that pays extra. Are you interested in hearing more about this game?',
   // From Tournament.js
   'TOURNAMENT_NOCHANGERULES': 'Sorry, you can\'t change the rules on this game. ',
   'TOURNAMENT_NORESET': 'Sorry, you can\'t reset your bankroll on this game. What else can I help you with?',

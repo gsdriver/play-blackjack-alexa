@@ -7,6 +7,7 @@
 const gameService = require('../GameService');
 const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
+const upsell = require('../UpsellEngine');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -39,7 +40,6 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const res = require('../resources')(event.request.locale);
     let launchSpeech;
-    const now = Date.now();
 
     return new Promise((resolve, reject) => {
       // Since we aren't in a tournament, make sure current hand isn't set to one
@@ -73,27 +73,16 @@ module.exports = {
           attributes.currentGame = 'standard';
           launchSpeech = launchWelcome['standard'];
           launchSpeech += res.strings.LAUNCH_SPANISH_TRIAL_OVER;
-        } else if (!attributes.newUser && !attributes.temp.noUpsellLaunch && (spanishState == 'AVAILABLE') &&
-          (!attributes.prompts.spanish || ((now - attributes.prompts.spanish) > 2*24*60*60*1000))) {
-          launchSpeech += bjUtils.selectUpsellMessage(handlerInput, 'LAUNCH_SELL_SPANISH');
-          attributes.prompts.spanish = now;
-          const directive = {
-            'type': 'Connections.SendRequest',
-            'name': 'Upsell',
-            'payload': {
-              'InSkillProduct': {
-                productId: attributes.paid.spanish.productId,
-              },
-              'upsellMessage': launchSpeech,
-            },
-            'token': 'game.spanish.launch',
-          };
-
-          resolve(handlerInput.responseBuilder
-            .addDirective(directive)
-            .withShouldEndSession(true)
-            .getResponse());
-          return;
+        } else if (!attributes.temp.noUpsellLaunch) {
+          const directive = upsell.getUpsell(attributes, 'launch');
+          if (directive) {
+            directive.token = 'game.spanish.launch';
+            resolve(handlerInput.responseBuilder
+              .addDirective(directive)
+              .withShouldEndSession(true)
+              .getResponse());
+            return;
+          }
         }
 
         // Figure out what the current game state is - give them option to reset

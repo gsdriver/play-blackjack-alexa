@@ -64,20 +64,6 @@ module.exports = {
         .getResponse();
     }
   },
-  selectUpsellMessage(handlerInput, message) {
-    const event = handlerInput.requestEnvelope;
-    const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('./resources')(event.request.locale);
-    let selection;
-
-    const options = res.strings[message].split('|');
-    selection = Math.floor(Math.random() * options.length);
-    if (selection === options.length) {
-      selection--;
-    }
-    attributes.upsellSelection = 'v' + (selection + 1);
-    return options[selection];
-  },
   // Figures out what state of the game we're in
   getState: function(attributes) {
     const game = attributes[attributes.currentGame];

@@ -6,6 +6,7 @@
 
 const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
+const upsell = require('../UpsellEngine');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -13,39 +14,54 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const game = attributes[attributes.currentGame];
 
-    return ((game.possibleActions.indexOf('bet') >= 0)
+    if ((game.possibleActions.indexOf('bet') >= 0)
       && !attributes.temp.joinTournament
-      && !attributes.temp.selectingGame
-      && (request.type === 'IntentRequest')
-      && ((request.intent.name === 'BettingIntent')
-        || (request.intent.name === 'AMAZON.YesIntent')));
+      && !attributes.temp.selectingGame) {
+      if ((request.type === 'IntentRequest')
+        && ((request.intent.name === 'BettingIntent')
+        || (request.intent.name === 'AMAZON.YesIntent'))) {
+        return true;
+      }
+
+      // Also OK if this was a BlackjackIntent mapping to bet
+      if ((request.type === 'IntentRequest')
+        && (request.intent.name === 'BlackjackIntent')
+        && request.intent.slots
+        && request.intent.slots.Action
+        && request.intent.slots.Action.value) {
+        const res = require('../resources')(request.locale);
+        return (res.getBlackjackAction(request.intent.slots.Action) === 'bet');
+      }
+    }
+
+    return false;
   },
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     let amount = 0;
     const game = attributes[attributes.currentGame];
-    const now = Date.now();
 
     // If the last hand was a 5 card 21, upsell them to Spanish 21
     if (attributes.temp.long21) {
       attributes.temp.long21 = undefined;
-      if (attributes.paid && attributes.paid.spanish && !attributes.temp.noUpsellBetting &&
-      (attributes.paid.spanish.state == 'AVAILABLE') &&
-      (!attributes.prompts.long21 || ((now - attributes.prompts.long21) > 2*24*60*60*1000))) {
-        attributes.prompts.long21 = now;
-        const directive = {
-          'type': 'Connections.SendRequest',
-          'name': 'Upsell',
-          'payload': {
-            'InSkillProduct': {
-              productId: attributes.paid.spanish.productId,
-            },
-            'upsellMessage': bjUtils.selectUpsellMessage(handlerInput, 'LONG21_SPANISH_UPSELL'),
-          },
-          'token': 'game.spanish.betting',
-        };
+      if (!attributes.temp.noUpsellBetting) {
+        const directive = upsell.getUpsell(attributes, 'long21');
+        if (directive) {
+          directive.token = 'game.spanish.betting';
+          return handlerInput.responseBuilder
+            .addDirective(directive)
+            .withShouldEndSession(true)
+            .getResponse();
+        }
+      }
+    }
 
+    // Check upsell opportunity
+    if (!attributes.temp.noUpsellBetting) {
+      const directive = upsell.getUpsell(attributes, 'play');
+      if (directive) {
+        directive.token = 'game.spanish.betting';
         return handlerInput.responseBuilder
           .addDirective(directive)
           .withShouldEndSession(true)
