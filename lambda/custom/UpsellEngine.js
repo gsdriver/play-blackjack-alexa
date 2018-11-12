@@ -35,83 +35,28 @@ module.exports = {
     if (!attributes.upsell[trigger]) {
       attributes.upsell[trigger] = {};
     }
+
     // Since we are called on launch, this
     // will help us see the full session length
     if (!attributes.upsell.start) {
       attributes.upsell.start = now;
     }
 
-    switch (trigger) {
-      case 'launch':
-        // We will trigger if this is not a new user
-        // and we haven't played this upsell in the past 48 hours
-        attributes.upsell.launch.trigger = now;
-        attributes.upsell.launch.count = (attributes.upsell.launch.count + 1) || 1;
-        if (!attributes.newUser &&
-          (!attributes.upsell.prompts.launch ||
-            ((now - attributes.upsell.prompts.launch) > 2*24*60*60*1000))) {
-          attributes.upsell.launch.impression = now;
-          attributes.upsell.prompts.launch = now;
-          directive = {
-            'type': 'Connections.SendRequest',
-            'name': 'Upsell',
-            'payload': {
-              'InSkillProduct': {
-                productId: attributes.paid.spanish.productId,
-              },
-              'upsellMessage': selectUpsellMessage(attributes, 'LAUNCH_SPANISH_UPSELL'),
-            },
-          };
-        }
-        break;
-
-      case 'long21':
-        attributes.upsell.long21.trigger = now;
-        attributes.upsell.long21.count = (attributes.upsell.long21.count + 1) || 1;
-        if (!attributes.upsell.prompts.long21 ||
-          ((now - attributes.upsell.prompts.long21) > 2*24*60*60*1000)) {
-          attributes.upsell.long21.impression = now;
-          attributes.upsell.prompts.long21 = now;
-          directive = {
-            'type': 'Connections.SendRequest',
-            'name': 'Upsell',
-            'payload': {
-              'InSkillProduct': {
-                productId: attributes.paid.spanish.productId,
-              },
-              'upsellMessage': selectUpsellMessage(attributes, 'LONG21_SPANISH_UPSELL'),
-            },
-          };
-        }
-        break;
-
-      case 'select':
-        // Always upsell here
-        attributes.upsell.select.trigger = now;
-        attributes.upsell.select.count = (attributes.upsell.select.count + 1) || 1;
-        attributes.upsell.select.impression = now;
-        attributes.upsell.prompts.select = now;
-        directive = {
-          'type': 'Connections.SendRequest',
-          'name': 'Upsell',
-          'payload': {
-            'InSkillProduct': {
-              productId: attributes.paid.spanish.productId,
-            },
-            'upsellMessage': selectUpsellMessage(attributes, 'SELECT_SPANISH_UPSELL'),
+    attributes.upsell[trigger].trigger = now;
+    attributes.upsell[trigger].count = (attributes.upsell[trigger].count + 1) || 1;
+    if (shouldUpsell(attributes, trigger, now)) {
+      attributes.upsell[trigger].impression = now;
+      attributes.upsell.prompts[trigger] = now;
+      directive = {
+        'type': 'Connections.SendRequest',
+        'name': 'Upsell',
+        'payload': {
+          'InSkillProduct': {
+            productId: attributes.paid.spanish.productId,
           },
-        };
-        break;
-
-      case 'play':
-        // Doesn't currently upsell
-        attributes.upsell.play.trigger = now;
-        attributes.upsell.play.count = (attributes.upsell.play.count + 1) || 1;
-        break;
-
-      default:
-        // Unknown trigger
-        break;
+          'upsellMessage': selectUpsellMessage(attributes, trigger.toUpperCase() + '_SPANISH_UPSELL'),
+        },
+      };
     }
 
     return directive;
@@ -179,7 +124,7 @@ function selectUpsellMessage(attributes, message) {
   // Store upsell messages locally
   // These aren't localized outside of en-US anyway
   const upsellMessages = {
-    'LAUNCH_SPANISH_UPSELL': 'We now have Spanish 21 available for purchase. Want to learn more?|We\'re proud to introduce a new way to play blackjack with Spanish 21! Want to hear more about it?|We have the popular blackjack variant Spanish 21 available for purchase. Want to learn more?',
+    'LAUNCH_SPANISH_UPSELL': 'Hello, welcome to Blackjack Game. We now have Spanish 21 available for purchase. Want to learn more?|Hi, welcome to Blackjack Game. We\'re proud to introduce a new way to play blackjack with Spanish 21! Want to hear more about it?|Welcome back to Blackjack Game. We have the popular blackjack variant Spanish 21 available for purchase. Want to learn more?',
     'LONG21_SPANISH_UPSELL': 'You got a 21 with five or more cards on your last hand. We have Spanish 21 available for purchase where that pays extra. Would you like to hear more?|Good job getting 21 the hard way. With Spanish 21 that would have paid extra. Would you like to hear more about it?|Getting 21 with that many cards isn\'t easy. In Spanish 21, that pays extra. Are you interested in hearing more about this game?',
     'SELECT_SPANISH_UPSELL': 'You\'ve played standard Blackjack, you can now get the Spanish 21 expansion pack. Want to learn more?|Would you like to hear more about the Spanish 21 expansion pack available for purchase?|We have a Spanish 21 game available for purchase. Want to hear more?',
     'PLAY_SPANISH_UPSELL': 'You\'ve enjoyed standard Blackjack, you can now get the Spanish 21 expansion pack. Want to learn more?|Would you like to hear more about the Spanish 21 expansion pack available for purchase?|We have a Spanish 21 game available for purchase. Want to hear more?',
@@ -192,4 +137,39 @@ function selectUpsellMessage(attributes, message) {
   }
   attributes.upsellSelection = 'v' + (selection + 1);
   return options[selection];
+}
+
+function shouldUpsell(attributes, trigger, now) {
+  let upsell = false;
+
+  switch (trigger) {
+    case 'launch':
+      // We will trigger if this is not a new user
+      // and we haven't played this upsell in the past 48 hours
+      upsell = (!attributes.newUser &&
+        (!attributes.upsell.prompts.launch ||
+          ((now - attributes.upsell.prompts.launch) > 2*24*60*60*1000)));
+      break;
+
+    case 'long21':
+      upsell = (!attributes.upsell.prompts.long21 ||
+        ((now - attributes.upsell.prompts.long21) > 2*24*60*60*1000));
+      break;
+
+    case 'select':
+      // Always upsell here
+      upsell = true;
+      break;
+
+    case 'play':
+      // Doesn't currently upsell
+      upsell = false;
+      break;
+
+    default:
+      // Unknown trigger
+      break;
+  }
+
+  return upsell;
 }
