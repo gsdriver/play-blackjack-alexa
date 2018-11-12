@@ -124,39 +124,45 @@ module.exports = {
     let upsell = false;
     let promise;
 
-    if (response.directives) {
-      response.directives.forEach((directive) => {
-        if ((directive.type === 'Connections.SendRequest') && (directive.name === 'Upsell')) {
-          upsell = true;
+    // Save if they can but haven't purchased Spanish 21
+    if ((attributes.paid && attributes.paid.spanish
+      && (attributes.paid.spanish.state === 'AVAILABLE'))
+      || (attributes.upsell && attributes.upsell.endOnUpsell)) {
+      if (response.directives) {
+        response.directives.forEach((directive) => {
+          if ((directive.type === 'Connections.SendRequest') && (directive.name === 'Upsell')) {
+            upsell = true;
+            attributes.upsell.endOnUpsell = true;
+          }
+        });
+      }
+
+      // If it wasn't an upsell, save and reset session details
+      // otherwise, persist as if it were part of the same session
+      if (!upsell) {
+        // Save session closing information
+        if (!attributes.upsell) {
+          attributes.upsell = {};
         }
-      });
-    }
+        attributes.upsell.end = now;
 
-    // If it wasn't an upsell, save and reset session details
-    // otherwise, persist as if it were part of the same session
-    if (!upsell) {
-      // Save session closing information
-      if (!attributes.upsell) {
+        // Save to S3 - if we are saving data
+        if (process.env.SNSTOPIC) {
+          const params = {
+            Body: JSON.stringify(attributes.upsell),
+            Bucket: 'garrett-alexa-upsell',
+            Key: 'blackjack/' + handlerInput.requestEnvelope.session.user.userId
+              + '/' + Date.now() + '.txt',
+          };
+          promise = s3.putObject(params).promise();
+        }
+
+        // Clear everything except the prompts data
+        const prompts = JSON.parse(JSON.stringify(attributes.upsell.prompts));
         attributes.upsell = {};
+        attributes.upsell.prompts = prompts;
+        attributes.upsell.lastSession = now;
       }
-      attributes.upsell.end = now;
-
-      // Save to S3 - if we are saving data
-      if (process.env.SNSTOPIC) {
-        const params = {
-          Body: JSON.stringify(attributes.upsell),
-          Bucket: 'garrett-alexa-upsell',
-          Key: 'blackjack/' + handlerInput.requestEnvelope.session.user.userId
-            + '/' + Date.now() + '.txt',
-        };
-        promise = s3.putObject(params).promise();
-      }
-
-      // Clear everything except the prompts data
-      const prompts = JSON.parse(JSON.stringify(attributes.upsell.prompts));
-      attributes.upsell = {};
-      attributes.upsell.prompts = prompts;
-      attributes.upsell.lastSession = now;
     }
 
     if (!promise) {
