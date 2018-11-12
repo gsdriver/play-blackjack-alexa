@@ -5,7 +5,7 @@
         "en-US": {
           "summary": "Play a game of blackjack, including the ability to double, split, and surrender. Use training mode to learn as you play!",
           "examplePhrases": [
-            "Alexa, tell blackjack game to deal",
+            "Alexa, open blackjack game",
             "Read high scores",
             "Enter training mode"
           ],
@@ -21,7 +21,7 @@
         "en-CA": {
           "summary": "Play a game of blackjack, including the ability to double, split, and surrender. Use training mode to learn as you play!",
           "examplePhrases": [
-            "Alexa, tell blackjack game to deal",
+            "Alexa, open blackjack game",
             "Read high scores",
             "Enter training mode"
           ],
@@ -37,7 +37,7 @@
         "en-IN": {
           "summary": "Play a game of blackjack, including the ability to double, split, and surrender. Use training mode to learn as you play!",
           "examplePhrases": [
-            "Alexa, tell blackjack game to deal",
+            "Alexa, open blackjack game",
             "Hit",
             "Enter training mode"
           ],
@@ -53,7 +53,7 @@
         "en-AU": {
           "summary": "Play a game of blackjack, including the ability to double, split, and surrender. Use training mode to learn as you play!",
           "examplePhrases": [
-            "Alexa, tell blackjack game to deal",
+            "Alexa, open blackjack game",
             "Read high scores",
             "Enter training mode"
           ],
@@ -69,7 +69,7 @@
         "en-GB": {
           "summary": "Play a game of blackjack, including the ability to double, split, and surrender. Use training mode to learn as you play!",
           "examplePhrases": [
-            "Alexa, tell blackjack game to deal",
+            "Alexa, open blackjack game",
             "Hit",
             "Enter training mode"
           ],

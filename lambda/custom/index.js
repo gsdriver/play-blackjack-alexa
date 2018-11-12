@@ -20,8 +20,6 @@ const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const Reset = require('./intents/Reset');
 const ConfirmReset = require('./intents/ConfirmReset');
-const ConfirmPurchase = require('./intents/ConfirmPurchase');
-const ConfirmRefund = require('./intents/ConfirmRefund');
 const ConfirmSelect = require('./intents/ConfirmSelect');
 const Select = require('./intents/Select');
 const Training = require('./intents/Training');
@@ -37,7 +35,7 @@ const request = require('request');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 
-function initialize(event, attributes, callback) {
+function initialize(event, attributes) {
   const locale = event.request.locale;
   const userId = event.session.user.userId;
 
@@ -52,10 +50,9 @@ function initialize(event, attributes, callback) {
     attributes.prompts = {};
   }
 
-  attributes.userId = event.session.user.userId;
-  bjUtils.readSuggestions(attributes, () => {
-    // Load purchased products
-    bjUtils.getPurchasedProducts(event, attributes, () => {
+  return new Promise((resolve, reject) => {
+    attributes.userId = event.session.user.userId;
+    bjUtils.readSuggestions(attributes, () => {
       // If they don't have a game, create one
       if (!attributes.currentGame) {
         gameService.initializeGame('standard', attributes, userId);
@@ -66,7 +63,7 @@ function initialize(event, attributes, callback) {
         // Now read the progressive jackpot amount
         bjUtils.getProgressivePayout(attributes, (jackpot) => {
           attributes[attributes.currentGame].progressiveJackpot = jackpot;
-          callback();
+          resolve();
         });
       } else {
         // Standard should have progressive; some customers will have this game
@@ -107,10 +104,10 @@ function initialize(event, attributes, callback) {
           if (game.progressive) {
             bjUtils.getProgressivePayout(attributes, (jackpot) => {
               game.progressiveJackpot = jackpot;
-              callback();
+              resolve();
             });
           } else {
-            callback();
+            resolve();
           }
         }
       }
@@ -118,34 +115,69 @@ function initialize(event, attributes, callback) {
   });
 }
 
+
 const requestInterceptor = {
   process(handlerInput) {
-    return new Promise((resolve, reject) => {
-      const attributesManager = handlerInput.attributesManager;
-      const sessionAttributes = attributesManager.getSessionAttributes();
-      const event = handlerInput.requestEnvelope;
+    const attributesManager = handlerInput.attributesManager;
+    const sessionAttributes = attributesManager.getSessionAttributes();
+    const event = handlerInput.requestEnvelope;
+    let attributes;
 
-      if ((Object.keys(sessionAttributes).length === 0) ||
-        ((Object.keys(sessionAttributes).length === 1)
-          && sessionAttributes.platform)) {
-        // No session attributes - so get the persistent ones
-        attributesManager.getPersistentAttributes()
-          .then((attributes) => {
-            initialize(event, attributes, () => {
-              tournament.getTournamentComplete(event.request.locale, attributes, (result) => {
-                attributes.prependLaunch = result;
-                attributesManager.setSessionAttributes(attributes);
-                resolve();
-              });
-            });
+    if ((Object.keys(sessionAttributes).length === 0) ||
+      ((Object.keys(sessionAttributes).length === 1)
+        && sessionAttributes.platform)) {
+      // No session attributes - so get the persistent ones
+      return attributesManager.getPersistentAttributes()
+        .then((attr) => {
+          attributes = attr;
+          return initialize(event, attributes);
+        }).then(() => {
+          const ms = handlerInput.serviceClientFactory.getMonetizationServiceClient();
+          return ms.getInSkillProducts(event.request.locale)
+          .then((inSkillProductInfo) => {
+            attributes.temp.inSkillProductInfo = inSkillProductInfo;
           })
           .catch((error) => {
-            reject(error);
+            // Ignore errors
+            console.log('ISP Error: ' + JSON.stringify(error));
           });
-      } else {
-        resolve();
-      }
-    });
+        }).then(() => {
+          if (attributes.temp.inSkillProductInfo) {
+            attributes.paid = {};
+            attributes.temp.inSkillProductInfo.inSkillProducts.forEach((product) => {
+              let state;
+              if (product.entitled === 'ENTITLED') {
+                state = 'PURCHASED';
+              } else if (product.purchasable == 'PURCHASABLE') {
+                // Just in case, we should clear the spanish game if it's not purchased
+                // Skip this though if a trial is underway
+                state = 'AVAILABLE';
+                if (!process.env.SPANISHTRIAL) {
+                  attributes.spanish = undefined;
+                  if (attributes.currentGame == 'spanish') {
+                    attributes.currentGame = 'standard';
+                  }
+                }
+              }
+
+              if (state) {
+                attributes.paid[product.referenceName] = {
+                  productId: product.productId,
+                  state: state,
+                };
+              }
+            });
+            attributes.temp.inSkillProductInfo = undefined;
+          }
+
+          return tournament.getTournamentComplete(event.request.locale, attributes);
+        }).then((result) => {
+          attributes.prependLaunch = result;
+          attributesManager.setSessionAttributes(attributes);
+        });
+    } else {
+      return Promise.resolve();
+    }
   },
 };
 
@@ -222,16 +254,14 @@ function runGame(event, context, callback) {
       OfferTournament,
       TournamentJoin,
       Launch,
+      Purchase,
+      Refund,
       ConfirmReset,
-      ConfirmPurchase,
-      ConfirmRefund,
       ConfirmSelect,
       TakeSuggestion,
       Help,
       Exit,
       Reset,
-      Purchase,
-      Refund,
       Suggest,
       Select,
       Rules,
@@ -250,6 +280,7 @@ function runGame(event, context, callback) {
     .addRequestInterceptors(requestInterceptor)
     .addResponseInterceptors(saveResponseInterceptor)
     .withPersistenceAdapter(dbAdapter)
+    .withApiClient(new Alexa.DefaultApiClient())
     .withSkillId('amzn1.ask.skill.8fb6e399-d431-4943-a797-7a6888e7c6ce')
     .lambda();
   skillFunction(event, context, (err, response) => {

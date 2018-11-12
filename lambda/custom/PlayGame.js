@@ -395,16 +395,11 @@ function tellResult(attributes, locale, action, oldGame) {
     }
 
     // If it's non-tournament play and that was 5 or more cards to a 21,
-    // let them know about Spanish 21
-    if ((attributes.currentGame !== 'tournament')
-      && attributes.paid && attributes.paid.spanish && (attributes.paid.spanish.state == 'AVAILABLE')
-      && !attributes.temp.noUpsell) {
-      if ((game.playerHands.length == 1) && (game.playerHands[0].cards.length > 4)
-        && (handTotal(game.playerHands[0].cards) == 21)) {
-        // Let them know about Spanish 21!
-        result += resources.strings.LONG21_SELL_SPANISH;
-        attributes.temp.noUpsell = true;
-      }
+    // flag it so we can tell them about Spanish 21 next hand
+    if ((attributes.currentGame !== 'tournament') &&
+      ((game.playerHands.length == 1) && (game.playerHands[0].cards.length > 4)
+        && (handTotal(game.playerHands[0].cards) == 21))) {
+      attributes.temp.long21 = true;
     }
   }
 

@@ -158,8 +158,7 @@ module.exports = {
         }
       } else if (game == 'spanish') {
         if (attributes.paid && attributes.paid.spanish &&
-              ((attributes.paid.spanish.state == 'PURCHASED')
-              || (attributes.paid.spanish.state == 'REFUND_PENDING'))) {
+              (attributes.paid.spanish.state == 'PURCHASED')) {
           games.push(game);
         } else if ((attributes.playerLocale == 'en-US') && process.env.SPANISHTRIAL) {
           games.push(game);

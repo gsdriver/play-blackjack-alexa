@@ -13,7 +13,7 @@ const bjUtils = require('./BlackjackUtils');
 const moment = require('moment-timezone');
 
 module.exports = {
-  getTournamentComplete: function(locale, attributes, callback) {
+  getTournamentComplete: function(locale, attributes) {
     // If the user is in a tournament, we check to see if that tournament
     // is complete.  If so, we set certain attributes and return a result
     // string via the callback for the user
@@ -22,49 +22,49 @@ module.exports = {
 
     if (game) {
       // You are in a tournament - let's see if it's completed
-      s3.getObject({Bucket: 'garrett-alexa-usage', Key: 'BlackjackTournamentResults.txt'}, (err, data) => {
-        if (err) {
-          console.log(err, err.stack);
-          callback('');
-        } else {
-          // Yeah, I can do a binary search (this is sorted), but straight search for now
-          const results = JSON.parse(data.Body.toString('ascii'));
-          let i;
-          let result;
-          let speech = '';
+      return s3.getObject({Bucket: 'garrett-alexa-usage', Key: 'BlackjackTournamentResults.txt'}).promise()
+      .then((data) => {
+        // Yeah, I can do a binary search (this is sorted), but straight search for now
+        const results = JSON.parse(data.Body.toString('ascii'));
+        let i;
+        let result;
+        let speech = '';
 
-          // Go through the results and find one that closed AFTER our last play
-          for (i = 0; i < (results ? results.length : 0); i++) {
-            if (results[i].timestamp > game.timestamp) {
-              // This is the one
-              result = results[i];
-              break;
-            }
+        // Go through the results and find one that closed AFTER our last play
+        for (i = 0; i < (results ? results.length : 0); i++) {
+          if (results[i].timestamp > game.timestamp) {
+            // This is the one
+            result = results[i];
+            break;
           }
-
-          if (result) {
-            if (game.bankroll >= result.highScore) {
-              // Congratulations, you won!
-              if (!attributes.achievements) {
-                attributes.achievements = {trophy: 1};
-              } else {
-                attributes.achievements.trophy = (attributes.achievements.trophy)
-                    ? (attributes.achievements.trophy + 1) : 1;
-              }
-              speech = res.strings.TOURNAMENT_WINNER.replace('{0}', game.bankroll);
-            } else {
-              speech = res.strings.TOURNAMENT_LOSER.replace('{0}', result.highScore).replace('{1}', game.bankroll);
-            }
-            attributes.currentGame = 'standard';
-            attributes['tournament'] = undefined;
-          }
-
-          callback(speech);
         }
+
+        if (result) {
+          if (game.bankroll >= result.highScore) {
+            // Congratulations, you won!
+            if (!attributes.achievements) {
+              attributes.achievements = {trophy: 1};
+            } else {
+              attributes.achievements.trophy = (attributes.achievements.trophy)
+                  ? (attributes.achievements.trophy + 1) : 1;
+            }
+            speech = res.strings.TOURNAMENT_WINNER.replace('{0}', game.bankroll);
+          } else {
+            speech = res.strings.TOURNAMENT_LOSER.replace('{0}', result.highScore).replace('{1}', game.bankroll);
+          }
+          attributes.currentGame = 'standard';
+          attributes['tournament'] = undefined;
+        }
+
+        return speech;
+      }).catch((err) => {
+        // Nothing to report
+        console.log(err, err.stack);
+        return '';
       });
     } else {
       // No-op, you weren't playing
-      callback('');
+      return Promise.resolve('');
     }
   },
   canEnterTournament: function(attributes) {
