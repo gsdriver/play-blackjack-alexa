@@ -24,6 +24,7 @@ const ConfirmSelect = require('./intents/ConfirmSelect');
 const Select = require('./intents/Select');
 const Training = require('./intents/Training');
 const Unhandled = require('./intents/Unhandled');
+const ListPurchases = require('./intents/ListPurchases');
 const Purchase = require('./intents/Purchase');
 const Refund = require('./intents/Refund');
 const ProductResponse = require('./intents/ProductResponse');
@@ -254,6 +255,7 @@ function runGame(event, context, callback) {
       OfferTournament,
       TournamentJoin,
       Launch,
+      ListPurchases,
       Purchase,
       Refund,
       ConfirmReset,

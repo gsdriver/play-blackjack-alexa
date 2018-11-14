@@ -8,7 +8,7 @@
           "apis": {
             "custom": {
               "endpoint": {
-                "uri": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v10"
+                "uri": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v11"
               }
             }
           }
@@ -23,7 +23,7 @@
       ],
       "resources": {
         "manifest": {
-          "eTag": "48407bf49dec2a9228295c03942c2095"
+          "eTag": "38fe43e24f291d0d9cab00a164969427"
         },
         "interactionModel": {
           "en-AU": {
@@ -39,18 +39,18 @@
             "eTag": "5e5c2b82bca9e4a96f4a2755ff5128ed"
           },
           "en-US": {
-            "eTag": "a7c25506ca7117b612c41c284631810b"
+            "eTag": "4e3499395907915e1c88658532cc9232"
           }
         },
         "lambda": [
           {
-            "arn": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v10",
-            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v10",
+            "arn": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v11",
+            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v11",
             "awsRegion": "us-east-1",
             "alexaUsage": [
               "custom/default"
             ],
-            "revisionId": "2935b584-9c5d-4705-abd8-5784794bfb47"
+            "revisionId": "1433cd5a-5c72-4ecc-a5c3-e7463e08c294"
           }
         ]
       }

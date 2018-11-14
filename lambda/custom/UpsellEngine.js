@@ -136,6 +136,7 @@ function selectUpsellMessage(attributes, message) {
     'LONG21_SPANISH_UPSELL': 'You got a 21 with five or more cards on your last hand. We have Spanish 21 available for purchase where that pays extra. Would you like to hear more?|Good job getting 21 the hard way. With Spanish 21 that would have paid extra. Would you like to hear more about it?|Getting 21 with that many cards isn\'t easy. In Spanish 21, that pays extra. Are you interested in hearing more about this game?',
     'SELECT_SPANISH_UPSELL': 'You\'ve played standard Blackjack, you can now get the Spanish 21 expansion pack. Want to learn more?|Would you like to hear more about the Spanish 21 expansion pack available for purchase?|We have a Spanish 21 game available for purchase. Want to hear more?',
     'PLAY_SPANISH_UPSELL': 'You\'ve enjoyed standard Blackjack, you can now get the Spanish 21 expansion pack. Want to learn more?|Would you like to hear more about the Spanish 21 expansion pack available for purchase?|We have a Spanish 21 game available for purchase. Want to hear more?',
+    'LISTPURCHASES_SPANISH_UPSELL': 'You don\'t have any products purchased, but we have Spanish 21 available. Want to learn more?|You haven\'t purchased any products, but we have a Spanish 21 expansion pack available for purchase. Would you like to hear more?|You haven\'t bought any products yet, but we have Spanish 21 available for purchase. Want to hear more?',
   };
 
   const options = upsellMessages[message].split('|');

@@ -49,6 +49,10 @@ const common = {
   'LAUNCH_START_PROMPT': ' <break time=\'300ms\'/>Now, what can I help you with?',
   'LAUNCH_SPANISH_TRIAL': 'For a limited time, we have a free trial version of Spanish 21 to play. Say select a new game to play Spanish 21. ',
   'LAUNCH_SPANISH_TRIAL_OVER': 'The free trial of Spanish 21 is over. If you would like to continue to play Spanish 21, say buy Spanish 21. ',
+  // From ListPurchases.js
+  'LISTPURCHASE_SPANISH': 'You have purchased Spanish 21. What else can I help you with?',
+  'LISTPURCHASE_NONE': 'You haven\'t purchased any products for Blackjack Game. What else can I help you with?',
+  'LISTPURCHASE_REPROMPT': 'What else can I help you with?',
   // From Purchase.js
   'PURCHASE_ONLY_SPANISH': 'We only offer the Spanish 21 expansion product, and you\'ve already purchased it. What else can I help you with?',
   'PURCHASE_SPANISH': 'We have a Spanish 21 game available for purchase. Would you like to buy it? ',
