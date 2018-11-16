@@ -122,7 +122,9 @@ module.exports = {
             callback(body.code);
           } else {
             // OK, return the time and timezone
-            callback({time: tourney, timezone: timezone});
+            module.exports.getLocalTournamentTime(handlerInput, (time, timezone) => {
+              callback({time: time, timezone: timezone});
+            });
           }
         });
       } else {
