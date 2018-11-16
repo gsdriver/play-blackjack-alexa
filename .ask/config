@@ -23,23 +23,23 @@
       ],
       "resources": {
         "manifest": {
-          "eTag": "38fe43e24f291d0d9cab00a164969427"
+          "eTag": "01d9bc5703a2d4e022ab8fb5bc71644c"
         },
         "interactionModel": {
           "en-AU": {
-            "eTag": "6771117462858a93cc092f47578f19d8"
+            "eTag": "b6757e12d61bf36c825bdb93a9498d4a"
           },
           "en-CA": {
-            "eTag": "6771117462858a93cc092f47578f19d8"
+            "eTag": "b6757e12d61bf36c825bdb93a9498d4a"
           },
           "en-IN": {
-            "eTag": "6771117462858a93cc092f47578f19d8"
+            "eTag": "489410a22d3d9b22f1def91ef3839288"
           },
           "en-GB": {
-            "eTag": "5e5c2b82bca9e4a96f4a2755ff5128ed"
+            "eTag": "ce8d45a497683bd8df610e6666371db8"
           },
           "en-US": {
-            "eTag": "4e3499395907915e1c88658532cc9232"
+            "eTag": "7b15e6a10b3afc68a6eff27d697d18e5"
           }
         },
         "lambda": [
@@ -50,7 +50,7 @@
             "alexaUsage": [
               "custom/default"
             ],
-            "revisionId": "1433cd5a-5c72-4ecc-a5c3-e7463e08c294"
+            "revisionId": "85360f15-3eb3-4ea8-ac11-502e56a0cdb1"
           }
         ]
       }

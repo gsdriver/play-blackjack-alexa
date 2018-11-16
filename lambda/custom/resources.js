@@ -29,6 +29,8 @@ const common = {
   'FULL_RULES': 'The full rules are {0}',
   // From Exit.js
   'EXIT_GOODBYE': 'Goodbye.',
+  'EXIT_REMINDER': 'Would you like me to set a weekly reminder for the tournament at {Time} {Timezone}?',
+  'EXIT_REMINDER_REPROMPT': 'Would you like me to set a weekly reminder for the tournament?',
   // From HighScore.js
   'HIGHSCORE_REPROMPT': 'What else can I help you with?',
   // From Help.js
@@ -59,6 +61,15 @@ const common = {
   'PURCHASE_CONFIRM_REPROMPT': 'Say yes to buy Spanish 21',
   'PURCHASE_NO_PURCHASE': 'What else can I help you with?',
   'PURCHASE_REPROMPT': 'What else can I help you with?',
+  // From Reminder.js
+  'REMINDER_ALREADY_SET': 'You already have a reminder set for the upcoming tournament. What else can I help you with?',
+  'REMINDER_ALREADY_SET_REPROMPT': 'What else can I help you with?',
+  'REMINDER_SET_REMINDER': 'Would you like me to set a weekly reminder for the tournament every {Time} {Timezone}?',
+  'REMINDER_SET_REPROMPT': 'Would you like me to set a weekly reminder for the tournament?',
+  'REMINDER_TEXT': 'Time to play the Blackjack Game tournament!',
+  'REMINDER_GRANT_PERMISSION': 'Please grant this skill permission in the Alexa companion app to set reminders and try again.',
+  'REMINDER_ERROR': 'Sorry, there was a problem setting your reminder. Please try again.',
+  'REMINDER_SET': 'Great. I set a reminder for the tournament round every {Time} {Timezone} <break time=\'200ms\'/> See you then!',
   // From Refund.js
   'REFUND_SPANISH': 'OK, as a reminder you will no longer be able to access Spanish 21 and will lose your progress on that game. Would you like to refund Spanish 21?',
   'REFUND_SPANISH_REPROMPT': 'Would you like to refund Spanish 21?',
@@ -146,6 +157,7 @@ const common = {
   'LEADER_ACHIEVEMENT_HELP': ' <break time=\'300ms\'/> Ask for help to hear how you earn achievement points',
   'MORE_THAN_PLAYERS': 'over {0}',
   // From Tournament.js
+  'TOURNAMENT_DEFAULT_TIMEZONE': 'Pacific time',
   'TOURNAMENT_NOCHANGERULES': 'Sorry, you can\'t change the rules on this game. ',
   'TOURNAMENT_NORESET': 'Sorry, you can\'t reset your bankroll on this game. What else can I help you with?',
   'TOURNAMENT_HANDS_REMAINING': 'You have {0} hands remaining. ',

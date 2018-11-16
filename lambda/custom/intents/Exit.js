@@ -6,6 +6,7 @@
 
 const ads = require('../ads');
 const tournament = require('../tournament');
+const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -43,15 +44,43 @@ module.exports = {
         .getResponse();
     } else {
       return new Promise((resolve, reject) => {
-        ads.getAd(attributes, 'blackjack', event.request.locale, (adText) => {
-          exitSpeech += tournament.getReminderText(event.request.locale);
-          exitSpeech += (adText + ' ' + res.strings.EXIT_GOODBYE);
-          const response = handlerInput.responseBuilder
-            .speak(exitSpeech)
-            .withShouldEndSession(true)
-            .getResponse();
-          resolve(response);
-        });
+        const now = Date.now();
+        let response;
+
+        if (!attributes.prompts.reminder
+          || (now - attributes.prompts.reminder > 4*24*60*60*1000)) {
+          bjUtils.isReminderActive(handlerInput, (isActive) => {
+            // Have we recently asked about setting a reminder?
+            if (!isActive) {
+              // We are going to go into reminder mode!
+              attributes.prompts.reminder = now;
+              attributes.temp.addingReminder = true;
+              bjUtils.getLocalTournamentTime(handlerInput, (time, timezone) => {
+                response = handlerInput.responseBuilder
+                  .speak(res.strings.EXIT_REMINDER.replace('{Time}', time).replace('{Timezone}', timezone))
+                  .reprompt(res.strings.EXIT_REMINDER_REPROMPT)
+                  .getResponse();
+                resolve(response);
+              });
+            } else {
+              done();
+            }
+          });
+        } else {
+          done();
+        }
+
+        function done() {
+          ads.getAd(attributes, 'blackjack', event.request.locale, (adText) => {
+            exitSpeech += tournament.getReminderText(event.request.locale);
+            exitSpeech += (adText + ' ' + res.strings.EXIT_GOODBYE);
+            response = handlerInput.responseBuilder
+              .speak(exitSpeech)
+              .withShouldEndSession(true)
+              .getResponse();
+            resolve(response);
+          });
+        }
       });
     }
   },

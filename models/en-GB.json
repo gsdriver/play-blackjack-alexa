@@ -231,6 +231,17 @@
           ]
         },
         {
+          "name": "ReminderIntent",
+          "slots": [],
+          "samples": [
+            "set a reminder for the tournament",
+            "set a reminder",
+            "remind me for the tournament",
+            "notify me for the tournament",
+            "alert me for the tournament"
+          ]
+        },
+        {
           "name": "HighScoreIntent",
           "slots": [],
           "samples": [

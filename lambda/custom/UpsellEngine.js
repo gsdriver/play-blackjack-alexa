@@ -176,6 +176,11 @@ function shouldUpsell(attributes, trigger, now) {
       upsell = false;
       break;
 
+    case 'listpurchases':
+      // Always upsell
+      upsell = true;
+      break;
+
     default:
       // Unknown trigger
       break;

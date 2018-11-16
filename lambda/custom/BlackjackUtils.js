@@ -43,6 +43,126 @@ module.exports = {
       callback(options[j].replace('{0}', greeting));
     });
   },
+  getLocalTournamentTime: function(handlerInput, callback) {
+    const event = handlerInput.requestEnvelope;
+    const res = require('./resources')(event.request.locale);
+
+    getUserTimezone(event, (timezone) => {
+      const tz = (timezone) ? timezone : 'America/Los_Angeles';
+      const time = getTournamentTime(tz);
+      if (time) {
+        // Get the user timezone
+        moment.locale(event.request.locale);
+        const useDefaultTimezone = (timezone === undefined);
+        const result = moment(time).format('dddd h a');
+        callback(result,
+          (useDefaultTimezone ? res.strings.TOURNAMENT_DEFAULT_TIMEZONE : ''));
+      } else {
+        callback();
+      }
+    });
+  },
+  setTournamentReminder: function(handlerInput, callback) {
+    const alert = {};
+    const event = handlerInput.requestEnvelope;
+    const res = require('./resources')(event.request.locale);
+    let timezone;
+
+    getUserTimezone(event, (tz) => {
+      // Let's see whether to set a reminder at 9 AM or 5 PM
+      // based on what will give the user the most time in
+      // their timezone
+      timezone = (tz) ? tz : 'America/Los_Angeles';
+      const tourney = getTournamentTime(timezone);
+
+      if (tourney) {
+        // Lop off trailing Z from string
+        let start = JSON.stringify(tourney);
+        start = start.substring(1, start.length - 1);
+        if (start.substring(start.length - 1) === 'Z') {
+          start = start.substring(0, start.length - 1);
+        }
+
+        moment.locale('en');
+        alert.requestTime = start;
+        alert.trigger = {
+          type: 'SCHEDULED_ABSOLUTE',
+          scheduledTime: start,
+          timeZoneId: timezone,
+          recurrence: {
+            freq: 'WEEKLY',
+            byDay: [moment(tourney).format('dd').toUpperCase()],
+          },
+        };
+        alert.alertInfo = {
+          spokenInfo: {
+            content: [{
+              locale: event.request.locale,
+              text: res.strings.REMINDER_TEXT,
+            }],
+          },
+        };
+        alert.pushNotification = {
+          status: 'ENABLED',
+        };
+        const params = {
+          url: event.context.System.apiEndpoint + '/v1/alerts/reminders',
+          method: 'POST',
+          headers: {
+            'Authorization': 'bearer ' + event.context.System.apiAccessToken,
+          },
+          json: alert,
+        };
+
+        // Post the reminder
+        request(params, (err, response, body) => {
+          if (body && body.code && (body.code !== 'OK')) {
+            console.log('SetReminder error ' + body.code);
+            console.log('SetReminder alert: ' + JSON.stringify(alert));
+            callback(body.code);
+          } else {
+            // OK, return the time and timezone
+            callback({time: tourney, timezone: timezone});
+          }
+        });
+      } else {
+        callback();
+      }
+    });
+  },
+  isReminderActive: function(handlerInput, callback) {
+    // Invoke the reminders API to load active reminders
+    const event = handlerInput.requestEnvelope;
+    const params = {
+      uri: event.context.System.apiEndpoint + '/v1/alerts/reminders',
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept-Language': event.request.locale,
+        'Authorization': 'bearer ' + event.context.System.apiAccessToken,
+      },
+    };
+
+    request(params, (err, response, body) => {
+      // Return the local tournament time
+      let isActive = false;
+      if (body) {
+        console.log('isReminderActive ' + body);
+        const alerts = JSON.parse(body);
+        if (alerts && alerts.alerts) {
+          alerts.alerts.forEach((alert) => {
+            if (alert.status === 'ON') {
+              isActive = true;
+            }
+          });
+        }
+      } else {
+        console.log('isReminderActive error ' + err.error);
+        console.log('isReminderActive request: ' + JSON.stringify(options));
+      }
+      callback(isActive);
+    });
+  },
   getResponse: function(handlerInput, error, response, speech, reprompt) {
     if (error) {
       const event = handlerInput.requestEnvelope;
@@ -431,4 +551,44 @@ function getUserTimezone(event, callback) {
     // No API token - no user timezone
     callback();
   }
+}
+
+function getTournamentTime(timezone) {
+  let start;
+  let tzOffset;
+
+  if (process.env.TOURNAMENT) {
+    // Tournament starts Monday 9 PM Pacific
+    tzOffset = moment.tz.zone('America/Los_Angeles').utcOffset(Date.now());
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - tzOffset);
+
+    // Find the next tournament
+    // First build off today's date
+    start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    start.setHours(21);
+    start.setMinutes(0);
+    let offset = 1 - d.getDay();
+    if (offset < 0) {
+      offset += 7;
+    }
+    start.setDate(start.getDate() + offset);
+
+    // Now convert to the user local timezone
+    tzOffset -= moment.tz.zone(timezone).utcOffset(Date.now());
+    start.setMinutes(start.getMinutes() + tzOffset);
+
+    // Great - now massage this to be either a 9 AM or 5 PM reminder
+    const hour = start.getHours();
+    if (hour < 9) {
+      start.setHours(9);
+    } else if (hour < 17) {
+      start.setHours(17);
+    } else {
+      start.setHours(9);
+      start.setDate(start.getDate() + 1);
+    }
+  }
+
+  return start;
 }

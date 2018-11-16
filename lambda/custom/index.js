@@ -19,6 +19,7 @@ const HighScore = require('./intents/HighScore');
 const Help = require('./intents/Help');
 const Exit = require('./intents/Exit');
 const Reset = require('./intents/Reset');
+const Reminder = require('./intents/Reminder');
 const ConfirmReset = require('./intents/ConfirmReset');
 const ConfirmSelect = require('./intents/ConfirmSelect');
 const Select = require('./intents/Select');
@@ -255,6 +256,7 @@ function runGame(event, context, callback) {
       OfferTournament,
       TournamentJoin,
       Launch,
+      Reminder,
       ListPurchases,
       Purchase,
       Refund,

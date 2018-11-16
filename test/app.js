@@ -23,6 +23,7 @@ function BuildEvent(argv)
     var yesIntent = {"name": "AMAZON.YesIntent", "slots": {}};
     var noIntent = {"name": "AMAZON.NoIntent", "slots": {}};
     var resetIntent = {"name": "ResetIntent", "slots": {}};
+    var reminderIntent = {"name": "ReminderIntent", "slots": {}};
     var repeatIntent = {"name": "AMAZON.RepeatIntent", "slots": {}};
     var helpIntent = {"name": "AMAZON.HelpIntent", "slots": {}};
     var exitIntent = {"name": "SessionEndedRequest", "slots": {}};
@@ -240,6 +241,10 @@ function BuildEvent(argv)
     else if (argv[2] == "reset")
     {
         lambda.request.intent = resetIntent;
+    }
+    else if (argv[2] == "reminder")
+    {
+        lambda.request.intent = reminderIntent;
     }
     else if (argv[2] == "placesidebet")
     {

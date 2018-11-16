@@ -13,12 +13,13 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
     return ((request.type === 'IntentRequest')
-      && attributes.paid && (request.intent.name === 'ListPurchaseIntent'));
+      && attributes.paid && (request.intent.name === 'ListPurchasesIntent'));
   },
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const res = require('../resources')(event.request.locale);
+    let speech;
 
     if (attributes.paid.spanish && (attributes.paid.spanish.state === 'PURCHASED')) {
       speech = res.strings.LISTPURCHASE_SPANISH;
