@@ -31,6 +31,7 @@ module.exports = {
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const endSession = (attributes.temp.addingReminder === 'onexit');
     const res = require('../resources')(event.request.locale);
     let response;
 
@@ -39,7 +40,7 @@ module.exports = {
       if (event.request.intent.name === 'ReminderIntent') {
         bjUtils.isReminderActive(handlerInput, (isActive) => {
           if (!isActive) {
-            attributes.temp.addingReminder = true;
+            attributes.temp.addingReminder = 'explicit';
             bjUtils.getLocalTournamentTime(handlerInput, (time, timezone) => {
               response = handlerInput.responseBuilder
                 .speak(res.strings.REMINDER_SET_REMINDER.replace('{Time}', time).replace('{Timezone}', timezone))
@@ -60,13 +61,24 @@ module.exports = {
         bjUtils.setTournamentReminder(handlerInput, (result) => {
           if (result && (typeof result !== 'string')) {
             attributes.setReminder = true;
-            const speech = res.strings.REMINDER_SET
-              .replace('{Time}', result.time)
-              .replace('{Timezone}', result.timezone);
-            response = handlerInput.responseBuilder
-              .speak(speech)
-              .withShouldEndSession(true)
-              .getResponse();
+            let speech;
+            if (endSession) {
+              speech = res.strings.REMINDER_SET
+                .replace('{Time}', result.time)
+                .replace('{Timezone}', result.timezone);
+              response = handlerInput.responseBuilder
+                .speak(speech)
+                .withShouldEndSession(true)
+                .getResponse();
+            } else {
+              speech = res.strings.REMINDER_SET_EXPLICIT
+                .replace('{Time}', result.time)
+                .replace('{Timezone}', result.timezone);
+              response = handlerInput.responseBuilder
+                .speak(speech)
+                .reprompt(res.strings.REMINDER_REPROMPT)
+                .getResponse();
+            }
           } else if (result === 'UNAUTHORIZED') {
             // Get their permission to show a reminder
             response = handlerInput.responseBuilder
@@ -76,10 +88,17 @@ module.exports = {
               .getResponse();
           } else {
             // Some other problem not auth-related
-            response = handlerInput.responseBuilder
-              .speak(res.strings.REMINDER_ERROR)
-              .withShouldEndSession(true)
-              .getResponse();
+            if (endSession) {
+              response = handlerInput.responseBuilder
+                .speak(res.strings.REMINDER_ERROR)
+                .withShouldEndSession(true)
+                .getResponse();
+            } else {
+              response = handlerInput.responseBuilder
+                .speak(res.strings.REMINDER_ERROR_EXPLICIT)
+                .reprompt(res.strings.REMINDER_REPROMPT)
+                .getResponse();
+            }
           }
           resolve(response);
         });

@@ -204,6 +204,9 @@ const saveResponseInterceptor = {
               attributes.temp.lastReprompt = response.reprompt.outputSpeech.ssml;
             }
           }
+          if (!process.env.NOLOG) {
+            console.log(JSON.stringify(response));
+          }
           resolve();
         });
       } else {

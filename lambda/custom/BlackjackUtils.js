@@ -89,10 +89,6 @@ module.exports = {
           type: 'SCHEDULED_ABSOLUTE',
           scheduledTime: start,
           timeZoneId: timezone,
-          recurrence: {
-            freq: 'WEEKLY',
-            byDay: [moment(tourney).format('dd').toUpperCase()],
-          },
         };
         alert.alertInfo = {
           spokenInfo: {
@@ -113,12 +109,12 @@ module.exports = {
           },
           json: alert,
         };
+        console.log('SetReminder alert: ' + JSON.stringify(alert));
 
         // Post the reminder
         request(params, (err, response, body) => {
           if (body && body.code && (body.code !== 'OK')) {
             console.log('SetReminder error ' + body.code);
-            console.log('SetReminder alert: ' + JSON.stringify(alert));
             callback(body.code);
           } else {
             // OK, return the time and timezone

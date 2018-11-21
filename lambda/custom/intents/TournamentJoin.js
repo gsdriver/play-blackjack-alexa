@@ -16,6 +16,7 @@ module.exports = {
     return (attributes.temp.joinTournament &&
       !attributes.temp.confirmPurchase &&
       !attributes.temp.confirmRefund &&
+      !attributes.temp.addingReminder &&
       (request.type === 'IntentRequest') &&
       ((request.intent.name === 'AMAZON.YesIntent')));
   },

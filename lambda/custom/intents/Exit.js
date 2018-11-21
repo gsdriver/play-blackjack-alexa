@@ -47,14 +47,14 @@ module.exports = {
         const now = Date.now();
         let response;
 
-        if (!attributes.prompts.reminder
-          || (now - attributes.prompts.reminder > 4*24*60*60*1000)) {
+        if (!attributes.tournament && (!attributes.prompts.reminder
+          || (now - attributes.prompts.reminder > 4*24*60*60*1000))) {
           bjUtils.isReminderActive(handlerInput, (isActive) => {
             // Have we recently asked about setting a reminder?
             if (!isActive) {
               // We are going to go into reminder mode!
               attributes.prompts.reminder = now;
-              attributes.temp.addingReminder = true;
+              attributes.temp.addingReminder = 'onexit';
               bjUtils.getLocalTournamentTime(handlerInput, (time, timezone) => {
                 response = handlerInput.responseBuilder
                   .speak(res.strings.EXIT_REMINDER.replace('{Time}', time).replace('{Timezone}', timezone))
