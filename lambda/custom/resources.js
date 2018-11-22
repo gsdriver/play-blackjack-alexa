@@ -29,8 +29,8 @@ const common = {
   'FULL_RULES': 'The full rules are {0}',
   // From Exit.js
   'EXIT_GOODBYE': 'Goodbye.',
-  'EXIT_REMINDER': 'Would you like me to set a reminder for the tournament at {Time} {Timezone}?',
-  'EXIT_REMINDER_REPROMPT': 'Would you like me to set a reminder for the tournament?',
+  'EXIT_REMINDER': 'Would you like me to set a weekly reminder for the tournament every {Time} {Timezone}?',
+  'EXIT_REMINDER_REPROMPT': 'Would you like me to set a weekly reminder for the tournament?',
   // From HighScore.js
   'HIGHSCORE_REPROMPT': 'What else can I help you with?',
   // From Help.js
@@ -64,15 +64,15 @@ const common = {
   // From Reminder.js
   'REMINDER_ALREADY_SET': 'You already have a reminder set for the upcoming tournament. What else can I help you with?',
   'REMINDER_ALREADY_SET_REPROMPT': 'What else can I help you with?',
-  'REMINDER_SET_REMINDER': 'Would you like me to set a reminder for the tournament at {Time} {Timezone}?',
-  'REMINDER_SET_REPROMPT': 'Would you like me to set a reminder for the tournament?',
+  'REMINDER_SET_REMINDER': 'Would you like me to set a weekly reminder for the tournament every {Time} {Timezone}?',
+  'REMINDER_SET_REPROMPT': 'Would you like me to set a weekly reminder for the tournament?',
   'REMINDER_REPROMPT': 'What else can I help you with?',
   'REMINDER_TEXT': 'Time to play the Blackjack Game tournament!',
   'REMINDER_GRANT_PERMISSION': 'Please grant this skill permission in the Alexa companion app to set reminders and try again.',
   'REMINDER_ERROR': 'Sorry, there was a problem setting your reminder. Please try again.',
   'REMINDER_ERROR_EXPLICIT': 'Sorry, there was a problem setting your reminder. What else can I help you with?',
-  'REMINDER_SET': 'Great. I set a reminder for the tournament round at {Time} {Timezone} <break time=\'200ms\'/> See you then!',
-  'REMINDER_SET_EXPLICIT': 'Great. I set a reminder for the tournament round at {Time} {Timezone} <break time=\'200ms\'/> What else can I help you with?',
+  'REMINDER_SET': 'Great. I set a weekly reminder for the tournament round every {Time} {Timezone} <break time=\'200ms\'/> See you then!',
+  'REMINDER_SET_EXPLICIT': 'Great. I set a weekly reminder for the tournament round every {Time} {Timezone} <break time=\'200ms\'/> What else can I help you with?',
   // From Refund.js
   'REFUND_SPANISH': 'OK, as a reminder you will no longer be able to access Spanish 21 and will lose your progress on that game. Would you like to refund Spanish 21?',
   'REFUND_SPANISH_REPROMPT': 'Would you like to refund Spanish 21?',

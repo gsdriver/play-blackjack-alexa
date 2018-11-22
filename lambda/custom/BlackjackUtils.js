@@ -89,6 +89,10 @@ module.exports = {
           type: 'SCHEDULED_ABSOLUTE',
           scheduledTime: start,
           timeZoneId: timezone,
+          recurrence: {
+            freq: 'WEEKLY',
+            byDay: [moment(tourney).format('dd').toUpperCase()],
+          },
         };
         alert.alertInfo = {
           spokenInfo: {
