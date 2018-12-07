@@ -14,12 +14,11 @@ module.exports = {
       tournament.canEnterTournament(attributes));
   },
   handle: function(handlerInput) {
-    const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
     return new Promise((resolve, reject) => {
       attributes.temp.joinTournament = true;
-      tournament.promptToEnter(event, attributes, (speech, reprompt) => {
+      tournament.promptToEnter(handlerInput, (speech, reprompt) => {
         const response = handlerInput.responseBuilder
           .speak(attributes.prependLaunch + speech)
           .reprompt(reprompt)

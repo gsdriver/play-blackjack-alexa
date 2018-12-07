@@ -8,7 +8,6 @@ const AWS = require('aws-sdk');
 const Alexa = require('ask-sdk');
 AWS.config.update({region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
-const speechUtils = require('alexa-speech-utils')();
 const querystring = require('querystring');
 const request = require('request');
 const s3 = new AWS.S3({apiVersion: '2006-03-01'});
@@ -17,30 +16,51 @@ const moment = require('moment-timezone');
 const seedrandom = require('seedrandom');
 
 module.exports = {
-  getWelcome: function(event, attributes, format, callback) {
+  getWelcome: function(handlerInput, format, callback) {
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
     const res = require('./resources')(event.request.locale);
     let greeting = '';
 
-    getUserTimezone(event, (timezone) => {
-      if (timezone) {
-        const hour = moment.tz(Date.now(), timezone).format('H');
-        if ((hour > 5) && (hour < 12)) {
-          greeting = res.strings.GOOD_MORNING;
-        } else if ((hour >= 12) && (hour < 18)) {
-          greeting = res.strings.GOOD_AFTERNOON;
-        } else {
-          greeting = res.strings.GOOD_EVENING;
+    module.exports.getUserName(handlerInput).then((name) => {
+      const givenName = name ? name : '';
+      getUserTimezone(event, (timezone) => {
+        if (timezone) {
+          const hour = moment.tz(Date.now(), timezone).format('H');
+          if ((hour > 5) && (hour < 12)) {
+            greeting = res.strings.GOOD_MORNING;
+          } else if ((hour >= 12) && (hour < 18)) {
+            greeting = res.strings.GOOD_AFTERNOON;
+          } else {
+            greeting = res.strings.GOOD_EVENING;
+          }
         }
-      }
 
-      const game = attributes[attributes.currentGame];
-      const options = format.split('|');
-      const randomValue = seedrandom(game.userID + (game.timestamp ? game.timestamp : ''))();
-      let j = Math.floor(randomValue * options.length);
-      if (j == options.length) {
-        j--;
-      }
-      callback(options[j].replace('{0}', greeting));
+        const game = attributes[attributes.currentGame];
+        const options = format.split('|');
+        const randomValue = seedrandom(game.userID + (game.timestamp ? game.timestamp : ''))();
+        let j = Math.floor(randomValue * options.length);
+        if (j == options.length) {
+          j--;
+        }
+        callback(options[j].replace('{0}', greeting.replace('{Name}', givenName)));
+      });
+    });
+  },
+  getUserName: function(handlerInput) {
+    const usc = handlerInput.serviceClientFactory.getUpsServiceClient();
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+     if (attributes.given_name) {
+      return Promise.resolve(attributes.given_name);
+    }
+     return usc.getProfileGivenName()
+    .then((givenName) => {
+      attributes.given_name = givenName;
+      return givenName;
+    })
+    .catch((err) => {
+      // If we need permissions, return false - otherwise, return undefined
+      return (err.statusCode === 403) ? false : undefined;
     });
   },
   getLocalTournamentTime: function(handlerInput, callback) {
@@ -290,16 +310,14 @@ module.exports = {
     });
   },
   readLeaderBoard: function(locale, userId, attributes, callback) {
-    const res = require('./resources')(locale);
-    const game = attributes[attributes.currentGame];
+    let leaderURL = process.env.SERVICEURL + 'blackjack/leadersWithNames';
     const scoreType = (attributes.currentGame === 'tournament') ? 'bankroll' : 'achievement';
-    let leaderURL = process.env.SERVICEURL + 'blackjack/leaders';
     const myScore = (scoreType === 'achievement') ?
             module.exports.getAchievementScore(attributes.achievements) : game[scoreType];
-    let speech = '';
     const params = {};
 
     if (myScore > 0) {
+      params.userName = attributes.given_name;
       params.userId = userId;
       params.score = myScore;
     }
@@ -317,39 +335,12 @@ module.exports = {
         method: 'GET',
         timeout: 1000,
       }, (err, response, body) => {
-      if (err) {
-        // No scores to read
-        speech = res.strings.LEADER_NO_SCORES;
-      } else {
-        const leaders = JSON.parse(body);
-
-        if (!leaders.count || !leaders.top) {
-          // Something went wrong
-          speech = res.strings.LEADER_NO_SCORES;
-        } else {
-          if (leaders.rank) {
-            speech += ((scoreType === 'bankroll') ? res.strings.LEADER_BANKROLL_RANKING : res.strings.LEADER_RANKING)
-              .replace('{0}', myScore)
-              .replace('{1}', leaders.rank)
-              .replace('{2}', roundPlayers(locale, leaders.count));
-          }
-
-          // And what is the leader board?
-          let topScores = leaders.top;
-          if (scoreType === 'bankroll') {
-            topScores = topScores.map((x) => res.strings.LEADER_BANKROLL_FORMAT.replace('{0}', x));
-          }
-
-          speech += ((scoreType === 'bankroll') ? res.strings.LEADER_TOP_BANKROLLS
-              : res.strings.LEADER_TOP_SCORES).replace('{0}', topScores.length);
-          speech += speechUtils.and(topScores, {locale: locale, pause: '300ms'});
-          if (scoreType === 'achievement') {
-            speech += res.strings.LEADER_ACHIEVEMENT_HELP;
-          }
-        }
+      let leaders;
+      if (!err) {
+        leaders = JSON.parse(body);
+        leaders.score = myScore;
       }
-
-      callback(speech);
+      callback(leaders);
     });
   },
   readSuggestions(attributes, callback) {
@@ -499,17 +490,6 @@ module.exports = {
     }
   },
 };
-
-function roundPlayers(locale, playerCount) {
-  const res = require('./resources')(locale);
-
-  if (playerCount < 200) {
-    return playerCount;
-  } else {
-    // "Over" to the nearest hundred
-    return res.strings.MORE_THAN_PLAYERS.replace('{0}', 100 * Math.floor(playerCount / 100));
-  }
-}
 
 function getUserTimezone(event, callback) {
   if (event.context.System.apiAccessToken) {

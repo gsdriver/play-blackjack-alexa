@@ -84,9 +84,11 @@ module.exports = {
 
     return reminder;
   },
-  promptToEnter: function(event, attributes, callback) {
+  promptToEnter: function(handlerInput, callback) {
     // If there is an active tournament, we need to either inform them
     // or if they are participating in the tournament, allow them to leave
+    const event = handlerInput.requestEnvelope;
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
     const res = require('./resources')(event.request.locale);
     let reprompt;
 
@@ -99,7 +101,7 @@ module.exports = {
       reprompt = res.strings.TOURNAMENT_LAUNCH_INFORM_REPROMPT;
     }
 
-    bjUtils.getWelcome(event, attributes, format, (speech) => {
+    bjUtils.getWelcome(handlerInput, format, (speech) => {
       callback(speech, reprompt);
     });
   },

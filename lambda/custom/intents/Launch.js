@@ -50,7 +50,7 @@ module.exports = {
 
       // Try to keep it simple
       const format = JSON.parse(res.strings.LAUNCH_WELCOME)[attributes.currentGame];
-      bjUtils.getWelcome(event, attributes, format, (greeting) => {
+      bjUtils.getWelcome(handlerInput, format, (greeting) => {
         // First let's eee if a free trial is underway - or has ended
         launchSpeech = greeting;
         let spanishState;

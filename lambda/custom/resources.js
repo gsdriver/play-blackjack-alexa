@@ -7,9 +7,9 @@ const common = {
   'ERROR_REPROMPT': 'What else can I help with?',
   'CHANGE_CARD_TEXT': 'You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
   'SELECT_GAME_TITLE': 'Select a game',
-  'GOOD_MORNING': 'Good morning <break time=\"200ms\"/> ',
-  'GOOD_AFTERNOON': 'Good afternoon <break time=\"200ms\"/> ',
-  'GOOD_EVENING': 'Good evening <break time=\"200ms\"/> ',
+  'GOOD_MORNING': 'Good morning {Name} <break time=\"200ms\"/> ',
+  'GOOD_AFTERNOON': 'Good afternoon {Name} <break time=\"200ms\"/> ',
+  'GOOD_EVENING': 'Good evening {Name} <break time=\"200ms\"/> ',
   // From Select.js
   'SELECT_ONE_GAME': 'Sorry, there is only one game available to play. ',
   'SELECT_GAMES': 'We have the following games available to play <break time=\'200ms\'/> {0}. ',
@@ -32,6 +32,7 @@ const common = {
   'EXIT_REMINDER': 'Would you like me to set a weekly reminder for the tournament every {Time} {Timezone}?',
   'EXIT_REMINDER_REPROMPT': 'Would you like me to set a weekly reminder for the tournament?',
   // From HighScore.js
+  'HIGHSCORE_GIVENAME': 'If you would like to include your name in the leaderboard, grant this skill permission in the Alexa companion app <break time=\'200ms\'/>',
   'HIGHSCORE_REPROMPT': 'What else can I help you with?',
   // From Help.js
   'HELP_GENERIC_HELP': 'You can play a game by saying Deal <break time=\'200ms\'/> or you can say enable training mode if you would like me to prompt when your play differs from Basic Strategy. <break time=\'300ms\'/> Now, what can I help you with?',
@@ -157,7 +158,6 @@ const common = {
   'LEADER_NO_SCORES': 'Sorry, I\'m unable to read the current leader board',
   'LEADER_TOP_SCORES': 'The top {0} achievement scores are ',
   'LEADER_TOP_BANKROLLS': 'The top {0} bankrolls are ',
-  'LEADER_ACHIEVEMENT_HELP': ' <break time=\'300ms\'/> Ask for help to hear how you earn achievement points',
   'MORE_THAN_PLAYERS': 'over {0}',
   // From Tournament.js
   'TOURNAMENT_DEFAULT_TIMEZONE': 'Pacific time',
@@ -249,6 +249,9 @@ const dollar = {
   'SUPERBONUS_WIN': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your hand was three suited sevens against a dealer seven winning you a super bonus payout of ${0}! ',
   'LEADER_BANKROLL_RANKING': 'You have ${0} ranking you as <say-as interpret-as="ordinal">{1}</say-as> of {2} players. ',
   'LEADER_BANKROLL_FORMAT': '${0}',
+  'LEADER_BANKROLL_FORMAT_NAME': '{1} with ${0}',
+  'LEADER_ACHIEVEMENT_FORMAT': '{0} points',
+  'LEADER_ACHIEVEMENT_FORMAT_NAME': '{1} with {0} points',
   // From Tournament.js
   'TOURNAMENT_BANKROLL': 'You have ${0} and {1} hands remaining. ',
   'TOURNAMENT_WINNER': 'Congratulations, you won the tournament with ${0}! ',
@@ -286,6 +289,7 @@ const pound = {
   'SUPERBONUS_WIN': '<audio src=\"https://s3-us-west-2.amazonaws.com/alexasoundclips/jackpot.mp3\"/> Your hand was three suited sevens against a dealer seven winning you a super bonus payout of £{0}! ',
   'LEADER_BANKROLL_RANKING': 'You have £{0} ranking you as <say-as interpret-as="ordinal">{1}</say-as> of {2} players. ',
   'LEADER_BANKROLL_FORMAT': '£{0}',
+  'LEADER_BANKROLL_FORMAT_NAME': '{1} with £{0}',
   // From Tournament.js
   'TOURNAMENT_BANKROLL': 'You have £{0} and {1} hands remaining. ',
   'TOURNAMENT_WINNER': 'Congratulations, you won the tournament with £{0}! ',
