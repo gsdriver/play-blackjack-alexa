@@ -158,6 +158,8 @@ const common = {
   'LEADER_NO_SCORES': 'Sorry, I\'m unable to read the current leader board',
   'LEADER_TOP_SCORES': 'The top {0} achievement scores are ',
   'LEADER_TOP_BANKROLLS': 'The top {0} bankrolls are ',
+  'LEADER_ACHIEVEMENT_FORMAT': '{0} points',
+  'LEADER_ACHIEVEMENT_FORMAT_NAME': '{1} with {0} points',
   'MORE_THAN_PLAYERS': 'over {0}',
   // From Tournament.js
   'TOURNAMENT_DEFAULT_TIMEZONE': 'Pacific time',
@@ -250,8 +252,6 @@ const dollar = {
   'LEADER_BANKROLL_RANKING': 'You have ${0} ranking you as <say-as interpret-as="ordinal">{1}</say-as> of {2} players. ',
   'LEADER_BANKROLL_FORMAT': '${0}',
   'LEADER_BANKROLL_FORMAT_NAME': '{1} with ${0}',
-  'LEADER_ACHIEVEMENT_FORMAT': '{0} points',
-  'LEADER_ACHIEVEMENT_FORMAT_NAME': '{1} with {0} points',
   // From Tournament.js
   'TOURNAMENT_BANKROLL': 'You have ${0} and {1} hands remaining. ',
   'TOURNAMENT_WINNER': 'Congratulations, you won the tournament with ${0}! ',
