@@ -312,6 +312,7 @@ module.exports = {
   readLeaderBoard: function(locale, userId, attributes, callback) {
     let leaderURL = process.env.SERVICEURL + 'blackjack/leadersWithNames';
     const scoreType = (attributes.currentGame === 'tournament') ? 'bankroll' : 'achievement';
+    const game = attributes[attributes.currentGame];
     const myScore = (scoreType === 'achievement') ?
             module.exports.getAchievementScore(attributes.achievements) : game[scoreType];
     const params = {};
