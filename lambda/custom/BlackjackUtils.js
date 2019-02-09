@@ -61,7 +61,6 @@ module.exports = {
         method: 'POST',
         formData: formData,
       };
-      console.log(params);
       request(params, (err, response, body) => {
         callback();
       });
