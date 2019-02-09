@@ -47,6 +47,28 @@ module.exports = {
       });
     });
   },
+  findQuestionableResponse: function(handlerInput, callback) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+
+    // If the request is "questionable" then we will log it
+    if (process.env.SERVICEURL && attributes.temp && attributes.temp.lastResponse) {
+      // Post to check for questionable content
+      const formData = {
+        response: attributes.temp.lastResponse,
+      };
+      const params = {
+        url: process.env.SERVICEURL + 'blackjack/checkResponse',
+        method: 'POST',
+        formData: formData,
+      };
+      console.log(params);
+      request(params, (err, response, body) => {
+        callback();
+      });
+    } else {
+      return callback();
+    }
+  },
   getUserName: function(handlerInput) {
     const usc = handlerInput.serviceClientFactory.getUpsServiceClient();
     const attributes = handlerInput.attributesManager.getSessionAttributes();

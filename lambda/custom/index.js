@@ -207,7 +207,9 @@ const saveResponseInterceptor = {
           if (!process.env.NOLOG) {
             console.log(JSON.stringify(response));
           }
-          resolve();
+          bjUtils.findQuestionableResponse(handlerInput, () => {
+            resolve();
+          });
         });
       } else {
         resolve();
