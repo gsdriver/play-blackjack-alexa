@@ -101,8 +101,8 @@ module.exports = {
 // Determines which rules to change
 //
 function buildRulesObject(res, option, value) {
-  let ruleValue = res.mapChangeValue(value.toLowerCase());
-  const ruleOption = res.mapChangeRule(option.toLowerCase());
+  let ruleValue = res.strings.CHANGE_VALUES[value.toLowerCase()];
+  const ruleOption = res.strings.CHANGE_RULES[option.toLowerCase()];
   const rules = {};
 
   if ((ruleValue == undefined) || (ruleOption == undefined)) {

@@ -29,8 +29,7 @@ module.exports = {
         && request.intent.slots
         && request.intent.slots.Action
         && request.intent.slots.Action.value) {
-        const res = require('../resources')(request.locale);
-        return (res.getBlackjackAction(request.intent.slots.Action) === 'bet');
+        return (bjUtils.getBlackjackAction(handlerInput, request.intent.slots.Action) === 'bet');
       }
     }
 

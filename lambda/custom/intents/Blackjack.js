@@ -46,7 +46,7 @@ module.exports = {
           .getResponse();
       } else {
         // Let's play this action
-        actionObj = {action: res.getBlackjackAction(actionSlot)};
+        actionObj = {action: bjUtils.getBlackjackAction(handlerInput, actionSlot)};
         if (!actionObj.action) {
           // What did they specify?
           console.log('NULL ACTION: ' + JSON.stringify(event.request));

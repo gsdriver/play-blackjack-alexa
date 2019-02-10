@@ -26,8 +26,8 @@ module.exports = {
 
       if (suggestText === 'notplayerturn') {
         speech = resources.strings.SUGGEST_TURNOVER;
-      } else if (resources.mapActionToSuggestion(suggestText)) {
-        speech = resources.pickRandomOption('SUGGEST_OPTIONS').replace('{0}', resources.mapActionToSuggestion(suggestText));
+      } else if (mapActionToSuggestion(suggestText)) {
+        speech = pickRandomOption('SUGGEST_OPTIONS').replace('{0}', mapActionToSuggestion(suggestText));
       } else {
         speech = suggestText;
       }
@@ -54,7 +54,7 @@ module.exports = {
       if (!game.possibleActions
             || (game.possibleActions.indexOf(action.action) < 0)) {
         // Probably need a way to read out the game state better
-        speechError = resources.strings.INVALID_ACTION.replace('{0}', resources.mapPlayOption(action.action));
+        speechError = resources.strings.INVALID_ACTION.replace('{0}', mapPlayOption(action.action));
         speechError += readHand(attributes, game, locale);
         speechError += ' ' + listValidActions(game, locale, 'full');
         sendUserCallback(attributes, speechError, null, null, null, callback);
@@ -74,12 +74,12 @@ module.exports = {
             game.suggestion = {suggestion: suggestion, player: action.action};
 
             let suggestText;
-            if (resources.mapActionToSuggestion(suggestion)) {
-              suggestText = resources.mapActionToSuggestion(suggestion);
+            if (mapActionToSuggestion(suggestion)) {
+              suggestText = mapActionToSuggestion(suggestion);
             } else {
               suggestText = suggestion;
             }
-            let speech = resources.pickRandomOption('SUGGESTED_PLAY').replace('{0}', suggestText);
+            let speech = pickRandomOption('SUGGESTED_PLAY').replace('{0}', suggestText);
             const reprompt = resources.strings.SUGGESTED_PLAY_REPROMPT.replace('{0}', suggestText);
 
             speech += reprompt;
@@ -99,7 +99,10 @@ module.exports = {
           let error;
 
           if (speechError) {
-            error = resources.mapServerError(speechError);
+            error = resources.strings['SERVER_ERROR_' + speechError.toUpperCase()];
+            if (!error) {
+              error = resources.strings.SERVER_ERROR_GENERIC;
+            }
           } else {
             // Player took an action - the board will need to be redrawn
             attributes.temp.drawBoard = true;
@@ -182,7 +185,7 @@ module.exports = {
           result = resources.strings.HELP_INSURANCE_INSUFFICIENT_BANKROLL;
         }
       } else {
-        const actions = game.possibleActions.map((x) => resources.mapPlayOption(x));
+        const actions = game.possibleActions.map((x) => mapPlayOption(x));
         actions.push(resources.strings.HELP_YOU_CAN_SAY_LEADER);
         if (helpPrompt && !game.training) {
           actions.push(resources.strings.HELP_YOU_CAN_SAY_ENABLE_TRAINING);
@@ -286,7 +289,7 @@ function listValidActions(game, locale, type) {
       }
     } else if (type === 'full') {
       result = resources.strings.ASK_POSSIBLE_ACTIONS.replace('{0}',
-        utils.or(game.possibleActions.map((x) => resources.mapPlayOption(x)),
+        utils.or(game.possibleActions.map((x) => mapPlayOption(x)),
         {locale: locale}));
     } else {
       // Provide a summary
@@ -295,7 +298,7 @@ function listValidActions(game, locale, type) {
       } else if (game.specialState === 'sidebet') {
         result = resources.strings.ASK_SAY_BET;
       } else {
-        result = resources.pickRandomOption('ASK_PLAY_AGAIN');
+        result = pickRandomOption('ASK_PLAY_AGAIN');
       }
     }
   }
@@ -318,10 +321,10 @@ function tellResult(attributes, locale, action, oldGame) {
       (oldHand.bet > game.playerHands[game.currentPlayerHand].bet)) {
       if (oldHand.total > 21) {
         result = resources.strings.RESULT_AFTER_HIT_BUST
-          .replace('{0}', resources.readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit));
+          .replace('{0}', readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit));
       } else {
         result = resources.strings.RESULT_AFTER_HIT_NOBUST
-          .replace('{0}', resources.readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit))
+          .replace('{0}', readCard(oldHand.cards[oldHand.cards.length - 1], 'article', game.readSuit))
           .replace('{1}', oldHand.total);
       }
 
@@ -412,10 +415,10 @@ function tellResult(attributes, locale, action, oldGame) {
 function readDealerAction(game, locale) {
   let result;
 
-  result = resources.strings.DEALER_HOLE_CARD.replace('{0}', resources.readCard(game.dealerHand.cards[0], 'article', game.readSuit));
+  result = resources.strings.DEALER_HOLE_CARD.replace('{0}', readCard(game.dealerHand.cards[0], 'article', game.readSuit));
   if (game.dealerHand.cards.length > 2) {
     result += resources.strings.DEALER_DRAW;
-    result += utils.and(game.dealerHand.cards.slice(2).map((x) => resources.readCard(x, 'article', game.readSuit)), {locale: locale});
+    result += utils.and(game.dealerHand.cards.slice(2).map((x) => readCard(x, 'article', game.readSuit)), {locale: locale});
   }
 
   if (game.dealerHand.total > 21) {
@@ -486,7 +489,7 @@ function readGameResult(attributes) {
           && (game.numSevens === 0)) {
         outcome += resources.strings.LOST_MULTIPLEHANDS_AND_SIDEBET;
       } else {
-        outcome += resources.mapMultipleOutcomes(game.playerHands[0].outcome,
+        outcome += mapMultipleOutcomes(game.playerHands[0].outcome,
             game.playerHands.length);
         outcome += ' ';
         outcome += sideBetResult;
@@ -495,7 +498,7 @@ function readGameResult(attributes) {
       // Read each hand
       for (i = 0; i < game.playerHands.length; i++) {
         outcome += readHandNumber(game, i);
-        outcome += resources.mapOutcome(game.playerHands[i].outcome);
+        outcome += mapOutcome(game.playerHands[i].outcome);
       }
       outcome += sideBetResult;
     }
@@ -507,11 +510,11 @@ function readGameResult(attributes) {
           (game.numSevens === 0)) {
         outcome += resources.strings.LOST_SINGLEHAND_AND_SIDEBET;
       } else {
-        outcome += resources.mapOutcomePlusSideBet(game.playerHands[0].outcome);
+        outcome += mapOutcomePlusSideBet(game.playerHands[0].outcome);
         outcome += sideBetResult;
       }
     } else {
-      outcome += resources.mapOutcome(game.playerHands[0].outcome);
+      outcome += mapOutcome(game.playerHands[0].outcome);
     }
   }
 
@@ -577,18 +580,32 @@ function readGameResult(attributes) {
   return outcome;
 }
 
+function mapOutcome(outcome) {
+  return resources.strings['OUTCOME_' + outcome.toUpperCase()];
+}
+
+function mapOutcomePlusSideBet(outcome) {
+  return resources.strings['OUTCOME_PLUSSIDE_' + outcome.toUpperCase()];
+}
+
+function mapMultipleOutcomes(outcome, numHands) {
+  return (numHands == 2)
+    ? resources.strings['OUTCOME_TWOHAND_' + outcome.toUpperCase()]
+    : resources.strings['OUTCOME_MULTIPLEHAND_' + outcome.toUpperCase()];
+}
+
 /*
  * We will read the new card, the total, and the dealer up card
  */
 function readHit(attributes, locale) {
   const game = attributes[attributes.currentGame];
   const currentHand = game.playerHands[game.currentPlayerHand];
-  const cardText = resources.readCard(currentHand.cards[currentHand.cards.length - 1], 'article', game.readSuit);
+  const cardText = readCard(currentHand.cards[currentHand.cards.length - 1], 'article', game.readSuit);
   const cardRank = currentHand.cards[currentHand.cards.length - 1].rank;
   let result;
 
   if (currentHand.total > 21) {
-    result = resources.pickRandomOption('PLAYER_HIT_BUSTED').replace('{0}', cardText);
+    result = pickRandomOption('PLAYER_HIT_BUSTED').replace('{0}', cardText);
   } else {
     let formatChoices;
 
@@ -612,9 +629,9 @@ function readHit(attributes, locale) {
       }
     }
 
-    result = resources.pickRandomOption(formatChoices).replace('{0}', cardText).replace('{1}', currentHand.total);
+    result = pickRandomOption(formatChoices).replace('{0}', cardText).replace('{1}', currentHand.total);
     if (game.activePlayer === 'player') {
-      result += resources.strings.DEALER_SHOWING.replace('{0}', resources.readCard(game.dealerHand.cards[1], 'article', game.readSuit));
+      result += resources.strings.DEALER_SHOWING.replace('{0}', readCard(game.dealerHand.cards[1], 'article', game.readSuit));
     }
   }
 
@@ -656,13 +673,18 @@ function readSplit(attributes, locale) {
   if (pairCard.rank >= 10) {
     result = resources.strings.SPLIT_TENS;
   } else {
-    result = resources.strings.SPLIT_PAIR.replace('{0}', resources.pluralCardRanks(pairCard));
+    result = resources.strings.SPLIT_PAIR.replace('{0}', pluralCardRanks(pairCard));
   }
 
   // Now read the current hand
   result += readHand(attributes, game, locale);
 
   return result;
+}
+
+function pluralCardRanks(card) {
+  const names = resources.strings.PLURAL_CARDS.split('|');
+  return names[card.rank];
 }
 
 /*
@@ -720,7 +742,7 @@ function readHand(attributes, game, locale) {
   // If they have more than one hand, then say the hand number
   result += readHandNumber(game, game.currentPlayerHand);
   const readCards = utils.and(currentHand.cards.map((x) => {
-    return resources.readCard(x, false, game.readSuit);
+    return readCard(x, false, game.readSuit);
   }), {locale: locale});
 
   // Read the full hand
@@ -749,7 +771,7 @@ function readHand(attributes, game, locale) {
     }
   }
 
-  const dealerCardText = resources.readCard(game.dealerHand.cards[1], 'article', game.readSuit);
+  const dealerCardText = readCard(game.dealerHand.cards[1], 'article', game.readSuit);
 
   if (game.activePlayer == 'none') {
     // Game over, so read the whole dealer hand
@@ -776,8 +798,8 @@ function promptHandPlay(attributes) {
       // OK, we should suggest this - once we do, we'll clear
       // this attribute so it isn't suggested again
       suggestion = resources.strings.PROACTIVE_SUGGESTION
-          .replace('{0}', resources.mapActionPastTense(suggest))
-          .replace('{1}', resources.mapActionToSuggestion(suggest));
+          .replace('{0}', mapActionPastTense(suggest))
+          .replace('{1}', mapActionToSuggestion(suggest));
       attributes.analysis[suggest] = 0;
     }
   }
@@ -792,7 +814,7 @@ function readHandNumber(game, handNumber) {
   let result = '';
 
   if (game.playerHands.length > 1) {
-    result = resources.mapHandNumber(handNumber);
+    result = resources.strings.HAND_NUMBER.replace('{0}', handNumber + 1);
   }
 
   return result;
@@ -824,7 +846,7 @@ function rulesToText(locale, rules, changeRules) {
 
   // Double rules
   if (!changeRules || changeRules.hasOwnProperty('double') || changeRules.hasOwnProperty('doubleaftersplit')) {
-    const doubleRule = resources.mapDouble(rules.double);
+    const doubleRule = mapDouble(rules.double);
     if (doubleRule) {
       text += resources.strings.RULES_DOUBLE.replace('{0}', doubleRule);
       if (rules.double != 'none') {
@@ -857,13 +879,35 @@ function rulesToText(locale, rules, changeRules) {
 
   if (!changeRules || changeRules.hasOwnProperty('blackjackBonus')) {
     // Blackjack payout
-    const payoutText = resources.mapBlackjackPayout(rules.blackjackBonus.toString());
+    const payoutText = mapBlackjackPayout(rules.blackjackBonus.toString());
     if (payoutText) {
       text += resources.strings.RULES_BLACKJACK.replace('{0}', payoutText);
     }
   }
 
   return text;
+}
+
+function mapDouble(rule) {
+  return resources.strings['DOUBLE_' + rule.toUpperCase()];
+}
+
+function mapBlackjackPayout(rule) {
+  let result = '';
+
+  switch (rule) {
+    case '0.5':
+      result = resources.strings.PAYOUT_3TO2;
+      break;
+    case '0.2':
+      result = resources.strings.PAYOUT_6TO5;
+      break;
+    case '0':
+      result = resources.strings.PAYOUT_EVEN;
+      break;
+  }
+
+  return result;
 }
 
 function handTotal(cards) {
@@ -890,4 +934,44 @@ function handTotal(cards) {
   }
 
   return retval;
+}
+
+function pickRandomOption(res) {
+  if (resources.strings[res]) {
+    const options = resources.strings[res].split('|');
+    return options[Math.floor(Math.random() * options.length)];
+  } else {
+    return undefined;
+  }
+}
+
+function mapPlayOption(option) {
+  const value = resources.strings['PLAY_OPTION_' + option.toUpperCase()];
+  return (value) ? value : option;
+}
+
+function mapActionToSuggestion(action) {
+  return resources.strings['MAP_SUGGEST_' + action.toUpperCase()];
+}
+
+function mapActionPastTense(action) {
+  return resources.strings['MAP_ACTION_PAST_' + action.toUpperCase()];
+}
+
+function readCard(card, withArticle, readSuit) {
+  let result;
+
+  if (withArticle === 'article') {
+    result = resources.strings.PLAYING_CARD_ARTICLE_NAMES[card.rank];
+  } else {
+    result = resources.strings.PLAYING_CARD_NAMES[card.rank];
+  }
+
+  if (readSuit) {
+    result = resources.strings.PLAYING_CARD_FORMAT
+      .replace('{0}', result)
+      .replace('{1}', resources.strings.PLAYING_CARD_SUITS[card.suit]);
+  }
+
+  return result;
 }

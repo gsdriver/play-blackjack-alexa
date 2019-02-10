@@ -54,7 +54,8 @@ module.exports = {
             });
           } else {
             const res = require('../resources')(event.request.locale);
-            const speech = res.strings.SELECT_REPROMPT.replace('{0}', res.sayGame(attributes.choices[0]));
+            const speech = res.strings.SELECT_REPROMPT
+              .replace('{0}', bjUtils.sayGame(handlerInput, attributes.choices[0]));
             resolve(handlerInput.responseBuilder
               .speak(speech)
               .reprompt(speech)

@@ -49,7 +49,7 @@ module.exports = {
       } else if (event.request.intent.name == 'BlackjackIntent') {
         if (event.request.intent.slots && event.request.intent.slots.Action
           && event.request.intent.slots.Action.value) {
-          valid = res.getBlackjackAction(event.request.intent.slots.Action);
+          valid = res.strings.ACTION_MAPPING[event.request.intent.slots.Action.value.toLowerCase()];
         }
       } else if (event.request.intent.name == 'ChangeRulesIntent') {
         // Need change slot and change option slot
@@ -57,8 +57,8 @@ module.exports = {
         const optionSlot = event.request.intent.slots.ChangeOption;
 
         if (changeSlot && changeSlot.value && optionSlot && optionSlot.value) {
-          const ruleValue = res.mapChangeValue(optionSlot.value.toLowerCase());
-          const ruleOption = res.mapChangeRule(changeSlot.value.toLowerCase());
+          const ruleValue = res.strings.CHANGE_VALUES[optionSlot.value.toLowerCase()];
+          const ruleOption = res.strings.CHANGE_RULES[changeSlot.value.toLowerCase()];
           valid = (ruleValue && ruleOption);
         }
       }

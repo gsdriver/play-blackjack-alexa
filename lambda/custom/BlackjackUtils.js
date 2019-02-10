@@ -439,7 +439,7 @@ module.exports = {
               'textContent': {
                 'primaryText': {
                   'type': 'RichText',
-                  'text': '<font size=\"7\">' + res.sayGame(choice) + '</font>',
+                  'text': '<font size=\"7\">' + module.exports.sayGame(handlerInput, choice) + '</font>',
                 },
               },
             });
@@ -510,6 +510,18 @@ module.exports = {
       // Not a display device
       callback();
     }
+  },
+  getBlackjackAction: function(handlerInput, actionSlot) {
+    const res = require('./resources')(handlerInput.requestEnvelope.request.locale);
+    const action = res.strings.ACTION_MAPPING[actionSlot.value.toLowerCase()];
+
+    // Look it up in lowercase
+    return (action == undefined) ? null : action;
+  },
+  sayGame: function(handlerInput, game) {
+    const res = require('./resources')(handlerInput.requestEnvelope.request.locale);
+    const gameName = res.strings['GAMENAME_' + game.toUpperCase()];
+    return (gameName ? gameName : game);
   },
 };
 

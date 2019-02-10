@@ -7,6 +7,7 @@
 const gameService = require('../GameService');
 const upsell = require('../UpsellEngine');
 const speechUtils = require('alexa-speech-utils')();
+const bjUtils = require('../BlackjackUtils');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -55,9 +56,10 @@ module.exports = {
       attributes.temp.selectingGame = true;
 
       speech = res.strings.SELECT_GAMES
-        .replace('{0}', speechUtils.and(availableGames.map((x) => res.sayGame(x)),
+        .replace('{0}', speechUtils.and(availableGames.map((x) => bjUtils.sayGame(handlerInput, x)),
             {locale: event.request.locale}));
-      reprompt = res.strings.SELECT_REPROMPT.replace('{0}', res.sayGame(availableGames[0]));
+      reprompt = res.strings.SELECT_REPROMPT
+        .replace('{0}', bjUtils.sayGame(handlerInput, availableGames[0]));
       speech += reprompt;
     }
 
