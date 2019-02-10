@@ -197,11 +197,17 @@ const saveResponseInterceptor = {
           } else {
             // Save the response and reprompt for repeat
             if (response.outputSpeech && response.outputSpeech.ssml) {
-              attributes.temp.lastResponse = response.outputSpeech.ssml;
+              let lastResponse = response.outputSpeech.ssml;
+              lastResponse = lastResponse.replace('<speak>', '');
+              lastResponse = lastResponse.replace('</speak>', '');
+              attributes.temp.lastResponse = lastResponse;
             }
             if (response.reprompt && response.reprompt.outputSpeech
               && response.reprompt.outputSpeech.ssml) {
-              attributes.temp.lastReprompt = response.reprompt.outputSpeech.ssml;
+              let lastReprompt = response.reprompt.outputSpeech.ssml;
+              lastReprompt = lastReprompt.replace('<speak>', '');
+              lastReprompt = lastReprompt.replace('</speak>', '');
+              attributes.temp.lastReprompt = lastReprompt;
             }
           }
           if (!process.env.NOLOG) {

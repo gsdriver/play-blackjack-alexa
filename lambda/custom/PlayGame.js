@@ -295,7 +295,7 @@ function listValidActions(game, locale, type) {
       } else if (game.specialState === 'sidebet') {
         result = resources.strings.ASK_SAY_BET;
       } else {
-        result = resources.strings.ASK_PLAY_AGAIN;
+        result = resources.pickRandomOption('ASK_PLAY_AGAIN');
       }
     }
   }
@@ -552,16 +552,9 @@ function readGameResult(attributes) {
   }
 
   if (pointsEarned.length) {
-    // Tell them what they earned - and what they have if we haven't said it yet
+    // Tell them what they earned
     let score;
-    let format = resources.strings.POINTS_EARNED_NOSCORE;
-    if (!attributes.temp.readScore) {
-      if (!noPoints) {
-        score = bjUtils.getAchievementScore(attributes.achievements);
-        format = resources.strings.POINTS_EARNED_SCORE;
-      }
-      attributes.temp.readScore = true;
-    }
+    const format = resources.strings.POINTS_EARNED_NOSCORE;
 
     outcome += format.replace('{0}', speechUtils.and(pointsEarned, {pause: '200ms'}))
         .replace('{1}', score);
