@@ -130,7 +130,7 @@
   "LOST_MULTIPLEHANDS_AND_SIDEBET": "You lost all your hands and your side bet. ",
   "WINNING_STREAK": "{1} points for {0} wins in a row",
   "FIRST_DAILY_HAND": "10 points for your first hand of the day",
-  "NATURAL_BLACKJACK": "5 points for a natural blackjack ",
+  "NATURAL_BLACKJACK": "5 points for a natural blackjack",
   "POINTS_EARNED_NOSCORE": "You earned {0}. ",
   "LEADER_RANKING": "You have {0} achievement points ranking you as <say-as interpret-as=\"ordinal\">{1}</say-as> of {2} players. ",
   "LEADER_NO_SCORES": "Sorry, I'm unable to read the current leader board",
