@@ -7,6 +7,7 @@
     "test": "test"
   },
   "dependencies": {
+    "@jargon/alexa-skill-sdk": "^1.1.4",
     "alexa-speech-utils": "~0.0.4",
     "ask-sdk": "^2.0.7",
     "aws-sdk": "^2.248.1",

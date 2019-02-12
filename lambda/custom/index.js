@@ -34,6 +34,7 @@ const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
 const playgame = require('./PlayGame');
 const request = require('request');
+const {ri, JargonSkillBuilder} = require('@jargon/alexa-skill-sdk');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 
@@ -229,9 +230,8 @@ const ErrorHandler = {
     return error.name.startsWith('AskSdk');
   },
   handle(handlerInput, error) {
-    console.log(error.stack);
-    return handlerInput.responseBuilder
-      .speak('An error was encountered while handling your request. Try again later')
+    return handlerInput.jrb
+      .speak(ri('SKILL_ERROR'))
       .getResponse();
   },
 };
@@ -244,7 +244,7 @@ if (process.env.DASHBOTKEY) {
 }
 
 function runGame(event, context, callback) {
-  const skillBuilder = Alexa.SkillBuilders.custom();
+  const skillBuilder = new JargonSkillBuilder().wrap(Alexa.SkillBuilders.custom());
 
   if (!process.env.NOLOG) {
     console.log(JSON.stringify(event));

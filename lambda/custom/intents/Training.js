@@ -5,6 +5,7 @@
 'use strict';
 
 const playgame = require('../PlayGame');
+const ri = require('@jargon/alexa-skill-sdk').ri;
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -16,24 +17,29 @@ module.exports = {
   },
   handle: function(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
-    const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('../resources')(event.request.locale);
     const game = attributes[attributes.currentGame];
-    const reprompt = playgame.getContextualHelp(event, attributes);
-    let speech;
+    let format;
+    const speechParams = {};
 
-    if (request.intent.name === 'EnableTrainingIntent') {
-      speech = res.strings.TRAINING_ON + reprompt;
-      game.training = true;
-    } else {
-      speech = res.strings.TRAINING_OFF + reprompt;
-      game.training = undefined;
-    }
+    return playgame.getContextualHelp(handlerInput)
+    .then((reprompt) => {
+      if (request.intent.name === 'EnableTrainingIntent') {
+        format = 'TRAINING_ON';
+        game.training = true;
+      } else {
+        format = 'TRAINING_OFF';
+        game.training = undefined;
+      }
+      speechParams.Reprompt = reprompt;
 
-    return handlerInput.responseBuilder
-      .speak(speech)
-      .reprompt(reprompt)
-      .getResponse();
+      return handlerInput.jrm.render(ri(format, speechParams))
+      .then((speech) => {
+        return handlerInput.responseBuilder
+          .speak(speech)
+          .reprompt(reprompt)
+          .getResponse();
+      });
+    });
   },
 };

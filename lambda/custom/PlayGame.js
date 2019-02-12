@@ -10,6 +10,7 @@ const tournament = require('./tournament');
 const request = require('request');
 const bjUtils = require('./BlackjackUtils');
 const speechUtils = require('alexa-speech-utils')();
+const ri = require('@jargon/alexa-skill-sdk').ri;
 
 let resources;
 
@@ -165,42 +166,52 @@ module.exports = {
     return {speech: speech, reprompt: reprompt};
   },
   // Gets contextual help based on the current state of the game
-  getContextualHelp: function(event, attributes, helpPrompt) {
-    resources = require('./resources')(event.request.locale);
+  getContextualHelp: function(handlerInput, helpPrompt) {
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
     const game = attributes[attributes.currentGame];
-    let result = '';
+    let format;
+    const speechParams = {};
+    const items = [ri('HELP_YOU_CAN_SAY_LEADER'), ri('HELP_YOU_CAN_SAY_ENABLE_TRAINING')];
 
-    if (attributes.temp.joinTournament || attributes.temp.confirmReset
-      || attributes.temp.selectingGame) {
-      result = resources.strings.HELP_YOU_CAN_SAY_YESNO;
-    } else if (game.possibleActions) {
-      // Special case - if there is insurance and noinsurance in the list, then pose as a yes/no
-      if (game.possibleActions.indexOf('noinsurance') > -1) {
-        // It's possible you can't take insurance because you don't have enough money
-        if (game.possibleActions.indexOf('insurance') > -1) {
-          result = ((game.playerHands[0].total === 21) && (game.rules.blackjackBonus == 0.5))
-              ? resources.strings.HELP_TAKE_INSURANCE_BLACKJACK
-              : resources.strings.HELP_TAKE_INSURANCE;
-        } else {
-          result = resources.strings.HELP_INSURANCE_INSUFFICIENT_BANKROLL;
+    return handlerInput.jrm.renderObject(ri('PLAY_OPTIONS'))
+    .then((playOptions) => {
+      return handlerInput.jrm.renderBatch(items)
+      .then((renderItems) => {
+        if (attributes.temp.joinTournament || attributes.temp.confirmReset
+          || attributes.temp.selectingGame) {
+          format = 'HELP_YOU_CAN_SAY_YESNO';
+        } else if (game.possibleActions) {
+          // Special case - if there is insurance and noinsurance in the list, then pose as a yes/no
+          if (game.possibleActions.indexOf('noinsurance') > -1) {
+            // It's possible you can't take insurance because you don't have enough money
+            if (game.possibleActions.indexOf('insurance') > -1) {
+              format = ((game.playerHands[0].total === 21) && (game.rules.blackjackBonus == 0.5))
+                  ? 'HELP_TAKE_INSURANCE_BLACKJACK'
+                  : 'HELP_TAKE_INSURANCE';
+            } else {
+              format = 'HELP_INSURANCE_INSUFFICIENT_BANKROLL';
+            }
+          } else {
+            const actions = game.possibleActions.map((x) => playOptions[x]);
+            actions.push(renderItems[0]);
+            if (helpPrompt && !game.training) {
+              actions.push(renderItems[1]);
+            }
+            format = 'HELP_YOU_CAN_SAY';
+            speechParams.Options = utils.or(actions,
+              {locale: handlerInput.requestEnvelope.request.locale});
+          }
+        } else if (!helpPrompt) {
+          format = 'Jargon.defaultReprompt';
         }
-      } else {
-        const actions = game.possibleActions.map((x) => mapPlayOption(x));
-        actions.push(resources.strings.HELP_YOU_CAN_SAY_LEADER);
-        if (helpPrompt && !game.training) {
-          actions.push(resources.strings.HELP_YOU_CAN_SAY_ENABLE_TRAINING);
+
+        if (helpPrompt) {
+          format += '_MORE_OPTIONS';
         }
-        result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}', utils.or(actions, {locale: event.request.locale}));
-      }
-    } else if (!helpPrompt) {
-      result = resources.strings.TRAINING_REPROMPT;
-    }
 
-    if (helpPrompt) {
-      result += resources.strings.HELP_MORE_OPTIONS;
-    }
-
-    return result;
+        return handlerInput.jrm.render(ri(format, speechParams));
+      });
+    });
   },
   // Changes the rules in play
   changeRules: function(attributes, locale, rules, callback) {
