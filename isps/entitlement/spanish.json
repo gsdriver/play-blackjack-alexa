@@ -25,10 +25,33 @@
           "purchasePromptDescription": "Spanish 21 allows you to play this popular Blackjack variant featuring doubling on any number of cards and bonus payouts for hitting 21 with five or more cards.",
           "boughtCardDescription": "Enjoy Spanish 21 by asking Alexa to select a new game."
         }
+      },
+      "en-GB": {
+        "name": "Spanish 21",
+        "smallIconUri": "http://garrettvargas.com/img/Spanish108.png",
+        "largeIconUri": "http://garrettvargas.com/img/Spanish512.png",
+        "summary": "Play the popular Blackjack variant Spanish 21",
+        "description": "This expansion pack includes Spanish 21, a popular Blackjack variant that features doubling on any number of cards and bonus payouts for hitting 21 with five or more cards.",
+        "examplePhrases": [
+          "Alexa, play Spanish 21",
+          "Alexa, buy Spanish 21"
+        ],
+        "keywords": [
+          "games",
+          "blackjack",
+          "casino",
+          "cards",
+          "Spanish 21"
+        ],
+        "customProductPrompts": {
+          "purchasePromptDescription": "Spanish 21 allows you to play this popular Blackjack variant featuring doubling on any number of cards and bonus payouts for hitting 21 with five or more cards.",
+          "boughtCardDescription": "Enjoy Spanish 21 by asking Alexa to select a new game."
+        }
       }
     },
     "distributionCountries": [
-      "US"
+      "US",
+      "UK"
     ],
     "pricing": {
       "amazon.com": {
@@ -36,6 +59,13 @@
         "defaultPriceListing": {
           "price": 1.99,
           "currency": "USD"
+        }
+      },
+      "amazon.co.uk": {
+        "releaseDate": "2019-06-15",
+        "defaultPriceListing": {
+          "price": 1.99,
+          "currency": "GBP"
         }
       }
     },
@@ -46,6 +76,9 @@
   "privacyAndCompliance": {
     "locales": {
       "en-US": {
+        "privacyPolicyUrl": "http://garrettvargas.com/privacy.html"
+      },
+      "en-GB": {
         "privacyPolicyUrl": "http://garrettvargas.com/privacy.html"
       }
     }
