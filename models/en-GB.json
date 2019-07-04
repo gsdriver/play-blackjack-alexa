@@ -231,6 +231,27 @@
           ]
         },
         {
+          "name": "SelectIntent",
+          "slots": [],
+          "samples": [
+            "pick a different game",
+            "pick a new game",
+            "pick another game",
+            "change to a different game",
+            "change to a new game",
+            "change to another game",
+            "select a different game",
+            "select a new game",
+            "select another game",
+            "choose a different game",
+            "choose a new game",
+            "choose another game",
+            "switch to a different game",
+            "switch to a new game",
+            "switch to another game"
+          ]
+        },
+        {
           "name": "ReminderIntent",
           "slots": [],
           "samples": [

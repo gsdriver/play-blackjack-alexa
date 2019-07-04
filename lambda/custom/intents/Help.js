@@ -26,7 +26,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       // Help is different for tournament play
       if (attributes.currentGame === 'tournament') {
-        tournament.readHelp(event, (response) => {
+        tournament.readHelp(handlerInput, (response) => {
           resolve(response);
         });
       } else {
@@ -37,6 +37,7 @@ module.exports = {
           speech = res.strings.HELP_GENERIC_HELP;
         }
         speech = res.strings.HELP_ACHIEVEMENT_POINTS + speech;
+        speech = res.strings.HELP_SELECT_GAME + speech;
 
         let cardContent = '';
         if (game.progressive) {

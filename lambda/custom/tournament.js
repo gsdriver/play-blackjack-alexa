@@ -124,7 +124,7 @@ module.exports = {
   readHelp: function(handlerInput, callback) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const res = require('../resources')(event.request.locale);
+    const res = require('./resources')(event.request.locale);
     const locale = event.request.locale;
     let speech;
     const game = attributes['tournament'];

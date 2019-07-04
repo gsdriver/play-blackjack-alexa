@@ -44,13 +44,16 @@
         },
         "lambda": [
           {
-            "arn": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v12",
-            "functionName": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v12",
-            "awsRegion": "us-east-1",
             "alexaUsage": [
               "custom/default"
             ],
-            "revisionId": "5a6ae722-1cd9-48ef-bf9a-81a84872569a"
+            "arn": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v12",
+            "awsRegion": "us-east-1",
+            "codeUri": "lambda/custom",
+            "functionName": "Play_Blackjack_v12",
+            "handler": "index.handler",
+            "revisionId": "399c7539-2ee0-4a56-881e-c669401fb402",
+            "runtime": "nodejs8.10"
           }
         ]
       }

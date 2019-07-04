@@ -14,6 +14,7 @@
 //                   always on select
 //  v1.1 - adds sold field, no upsell on launch, upsell on long21 after 24 hours,
 //                   after 6 rounds every two days
+//  v1.2 - trigger Spanish upsell even for new players
 //
 
 'use strict';
@@ -41,6 +42,7 @@ module.exports = {
     if (!attributes.upsell[trigger]) {
       attributes.upsell[trigger] = {};
     }
+    attributes.upsell.version = 'v1.2';
 
     // Clear legacy prompts structure
     if (attributes.prompts) {
@@ -178,8 +180,7 @@ function shouldUpsell(attributes, trigger, now) {
 
     case 'play':
       // Trigger if once they hit 6 hands - once every 2 days and not for the first session
-      upsell = (attributes.upsell.sessions > 1) &&
-        (attributes.upsell.play.count === 6) &&
+      upsell = (attributes.upsell.play.count === 6) &&
         (!attributes.upsell.prompts.play ||
           ((now - attributes.upsell.prompts.play) > 2*24*60*60*1000));
       break;
