@@ -128,7 +128,7 @@ module.exports = {
     if (j == hardHands.length) {
       j--;
     }
-
+console.log(hardHands[j]);
     const hand = hardHands[j].split(',');
     const cards = [];
 
@@ -169,7 +169,7 @@ module.exports = {
 
     // And the dealer upcard - which goes between these two player cards
     const retCards = {player: cards, dealer: {'rank': parseInt(hand[3], 10), 'suit': 'C'}};
-
+console.log(JSON.stringify(retCards));
     // Spit this out so we can verify
     console.log('Hard hand', JSON.stringify(hand));
     console.log('Cards', JSON.stringify(retCards));

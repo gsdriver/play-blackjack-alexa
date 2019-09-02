@@ -4,6 +4,8 @@
 
 'use strict';
 
+const bjUtils = require('../BlackjackUtils');
+
 module.exports = {
   canHandle: function(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
@@ -24,7 +26,9 @@ module.exports = {
     return canRefund;
   },
   handle: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const res = require('../resources')(event.request.locale);
 
     if (event.request.dialogState !== 'COMPLETED') {
       return handlerInput.responseBuilder
@@ -32,7 +36,7 @@ module.exports = {
         .getResponse();
     }
 
-    const product = utils.mapProduct(handlerInput);
+    const product = bjUtils.mapProduct(handlerInput);
     if (product) {
       return handlerInput.responseBuilder
         .addDirective({

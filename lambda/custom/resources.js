@@ -211,7 +211,7 @@ const informal = {
   'DEALER_DRAW': '. I drew ',
   'DEALER_HAD_BLACKJACK': 'I had a blackjack. ',
   'DEALER_NO_BLACKJACK': 'I didn\'t have a blackjack. ',
-  'PLAYER_HIT_BUSTED': 'Sorry, it\'s a {0}. You busted. |You got {0} and busted. |You got {0} and busted. ',
+  'PLAYER_HIT_BUSTED': 'Sorry, it\'s {0}. You busted. |You got {0} and busted. |You got {0} and busted. ',
   'DEALER_SHOWING': ' I am showing {0}.',
   'READHAND_DEALER_ACTIVE': 'I have {0} showing.',
   'READHAND_DEALER_DONE': 'I had {0} showing. ',

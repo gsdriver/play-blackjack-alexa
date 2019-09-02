@@ -216,7 +216,7 @@ function shouldUpsell(attributes, availableProducts, trigger, now) {
       if (availableProducts.indexOf('training') > -1) {
         if (!attributes.upsell.prompts.hardhand ||
           ((now - attributes.upsell.prompts.hardhand) > 24*60*60*1000)) {
-          upsell = 'hardhand';
+          upsell = 'training';
         }
       }
       break;
