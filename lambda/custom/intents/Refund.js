@@ -26,19 +26,32 @@ module.exports = {
   handle: function(handlerInput) {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
 
-    // We only offer Spanish 21 so let's kick into that flow
-    return handlerInput.responseBuilder
-      .addDirective({
-        'type': 'Connections.SendRequest',
-        'name': 'Cancel',
-        'payload': {
-          'InSkillProduct': {
-            'productId': attributes.paid.spanish.productId,
+    if (event.request.dialogState !== 'COMPLETED') {
+      return handlerInput.responseBuilder
+        .addDelegateDirective(event.request.intent)
+        .getResponse();
+    }
+
+    const product = utils.mapProduct(handlerInput);
+    if (product) {
+      return handlerInput.responseBuilder
+        .addDirective({
+          'type': 'Connections.SendRequest',
+          'name': 'Cancel',
+          'payload': {
+            'InSkillProduct': {
+              'productId': attributes.paid[product].productId,
+            },
           },
-        },
-        'token': 'game.spanish.launch',
-      })
-      .withShouldEndSession(true)
-      .getResponse();
+          'token': 'game.' + product + '.launch',
+        })
+        .withShouldEndSession(true)
+        .getResponse();
+    } else {
+      return handlerInput.responseBuilder
+        .speak(res.strings.PURCHASE_NO_PURCHASE)
+        .reprompt(res.strings.PURCHASE_REPROMPT)
+        .getResponse();
+    }
   },
 };

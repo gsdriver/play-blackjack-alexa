@@ -8,6 +8,7 @@ const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
 const request = require('request');
 const seedrandom = require('seedrandom');
+const hardHands = require('./hardHands');
 
 const STARTING_BANKROLL = 5000;
 
@@ -41,6 +42,33 @@ availableGames = {
      possibleActions: [],
      canReset: true,
      canChangeRules: true,
+  },
+  'training': {version: '1.0.0',
+     deck: {cards: []},
+     dealerHand: {cards: []},
+     playerHands: [],
+     rules: {
+       hitSoft17: false,         // Does dealer hit soft 17
+       surrender: 'late',        // Surrender offered - none, late, or early
+       double: 'any',            // Double rules - none, 10or11, 9or10or11, any
+       doubleaftersplit: true,   // Can double after split - none, 10or11, 9or10or11, any
+       resplitAces: false,       // Can you resplit aces
+       blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
+       numberOfDecks: 1,         // Number of decks in play
+       minBet: 5,                // The minimum bet - not configurable
+       maxBet: 1000,             // The maximum bet - not configurable
+       maxSplitHands: 4,         // Maximum number of hands you can have due to splits
+     },
+     activePlayer: 'none',
+     currentPlayerHand: 0,
+     specialState: null,
+     bankroll: STARTING_BANKROLL,
+     lastBet: 100,
+     possibleActions: [],
+     canReset: true,
+     useTrainingHands: true,
+     alwaysShuffle: true,
+     canChangeRules: false,
   },
   'tournament': {version: '1.0.0',
      deck: {cards: []},
@@ -156,15 +184,15 @@ module.exports = {
         if (tournamentAvailable) {
           games.push(game);
         }
-      } else if (game == 'spanish') {
-        if (attributes.paid && attributes.paid.spanish &&
-              (attributes.paid.spanish.state == 'PURCHASED')) {
+      } else if (game === 'standard') {
+        games.push(game);
+      } else {
+        if (attributes.paid && attributes.paid[game] &&
+            (attributes.paid[game].state == 'PURCHASED')) {
           games.push(game);
-        } else if ((attributes.playerLocale == 'en-US') && process.env.SPANISHTRIAL) {
+        } else if ((attributes.playerLocale == 'en-US') && (game === 'spanish') && process.env.SPANISHTRIAL) {
           games.push(game);
         }
-      } else {
-        games.push(game);
       }
     }
 
@@ -496,6 +524,11 @@ function deal(attributes, betAmount) {
   if (game.sideBetPlaced) {
     bjUtils.incrementProgressive(attributes);
   }
+
+  // Check if this is a "hard hand"
+  if (!game.useTrainingHands) {
+    game.isHardHand = hardHands.isHardHand(game);
+  }
 }
 
 function shuffleDeck(game) {
@@ -527,6 +560,27 @@ function shuffleDeck(game) {
     const tempCard = game.deck.cards[i];
     game.deck.cards[i] = game.deck.cards[j];
     game.deck.cards[j] = tempCard;
+  }
+
+  // If we are supposed to get a training hand, splice those cards out to the top of the deck
+  if (game.useTrainingHands) {
+    const trainingHand = hardHands.getInitialCards(game);
+    const topCards = [trainingHand.player[0], trainingHand.player[1], trainingHand.dealer];
+
+    topCards.forEach((card) => {
+      game.deck.cards.forEach((deckCard, idx) => {
+        if ((deckCard.rank === card.rank) && (deckCard.suit === card.suit)) {
+          game.deck.cards.splice(idx, 1);
+        }
+      });
+    });
+
+    // Now add each of these to the top of the array
+    const dealerHole = game.deck.cards.splice(0, 1);
+    game.deck.cards.unshift(trainingHand.dealer);
+    game.deck.cards.unshift(trainingHand.player[1]);
+    game.deck.cards.unshift(dealerHole[0]);
+    game.deck.cards.unshift(trainingHand.player[0]);
   }
 
   // Clear out all hands
@@ -647,6 +701,9 @@ function setNextActions(game) {
       game.possibleActions.push('resetbankroll');
     } else if (game.deck.cards.length > 20) {
       game.possibleActions.push('bet');
+      if (game.alwaysShuffle) {
+        game.possibleActions.push('shuffle');
+      }
       if (game.progressive
           && !game.sideBetPlaced
           && ((game.bankroll - game.progressive.bet) >= game.rules.minBet)) {

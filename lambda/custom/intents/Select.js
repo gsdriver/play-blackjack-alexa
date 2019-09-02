@@ -27,12 +27,13 @@ module.exports = {
     let speech;
     let reprompt;
 
-    // If they don't have Spanish 21, upsell
+    // If they don't have Spanish 21 or training, upsell
     if (!attributes.temp.noUpsellSelect &&
-        (availableGames.indexOf('spanish') === -1)) {
+        ((availableGames.indexOf('spanish') === -1)
+        || (availableGames.indexOf('training') === -1))) {
       const directive = upsell.getUpsell(attributes, 'select');
       if (directive) {
-        directive.token = 'game.spanish.select';
+        directive.token = 'game.' + directive.token + '.select';
         return handlerInput.responseBuilder
           .addDirective(directive)
           .withShouldEndSession(true)

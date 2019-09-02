@@ -4,6 +4,7 @@
 
 const common = {
   // From BlackjackUtils.js
+  'ERROR_SPEECH': 'Sorry, I didn\'t get that. What else can I help with?',
   'ERROR_REPROMPT': 'What else can I help with?',
   'CHANGE_CARD_TEXT': 'You can change the following options:\n\n - HIT SOFT SEVENTEEN: whether the dealer will hit a soft 17 total. Can be ON or OFF.\n - SURRENDER: whether surrender is offered as an option. Can be ON or OFF.\n - DOUBLE DOWN: whether double down is offered or not.  Can be ON or OFF.\n - DOUBLE AFTER SPLIT: whether you can double down after splitting a pair.  Can be ON or OFF.\n - RESPLIT ACES: wheter you can resplit Aces or not.  Can be ON or OFF.\n - NUMBER OF DECKS: the number of decks in play. Can be ONE, TWO, FOUR, SIX, or EIGHT.\n - NUMBER OF SPLIT HANDS: the maximum number of hands you can have from splitting. Can be ONE, TWO, THREE, or FOUR.\n\nFor example, say "change number of decks to two" if you want to play with two decks.\nNote that the deck will be shuffled if you change the rules of the game',
   'SELECT_GAME_TITLE': 'Select a game',
@@ -42,8 +43,8 @@ const common = {
   'HELP_SELECT_GAME': 'Say choose a new game to hear other available games. ',
   'HELP_ACHIEVEMENT_CARD_TEXT': '\nYou earn achievement points as you play which is how the high score board is determined. You earn points as follows:\n - 100 achievement points each time you win the Tuesday Tournament\n - 10 points each day you play\n - 5 points for a natural winning blackjack\n - N points for each streak of N winning hands more than one.\n',
   // From Launch.js
-  'LAUNCH_WELCOME': '{"standard":"Welcome to Blackjack Game. |{0} Welcome to Blackjack Game. |{0} Let\'s play blackjack! |{0} Ready for some blackjack? ","tournament":"Welcome to the tournament round of Blackjack Game. |{0} It\'s tournament time! |{0} Welcome to the Blackjack tournament. ","spanish":"Welcome to Spanish 21. |{0} Welcome to Spanish 21. |{0} Ready for some Spanish 21? "}',
-  'LAUNCH_INITIAL_WELCOME': '{"standard":"","tournament":"You can play up to 100 hands to get the highest bankroll in the tournament. ","spanish":"In this game a player 21 always wins <break time=\'200ms\'/> you can redouble <break time=\'200ms\'/> 21 with 5 or more cards wins a bonus payout <break time=\'200ms\'/> and there are special suited bonuses. "}',
+  'LAUNCH_WELCOME': '{"standard":"Welcome to Blackjack Game. |{0} Welcome to Blackjack Game. |{0} Let\'s play blackjack! |{0} Ready for some blackjack? ","tournament":"Welcome to the tournament round of Blackjack Game. |{0} It\'s tournament time! |{0} Welcome to the Blackjack tournament. ","spanish":"Welcome to Spanish 21. |{0} Welcome to Spanish 21. |{0} Ready for some Spanish 21? ","training":"Welcome to Advanced Training. |Ready to play Advanced Training? "}',
+  'LAUNCH_INITIAL_WELCOME': '{"standard":"","tournament":"You can play up to 100 hands to get the highest bankroll in the tournament. ","spanish":"In this game a player 21 always wins <break time=\'200ms\'/> you can redouble <break time=\'200ms\'/> 21 with 5 or more cards wins a bonus payout <break time=\'200ms\'/> and there are special suited bonuses. ","training":"We\'ll practice the top hands that most people played incorrectly to improve your game. "}',
   'LAUNCH_START_GAME': 'Say bet to start a new game',
   'LAUNCH_ENABLE_TRAINING': 'say enable training mode',
   'LAUNCH_SELECT_GAME': ' or say select a different game to change between Spanish 21 and standard blackjack',
@@ -54,13 +55,10 @@ const common = {
   'LAUNCH_SPANISH_TRIAL': 'For a limited time, we have a free trial version of Spanish 21 to play. Say select a new game to play Spanish 21. ',
   'LAUNCH_SPANISH_TRIAL_OVER': 'The free trial of Spanish 21 is over. If you would like to continue to play Spanish 21, say buy Spanish 21. ',
   // From ListPurchases.js
-  'LISTPURCHASE_SPANISH': 'You have purchased Spanish 21. What else can I help you with?',
+  'LISTPURCHASE_LIST': 'You have purchased {Products}. What else can I help you with?',
   'LISTPURCHASE_NONE': 'You haven\'t purchased any products for Blackjack Game. What else can I help you with?',
   'LISTPURCHASE_REPROMPT': 'What else can I help you with?',
   // From Purchase.js
-  'PURCHASE_ONLY_SPANISH': 'We only offer the Spanish 21 expansion product, and you\'ve already purchased it. What else can I help you with?',
-  'PURCHASE_SPANISH': 'We have a Spanish 21 game available for purchase. Would you like to buy it? ',
-  'PURCHASE_CONFIRM_REPROMPT': 'Say yes to buy Spanish 21',
   'PURCHASE_NO_PURCHASE': 'What else can I help you with?',
   'PURCHASE_REPROMPT': 'What else can I help you with?',
   // From Reminder.js
@@ -76,8 +74,6 @@ const common = {
   'REMINDER_SET': 'Great. I set a weekly reminder for the tournament round every {Time} {Timezone} <break time=\'200ms\'/> See you then!',
   'REMINDER_SET_EXPLICIT': 'Great. I set a weekly reminder for the tournament round every {Time} {Timezone} <break time=\'200ms\'/> What else can I help you with?',
   // From Refund.js
-  'REFUND_SPANISH': 'OK, as a reminder you will no longer be able to access Spanish 21 and will lose your progress on that game. Would you like to refund Spanish 21?',
-  'REFUND_SPANISH_REPROMPT': 'Would you like to refund Spanish 21?',
   'REFUND_REPROMPT': 'What else can I help you with?',
   // From Reset.js
   'RESET_CONFIRM': 'Would you like to reset the game? This will reset your bankroll and rules of the game.',
@@ -557,6 +553,7 @@ const utils = (locale) => {
     sayGame: function(game) {
       const games = {'standard': 'standard blackjack',
         'tournament': 'the tournament round',
+        'training': 'advanced training',
         'spanish': 'spanish 21'};
 
       return (games[game] ? games[game] : game);

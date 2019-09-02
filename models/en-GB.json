@@ -305,7 +305,8 @@
           ],
           "samples": [
             "return {Product}",
-            "refund {Product}"
+            "refund {Product}",
+            "cancel {Product}"
           ]
         },
         {
@@ -464,13 +465,28 @@
         {
           "values": [
             {
+              "id": "spanish",
               "name": {
-                "value": "spanish 21"
+                "value": "spanish",
+                "synonyms": [
+                  "spanish 21",
+                  "spanish 21 game",
+                  "spanish game"
+                ]
               }
             },
             {
+              "id": "training",
               "name": {
-                "value": "spanish"
+                "value": "advanced hands",
+                "synonyms": [
+                  "hard hands",
+                  "list of hard hands",
+                  "list of advanced hands",
+                  "advanced training",
+                  "advanced training hands",
+                  "advanced training mode"
+                ]
               }
             }
           ],
@@ -712,6 +728,75 @@
           ]
         }
       ]
-    }
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "PurchaseIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "Product",
+              "type": "LIST_OF_PRODUCTS",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Slot.608662361091.296773324169"
+              }
+            }
+          ]
+        },
+        {
+          "name": "RefundIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "Product",
+              "type": "LIST_OF_PRODUCTS",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Slot.388464246575.17269971272"
+              }
+            }
+          ]
+        }
+      ],
+      "delegationStrategy": "ALWAYS"
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Slot.608662361091.296773324169",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Would you like to buy Spanish twenty-one or an advanced training mode?"
+          },
+          {
+            "type": "PlainText",
+            "value": "What have Spanish twenty-one and an advanced training mode available for purchase. Which are you interested in?"
+          },
+          {
+            "type": "PlainText",
+            "value": "We have the popular Spanish twenty-one game and and advanced training mode available for purchase. Which would you like?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.388464246575.17269971272",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Would you like to refund Spanish twenty-one or advanced training?"
+          },
+          {
+            "type": "PlainText",
+            "value": "Which product would you like to refund?"
+          }
+        ]
+      }
+    ]
   }
 }

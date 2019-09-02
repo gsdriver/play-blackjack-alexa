@@ -8,7 +8,7 @@
           "apis": {
             "custom": {
               "endpoint": {
-                "uri": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v12"
+                "uri": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v13"
               }
             }
           }
@@ -17,29 +17,33 @@
       "in_skill_products": [
         {
           "deploy_status": "Update",
-          "filePath": "isps\\entitlement\\spanish.json",
+          "filePath": "isps/entitlement/spanish.json",
           "productId": "amzn1.adg.product.48f3cc52-c32e-459a-b7b5-eb36ebe6c86a"
+        },
+        {
+          "deploy_status": "Add",
+          "filePath": "isps/entitlement/training.json"
         }
       ],
       "resources": {
         "manifest": {
-          "eTag": "cb17c4344a05092c8e9c066adc193263"
+          "eTag": "96e7bb41c8130f92c7daa08aa9ea71f3"
         },
         "interactionModel": {
           "en-AU": {
-            "eTag": "b6757e12d61bf36c825bdb93a9498d4a"
+            "eTag": "a70a370a47c31da55d7cd2cd28204ccd"
           },
           "en-CA": {
-            "eTag": "b6757e12d61bf36c825bdb93a9498d4a"
+            "eTag": "a70a370a47c31da55d7cd2cd28204ccd"
           },
           "en-IN": {
-            "eTag": "489410a22d3d9b22f1def91ef3839288"
+            "eTag": "8a29d51404b2362f8de8aac454341f4e"
           },
           "en-GB": {
-            "eTag": "ce8d45a497683bd8df610e6666371db8"
+            "eTag": "925886e15ff75e85a48ae37bace06083"
           },
           "en-US": {
-            "eTag": "7b15e6a10b3afc68a6eff27d697d18e5"
+            "eTag": "e4a7e661b1ac2101c186a888ec9b33f8"
           }
         },
         "lambda": [
@@ -47,13 +51,13 @@
             "alexaUsage": [
               "custom/default"
             ],
-            "arn": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v12",
+            "arn": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v13",
             "awsRegion": "us-east-1",
             "codeUri": "lambda/custom",
-            "functionName": "Play_Blackjack_v12",
+            "functionName": "Play_Blackjack_v13",
             "handler": "index.handler",
-            "revisionId": "399c7539-2ee0-4a56-881e-c669401fb402",
-            "runtime": "nodejs8.10"
+            "revisionId": "72e16fa3-a4e9-48da-8c9c-308ce7de3789",
+            "runtime": "nodejs10.x"
           }
         ]
       }
