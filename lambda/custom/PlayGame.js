@@ -544,8 +544,21 @@ function readGameResult(attributes) {
   });
   game.winningStreak = (winner) ? ((game.winningStreak) ? (game.winningStreak + 1) : 1) : 0;
   if (game.winningStreak > 1) {
-    pointsEarned.push(resources.strings.WINNING_STREAK
-      .replace('{0}', game.winningStreak).replace('{1}', game.winningStreak));
+    // If they won 3 in a row and we haven't mentioned it yet, let them
+    // know one more win and they are eligible for the tournament!
+    if ((game.winningStreak === 3) && !attributes.temp.tournamentEntryReminder) {
+      attributes.temp.tournamentEntryReminder = true;
+      pointsEarned.push(resources.strings.WINNING_STREAK_CLOSETOENTRY
+        .replace('{0}', game.winningStreak).replace('{1}', game.winningStreak));
+    } else if ((game.winningStreak === 4) && !attributes.tournamentEligible) {
+      attributes.tournamentEligible = true;
+      pointsEarned.push(resources.strings.WINNING_STREAK_TOURNAMENTENTRY
+        .replace('{0}', game.winningStreak).replace('{1}', game.winningStreak));
+    } else {
+      pointsEarned.push(resources.strings.WINNING_STREAK
+        .replace('{0}', game.winningStreak).replace('{1}', game.winningStreak));
+    }
+
     attributes.achievements.streakScore = (attributes.achievements.streakScore)
         ? (attributes.achievements.streakScore + game.winningStreak)
         : game.winningStreak;

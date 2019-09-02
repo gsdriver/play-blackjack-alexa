@@ -134,15 +134,14 @@ function selectedGame(handlerInput, gameToPlay) {
         event.session.user.userId);
   }
 
-  return new Promise((resolve, reject) => {
-    const format = JSON.parse(res.strings.LAUNCH_WELCOME)[attributes.currentGame];
-    bjUtils.getWelcome(handlerInput, format, (greeting) => {
-      const launchSpeech = greeting + res.strings.LAUNCH_START_GAME;
-      const output = playgame.readCurrentHand(attributes, event.request.locale);
-      resolve(handlerInput.responseBuilder
-        .speak(launchSpeech)
-        .reprompt(output.reprompt)
-        .getResponse());
-    });
+  const format = JSON.parse(res.strings.LAUNCH_WELCOME)[attributes.currentGame];
+  return bjUtils.getWelcome(handlerInput, format)
+  .then((greeting) => {
+    const launchSpeech = greeting + res.strings.LAUNCH_START_GAME;
+    const output = playgame.readCurrentHand(attributes, event.request.locale);
+    return handlerInput.responseBuilder
+      .speak(launchSpeech)
+      .reprompt(output.reprompt)
+      .getResponse();
   });
 }

@@ -151,6 +151,8 @@ const common = {
   'LOST_SINGLEHAND_AND_SIDEBET': 'You lost your hand and your side bet. ',
   'LOST_MULTIPLEHANDS_AND_SIDEBET': 'You lost all your hands and your side bet. ',
   'WINNING_STREAK': '{1} points for {0} wins in a row',
+  'WINNING_STREAK_CLOSETOENTRY': '{1} points for {0} wins in a row <break time="200ms"/> one more for an entry into the weekly tournament',
+  'WINNING_STREAK_TOURNAMENTENTRY': '{1} points and an entry into the weekly tournament for {0} wins in a row',
   'FIRST_DAILY_HAND': '10 points for your first hand of the day',
   'NATURAL_BLACKJACK': '5 points for a natural blackjack ',
   'POINTS_EARNED_NOSCORE': 'You earned {0}. ',

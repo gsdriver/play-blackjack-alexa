@@ -52,6 +52,7 @@ module.exports = {
           } else {
             speech = res.strings.TOURNAMENT_LOSER.replace('{0}', result.highScore).replace('{1}', game.bankroll);
           }
+          attributes.tournamentEligible = undefined;
           attributes.currentGame = 'standard';
           attributes['tournament'] = undefined;
         }
@@ -69,9 +70,10 @@ module.exports = {
   },
   canEnterTournament: function(attributes) {
     // You can enter a tournament if one is active and you haven't ended one
+    // and you are eligible to enter it!
     const game = attributes['tournament'];
 
-    return (isTournamentActive() &&
+    return (isTournamentActive() && attributes.tournamentEligible &&
           !(game && ((game.bankroll === 0) || game.finished)));
   },
   getReminderText: function(locale) {
@@ -101,7 +103,7 @@ module.exports = {
       reprompt = res.strings.TOURNAMENT_LAUNCH_INFORM_REPROMPT;
     }
 
-    bjUtils.getWelcome(handlerInput, format, (speech) => {
+    bjUtils.getWelcome(handlerInput, format).then((speech) => {
       callback(speech, reprompt);
     });
   },

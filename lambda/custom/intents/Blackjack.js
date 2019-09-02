@@ -2,6 +2,7 @@
 
 const playgame = require('../PlayGame');
 const bjUtils = require('../BlackjackUtils');
+const { AlexaGamesGameOnClient } = require('@amzn-gameon/alexa-sdk');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -57,10 +58,25 @@ module.exports = {
       if (response) {
         resolve(response);
       } else {
+        const tournamentEligible = attributes.tournamentEligible;
         playgame.playBlackjackAction(attributes, event.request.locale,
           event.session.user.userId, actionObj,
           (error, response, speech, reprompt) => {
-          resolve(bjUtils.getResponse(handlerInput, error, response, speech, reprompt));
+          // If they weren't eligible for the tournament and are now, let's enter them
+          let promise;
+          if (tournamentEligible !== attributes.tournamentEligible) {
+            const client = new AlexaGamesGameOnClient();
+            promise = client.enterTournamentForPlayer({
+              tournamentId: process.env.GAMEON_TOURNAMENT_ID,
+              player: attributes.GameOn,
+            });
+          } else {
+            promise = Promise.resolve();
+          }
+
+          return promise.then(() => {
+            resolve(bjUtils.getResponse(handlerInput, error, response, speech, reprompt));
+          });
         });
       }
     });

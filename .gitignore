@@ -13,3 +13,6 @@ seed.txt
 lastResponse.txt
 lastaction.txt
 hooks
+*.txt
+.DS_Store
+.npmrc

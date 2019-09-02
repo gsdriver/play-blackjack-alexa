@@ -97,7 +97,7 @@ function selectedGame(handlerInput, callback) {
   attributes.temp.drawBoard = true;
 
   const format = JSON.parse(res.strings.LAUNCH_WELCOME)[attributes.currentGame];
-  bjUtils.getWelcome(handlerInput, format, (greeting) => {
+  bjUtils.getWelcome(handlerInput, format).then((greeting) => {
     let launchSpeech = greeting;
     launchSpeech += launchInitialText;
     launchSpeech += res.strings.LAUNCH_START_GAME;
