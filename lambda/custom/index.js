@@ -33,6 +33,7 @@ const gameService = require('./GameService');
 const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
 const playgame = require('./PlayGame');
+const upsell = require('./UpsellEngine');
 const request = require('request');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
@@ -170,6 +171,7 @@ const requestInterceptor = {
               }
             });
             attributes.temp.inSkillProductInfo = undefined;
+            upsell.initUpsell(attributes);
           }
 
           return tournament.getTournamentComplete(event.request.locale, attributes);

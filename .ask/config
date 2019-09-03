@@ -56,7 +56,7 @@
             "codeUri": "lambda/custom",
             "functionName": "Play_Blackjack_v13",
             "handler": "index.handler",
-            "revisionId": "8eac17f6-6ca1-425d-b56b-4d6da020606a",
+            "revisionId": "a5760f05-52ed-4d3a-a645-f15639592b6f",
             "runtime": "nodejs10.x"
           }
         ]

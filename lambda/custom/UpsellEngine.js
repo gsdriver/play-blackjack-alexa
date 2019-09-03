@@ -26,8 +26,7 @@ AWS.config.update({region: 'us-east-1'});
 const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 
 module.exports = {
-  getUpsell: function(attributes, trigger) {
-    let directive;
+  initUpsell: function(attributes) {
     const now = Date.now();
 
     // See what's available
@@ -42,9 +41,6 @@ module.exports = {
       attributes.upsell = {};
       attributes.upsell.prompts = {};
     }
-    if (!attributes.upsell[trigger]) {
-      attributes.upsell[trigger] = {};
-    }
     attributes.upsell.version = 'v1.3';
 
     // Clear legacy prompts structure
@@ -54,11 +50,25 @@ module.exports = {
       attributes.prompts.sellSpanish = undefined;
     }
 
-    // Since we are called on launch, this
-    // will help us see the full session length
+    // Capture start time so we can see full session length
     if (!attributes.upsell.start) {
       attributes.upsell.start = now;
       attributes.upsell.sessions = (attributes.upsell.sessions + 1) || 1;
+    }
+  },
+  getUpsell: function(attributes, trigger) {
+    let directive;
+    const now = Date.now();
+
+    // See what's available
+    const availableProducts = getAvailableProducts(attributes);
+    if (!availableProducts.length) {
+      // Nothing is available to sell
+      return;
+    }
+
+    if (!attributes.upsell[trigger]) {
+      attributes.upsell[trigger] = {};
     }
 
     attributes.upsell[trigger].trigger = now;

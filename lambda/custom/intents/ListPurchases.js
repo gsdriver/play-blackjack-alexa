@@ -6,6 +6,7 @@
 'use strict';
 
 const upsell = require('../UpsellEngine');
+const speechUtils = require('alexa-speech-utils')();
 
 module.exports = {
   canHandle: function(handlerInput) {
