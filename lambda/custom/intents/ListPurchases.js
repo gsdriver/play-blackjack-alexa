@@ -37,6 +37,16 @@ module.exports = {
       }
     }
 
+    if (purchasedProducts.length) {
+      const speech = res.strings.LISTPURCHASE_LIST
+        .replace('{Products}', speechUtils.and(purchasedProducts, {pause: '300ms', locale: event.request.locale}));
+
+      return handlerInput.responseBuilder
+        .speak(speech)
+        .reprompt(res.strings.LISTPURCHASE_REPROMPT)
+        .getResponse();
+    }
+
     if (availableProducts.length) {
       const directive = upsell.getUpsell(attributes, 'listpurchases');
       if (directive) {
@@ -48,19 +58,9 @@ module.exports = {
       }
     }
 
-    if (purchasedProducts.length) {
-      const speech = res.strings.LISTPURCHASE_LIST
-        .replace('{Products}', speechUtils.and(purchasedProducts, {pause: '300ms', locale: event.request.locale}));
-
-      return handlerInput.responseBuilder
-        .speak(speech)
-        .reprompt(res.strings.LISTPURCHASE_REPROMPT)
-        .getResponse();
-    } else {
-      return handlerInput.responseBuilder
-        .speak(res.strings.LISTPURCHASE_NONE)
-        .reprompt(res.strings.LISTPURCHASE_REPROMPT)
-        .getResponse();
-    }
+    return handlerInput.responseBuilder
+      .speak(res.strings.LISTPURCHASE_NONE)
+      .reprompt(res.strings.LISTPURCHASE_REPROMPT)
+      .getResponse();
   },
 };
