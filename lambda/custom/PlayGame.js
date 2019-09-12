@@ -36,7 +36,7 @@ module.exports = {
       // about training mode, then let them know about this feature
       if (!attributes.prompts.training) {
         attributes.prompts.training = true;
-        if (!game.training) {
+        if (!game.training && !game.useTrainingHands) {
           speech += ('. ' + resources.strings.PROMPT_TRAINING);
         }
       }
@@ -63,9 +63,19 @@ module.exports = {
         const betAmount = (action.amount ? action.amount : game.lastBet);
         const oldGame = JSON.parse(JSON.stringify(game));
 
+        // Check what they should have done if this is a hard hand
+        if (game.isHardHand && !game.training && !game.hardSuggestion) {
+          const hardSuggestion = gameService.getRecommendedAction(game);
+          if ((hardSuggestion !== 'notplayerturn') && (hardSuggestion !== action.action)) {
+            game.hardSuggestion = hardSuggestion;
+          } else {
+            game.hardSuggestion = 'none';
+          }
+        }
+
         // If they are in training mode, first check if this is the right action
         // and we didn't already make a suggestion that they are ignoring
-        if (game.training && !game.suggestion) {
+        if ((game.training || game.useTrainingHands) && !game.suggestion) {
           const suggestion = gameService.getRecommendedAction(game);
 
           if ((suggestion !== 'notplayerturn') && (suggestion !== action.action)) {
@@ -184,7 +194,7 @@ module.exports = {
       } else {
         const actions = game.possibleActions.map((x) => resources.mapPlayOption(x));
         actions.push(resources.strings.HELP_YOU_CAN_SAY_LEADER);
-        if (helpPrompt && !game.training) {
+        if (helpPrompt && !game.training && !game.useTrainingHands) {
           actions.push(resources.strings.HELP_YOU_CAN_SAY_ENABLE_TRAINING);
         }
         result = resources.strings.HELP_YOU_CAN_SAY.replace('{0}', utils.or(actions, {locale: event.request.locale}));

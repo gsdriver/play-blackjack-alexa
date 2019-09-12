@@ -48,7 +48,21 @@ module.exports = {
       if (!attributes.temp.noUpsellBetting) {
         const directive = upsell.getUpsell(attributes, 'long21');
         if (directive) {
-          directive.token = 'game.spanish.betting';
+          directive.token = 'game.' + directive.token + '.betting';
+          return handlerInput.responseBuilder
+            .addDirective(directive)
+            .withShouldEndSession(true)
+            .getResponse();
+        }
+      }
+    }
+
+    // If the last hand was a hard hand and they played it wrong, upsell them
+    if (game.hardSuggestion && (game.hardSuggestion !== 'none')) {
+      if (!attributes.temp.noUpsellBetting) {
+        const directive = upsell.getUpsell(attributes, 'hardhand');
+        if (directive) {
+          directive.token = 'game.' + directive.token + '.betting';
           return handlerInput.responseBuilder
             .addDirective(directive)
             .withShouldEndSession(true)
@@ -61,7 +75,7 @@ module.exports = {
     if (!attributes.temp.noUpsellBetting) {
       const directive = upsell.getUpsell(attributes, 'play');
       if (directive) {
-        directive.token = 'game.spanish.betting';
+        directive.token = 'game.' + directive.token + '.betting';
         return handlerInput.responseBuilder
           .addDirective(directive)
           .withShouldEndSession(true)
@@ -73,6 +87,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       amount = getBet(event, attributes);
       const action = {action: 'bet', amount: amount, firsthand: attributes.temp.firsthand};
+      game.hardSuggestion = undefined;
       playgame.playBlackjackAction(attributes, event.request.locale,
         event.session.user.userId, action,
         (error, response, speech, reprompt) => {

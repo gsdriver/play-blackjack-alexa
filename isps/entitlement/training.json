@@ -1,0 +1,88 @@
+{
+  "version": "1.0",
+  "type": "ENTITLEMENT",
+  "referenceName": "training",
+  "publishingInformation": {
+    "locales": {
+      "en-US": {
+        "name": "Advanced Hands",
+        "smallIconUri": "http://garrettvargas.com/img/Spanish108.png",
+        "largeIconUri": "http://garrettvargas.com/img/Spanish512.png",
+        "summary": "Practice hands that stump most players",
+        "description": "Based on analysis half a million hands played through this skill, this feature will allow you to practice the top 100 hands that most people get wrong",
+        "examplePhrases": [
+          "Alexa, buy advanced hands",
+          "Alexa, purchase hard hands",
+          "Alexa, buy hard hands"
+        ],
+        "keywords": [
+          "blackjack",
+          "training",
+          "analysis"
+        ],
+        "customProductPrompts": {
+          "purchasePromptDescription": "Based on analysis of half a million hands played through this still, Advanced Hands lets you practice the top 100 hands that people played incorrectly",
+          "boughtCardDescription": "Great, now you can practice the top 100 hands people played wrong by saying Practice Advanced Hands"
+        }
+      },
+      "en-GB": {
+        "name": "Advanced Hands",
+        "smallIconUri": "http://garrettvargas.com/img/Spanish108.png",
+        "largeIconUri": "http://garrettvargas.com/img/Spanish512.png",
+        "summary": "Practice hands that stump most players",
+        "description": "Based on analysis half a million hands played through this skill, this feature will allow you to practice the top 100 hands that most people get wrong",
+        "examplePhrases": [
+          "Alexa, buy advanced hands",
+          "Alexa, purchase hard hands",
+          "Alexa, buy hard hands"
+        ],
+        "keywords": [
+          "blackjack",
+          "training",
+          "analysis"
+        ],
+        "customProductPrompts": {
+          "purchasePromptDescription": "Based on analysis of half a million hands played through this still, Advanced Hands lets you practice the top 100 hands that people played incorrectly",
+          "boughtCardDescription": "Great, now you can practice the top 100 hands people played wrong by saying Practice Advanced Hands"
+        }
+      }
+    },
+    "distributionCountries": [
+      "US",
+      "UK"
+    ],
+    "pricing": {
+      "pricing": {
+        "amazon.com": {
+          "releaseDate": "2019-09-02",
+          "defaultPriceListing": {
+            "price": 1.99,
+            "currency": "USD"
+          }
+        },
+        "amazon.co.uk": {
+          "releaseDate": "2019-09-02",
+          "defaultPriceListing": {
+            "price": 1.99,
+            "currency": "GBP"
+          }
+        }
+      }
+    },
+    "taxInformation": {
+      "category": "SOFTWARE"
+    }
+  },
+  "privacyAndCompliance": {
+    "locales": {
+      "en-US": {
+        "privacyPolicyUrl": "http://garrettvargas.com/privacy.html"
+      },
+      "en-GB": {
+        "privacyPolicyUrl": "http://garrettvargas.com/privacy.html"
+      }
+    }
+  },
+  "testingInstructions": "After purchasing Advanced Hands, you can say 'Practice Advanced Hands' which will allow you to play the top 100 hands most people play wrong.",
+  "purchasableState": "PURCHASABLE"
+}

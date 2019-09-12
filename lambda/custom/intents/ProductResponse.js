@@ -74,31 +74,24 @@ module.exports = {
 
     return promise.then(() => {
       const options = event.request.token.split('.');
-      let nextAction = 'launch';
+      const game = options[1];
+      let nextAction = options[2];
 
       attributes.upsellSelection = undefined;
       switch (event.request.name) {
         case 'Buy':
-          if (event.request.payload &&
-            ((event.request.payload.purchaseResult == 'ACCEPTED') ||
-             (event.request.payload.purchaseResult == 'ALREADY_PURCHASED'))) {
-            // OK, flip them to Spanish 21
-            return selectedGame(handlerInput, 'spanish');
-          }
-          break;
         case 'Upsell':
           if (event.request.payload &&
             ((event.request.payload.purchaseResult == 'ACCEPTED') ||
              (event.request.payload.purchaseResult == 'ALREADY_PURCHASED'))) {
-            // They either purchased or already had this game, so drop them into it
-            return selectedGame(handlerInput, 'spanish');
+            // OK, flip them to this game
+            return selectedGame(handlerInput, game);
           }
-          nextAction = options[2];
           break;
         case 'Cancel':
           if (event.request.payload &&
               (event.request.payload.purchaseResult == 'ACCEPTED')) {
-            attributes.spanish = undefined;
+            attributes[game] = undefined;
             return selectedGame(handlerInput, 'standard');
           }
           break;

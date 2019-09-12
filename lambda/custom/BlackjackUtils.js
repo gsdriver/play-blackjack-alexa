@@ -252,6 +252,24 @@ module.exports = {
       return 'INGAME';
     }
   },
+  mapProduct: function(handlerInput) {
+    const event = handlerInput.requestEnvelope;
+    let product;
+
+    if (event.request.intent.slots && event.request.intent.slots.Product
+      && event.request.intent.slots.Product.resolutions
+      && event.request.intent.slots.Product.resolutions.resolutionsPerAuthority
+      && event.request.intent.slots.Product.resolutions.resolutionsPerAuthority[0].values
+      && event.request.intent.slots.Product.resolutions.resolutionsPerAuthority[0].values[0].value
+      && event.request.intent.slots.Product.resolutions.resolutionsPerAuthority[0]
+        .values[0].value.id) {
+      product = event.request.intent.slots.Product.resolutions.resolutionsPerAuthority[0]
+        .values[0].value.id;
+    }
+
+    // Legacy - map advanced_hands to training
+    return (product === 'advanced_hands') ? 'training' : product;
+  },
   readBankroll: function(locale, attributes) {
     const res = require('./resources')(locale);
     const game = attributes[attributes.currentGame];

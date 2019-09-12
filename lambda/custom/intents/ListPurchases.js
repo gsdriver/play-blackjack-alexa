@@ -6,6 +6,7 @@
 'use strict';
 
 const upsell = require('../UpsellEngine');
+const speechUtils = require('alexa-speech-utils')();
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -19,25 +20,46 @@ module.exports = {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const res = require('../resources')(event.request.locale);
-    let speech;
+    const availableProducts = [];
+    const purchasedProducts = [];
 
-    if (attributes.paid.spanish && (attributes.paid.spanish.state === 'PURCHASED')) {
-      speech = res.strings.LISTPURCHASE_SPANISH;
-    } else {
+    const productMap = {
+      'spanish': 'Spanish 21',
+      'training': 'advanced training',
+    };
+
+    let product;
+    for (product in attributes.paid) {
+      if (attributes.paid[product].state === 'PURCHASED') {
+        purchasedProducts.push(productMap[product]);
+      } else if (attributes.paid[product].state === 'AVAILABLE') {
+        availableProducts.push(productMap[product]);
+      }
+    }
+
+    if (purchasedProducts.length) {
+      const speech = res.strings.LISTPURCHASE_LIST
+        .replace('{Products}', speechUtils.and(purchasedProducts, {pause: '300ms', locale: event.request.locale}));
+
+      return handlerInput.responseBuilder
+        .speak(speech)
+        .reprompt(res.strings.LISTPURCHASE_REPROMPT)
+        .getResponse();
+    }
+
+    if (availableProducts.length) {
       const directive = upsell.getUpsell(attributes, 'listpurchases');
       if (directive) {
-        directive.token = 'game.spanish.launch';
+        directive.token = 'game.' + directive.token + '.launch';
         return handlerInput.responseBuilder
           .addDirective(directive)
           .withShouldEndSession(true)
           .getResponse();
-      } else {
-        speech = res.strings.LISTPURCHASE_NONE;
       }
     }
 
     return handlerInput.responseBuilder
-      .speak(speech)
+      .speak(res.strings.LISTPURCHASE_NONE)
       .reprompt(res.strings.LISTPURCHASE_REPROMPT)
       .getResponse();
   },

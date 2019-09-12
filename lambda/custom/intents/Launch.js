@@ -76,7 +76,7 @@ module.exports = {
         } else if (!attributes.temp.noUpsellLaunch) {
           const directive = upsell.getUpsell(attributes, 'launch');
           if (directive) {
-            directive.token = 'game.spanish.launch';
+            directive.token = 'game.' + directive.token + '.launch';
             resolve(handlerInput.responseBuilder
               .addDirective(directive)
               .withShouldEndSession(true)
