@@ -199,9 +199,8 @@ module.exports = {
             }
           });
         }
-      } else {
+      } else if (err) {
         console.log('isReminderActive error ' + err.error);
-        console.log('isReminderActive request: ' + JSON.stringify(options));
       }
       callback(isActive);
     });
