@@ -6,7 +6,9 @@ play-blackjack-alexa.zip
 PlayGame.zip
 *.bat
 src/test.json
+.ask
 .idea
+.legacy
 summary.csv
 attributes.txt
 seed.txt
