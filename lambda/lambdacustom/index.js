@@ -24,11 +24,13 @@ const ConfirmReset = require('./intents/ConfirmReset');
 const ConfirmSelect = require('./intents/ConfirmSelect');
 const Select = require('./intents/Select');
 const Training = require('./intents/Training');
+const BuyGood = require('./intents/BuyGood');
 const Unhandled = require('./intents/Unhandled');
 const ListPurchases = require('./intents/ListPurchases');
 const Purchase = require('./intents/Purchase');
 const Refund = require('./intents/Refund');
 const ProductResponse = require('./intents/ProductResponse');
+const SessionResumed = require('./intents/SessionResumed');
 const gameService = require('./GameService');
 const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
@@ -266,6 +268,8 @@ function runGame(event, context, callback) {
   });
   const skillFunction = skillBuilder.addRequestHandlers(
       ProductResponse,
+      SessionResumed,
+      BuyGood,
       OfferTournament,
       TournamentJoin,
       Launch,

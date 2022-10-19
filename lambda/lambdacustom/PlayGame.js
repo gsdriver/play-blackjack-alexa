@@ -73,12 +73,14 @@ module.exports = {
           }
         }
 
+        // We need to know if this was the right play or not
+        const suggestion = gameService.getRecommendedAction(game);
+        const wrongPlay = ((suggestion !== 'notplayerturn') && (suggestion !== action.action));
+
         // If they are in training mode, first check if this is the right action
         // and we didn't already make a suggestion that they are ignoring
         if ((game.training || game.useTrainingHands) && !game.suggestion) {
-          const suggestion = gameService.getRecommendedAction(game);
-
-          if ((suggestion !== 'notplayerturn') && (suggestion !== action.action)) {
+          if (wrongPlay) {
             // Let them know what the recommended action was
             // and give them a chance to use this action instead
             game.suggestion = {suggestion: suggestion, player: action.action};
@@ -141,6 +143,9 @@ module.exports = {
                 return;
               }
             }
+
+            // Make note if the hand is over and they played it wrong
+            attributes.temp.wrongPlay = (wrongPlay && (game.activePlayer === 'none'));
 
             // Pose this as a question whether it's the player or dealer's turn
             repromptQuestion = listValidActions(game, locale, 'full');

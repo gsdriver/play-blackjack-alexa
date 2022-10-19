@@ -20,6 +20,11 @@ const common = {
   // From Blackjack.js
   'BLACKJACKINTENT_NO_ACTION': 'I\'m sorry, I didn\'t catch that action. Please say what you want to do on this hand like hit or stand. What else can I help with?',
   'BLACKJACKINTENT_UNKNOWN_ACTION': 'I\'m sorry, I don\'t understand how to {0}. Please provide an action like hit or stand. What else can I help with?',
+  // From BuyGood.js
+  'BUY_GOOD_DECLINE': 'What else can I help you with?',
+  'BUY_GOOD_DECLINE_REPROMPT': 'What else can I help you with?',
+  'BUY_GOOD_SUCCESS': 'Thank you! ',
+  'BUY_GOOD_FAILURE': 'I\'m sorry, there was an issue while performing your request. ',
   // From ChangeRules.js
   'CHANGERULES_NO_RULE': 'I\'m sorry, I didn\'t catch a rule to change. {2} What else can I help with?',
   'CHANGERULES_NO_RULE_VALUE': 'I\'m sorry, I don\'t understand how to change {0}. {2} What else can I help with?',

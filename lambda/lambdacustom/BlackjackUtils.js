@@ -433,10 +433,12 @@ module.exports = {
     const res = require('./resources')(event.request.locale);
     let image;
 
+    // We could look at the specific viewport dimensions and display based on that
+    // But for now, we'll try to display on all viewport sizes
     if (event.context && event.context.System &&
         event.context.System.device &&
         event.context.System.device.supportedInterfaces &&
-        event.context.System.device.supportedInterfaces.Display) {
+        event.context.System.device.supportedInterfaces['Alexa.Presentation.APL']) {
       if ((attributes.temp && attributes.temp.drawBoard)
           || attributes.originalChoices
           || !(attributes.temp && attributes.temp.imageUrl)) {
@@ -452,27 +454,46 @@ module.exports = {
 
           attributes.originalChoices.forEach((choice) => {
             listItems.push({
-              'token': 'game.' + i++,
-              'textContent': {
-                'primaryText': {
-                  'type': 'RichText',
-                  'text': '<font size=\"7\">' + res.sayGame(choice) + '</font>',
-                },
-              },
+              primaryText: res.sayGame(choice),
+              token: 'game.' + i++,
             });
           });
 
-          image = new Alexa.ImageHelper()
-            .addImageInstance('http://garrettvargas.com/img/blackjack-background.png')
-            .getImage();
-          response.addRenderTemplateDirective({
-            type: 'ListTemplate1',
-            token: 'listToken',
-            backButton: 'HIDDEN',
-            title: res.strings.SELECT_GAME_TITLE,
-            backgroundImage: image,
-            listItems: listItems,
+          const document = {
+            type: 'APL',
+            version: '1.6',
+            import: [{
+              name: 'alexa-layouts',
+              version: '1.3.0',
+            }],
+            mainTemplate: {
+              parameters: [
+                'listTemplateData',
+              ],
+              item: [{
+                type: 'AlexaTextList',
+                primaryText: '${listTemplateData.textContent}',
+                headerBackButton: false,
+                backgroundImageSource: '${listTemplateData.backgroundImage}',
+                listItems: '${listTemplateData.listItems}',
+              }],
+            },
+          };
+          const datasources = {
+            listTemplateData: {
+              backgroundImage: 'http://garrettvargas.com/img/blackjack-background.png',
+              textContent: res.strings.SELECT_GAME_TITLE,
+              listItems,
+            },
+          };
+  
+          response.addDirective({
+            type: 'Alexa.Presentation.APL.RenderDocument',
+            version: '1.1',
+            document,
+            datasources,
           });
+
           callback();
         } else {
           const start = Date.now();
@@ -512,15 +533,39 @@ module.exports = {
       }
 
       function done() {
-        image = new Alexa.ImageHelper()
-          .addImageInstance(attributes.temp.imageUrl)
-          .getImage();
-        response.addRenderTemplateDirective({
-          type: 'BodyTemplate6',
-          backButton: 'HIDDEN',
-          title: '',
-          backgroundImage: image,
+        const document = {
+          type: 'APL',
+          version: '1.6',
+          import: [{
+            name: 'alexa-layouts',
+            version: '1.3.0',
+          }],
+          mainTemplate: {
+            parameters: [
+              'headlineTemplateData',
+            ],
+            item: [{
+              type: 'AlexaHeadline',
+              primaryText: '${headlineTemplateData.textContent}',
+              headerBackButton: false,
+              backgroundImageSource: '${headlineTemplateData.backgroundImage}',
+            }],
+          },
+        };
+        const datasources = {
+          headlineTemplateData: {
+            backgroundImage: attributes.temp.imageUrl,
+            textContent: '',
+          },
+        };
+
+        response.addDirective({
+          type: 'Alexa.Presentation.APL.RenderDocument',
+          version: '1.1',
+          document,
+          datasources,
         });
+
         callback();
       }
     } else {
