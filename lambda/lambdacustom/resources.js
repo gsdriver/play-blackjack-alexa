@@ -25,6 +25,7 @@ const common = {
   'BUY_GOOD_DECLINE_REPROMPT': 'What else can I help you with?',
   'BUY_GOOD_SUCCESS': 'Thank you! ',
   'BUY_GOOD_FAILURE': 'I\'m sorry, there was an issue while performing your request. ',
+  'BUY_GOOD_CANCEL': 'Please visit your Amazon account to cancel your order.',
   // From ChangeRules.js
   'CHANGERULES_NO_RULE': 'I\'m sorry, I didn\'t catch a rule to change. {2} What else can I help with?',
   'CHANGERULES_NO_RULE_VALUE': 'I\'m sorry, I don\'t understand how to change {0}. {2} What else can I help with?',
@@ -78,6 +79,7 @@ const common = {
   'REMINDER_ERROR_EXPLICIT': 'Sorry, there was a problem setting your reminder. What else can I help you with?',
   'REMINDER_SET': 'Great. I set a weekly reminder for the tournament round every {Time} {Timezone} <break time=\'200ms\'/> See you then!',
   'REMINDER_SET_EXPLICIT': 'Great. I set a weekly reminder for the tournament round every {Time} {Timezone} <break time=\'200ms\'/> What else can I help you with?',
+  'REMINDER_SET_CARD': 'Blackjack Game set a weekly reminder for the tournament round every {Time} {Timezone}.',
   // From Refund.js
   'REFUND_REPROMPT': 'What else can I help you with?',
   // From Reset.js

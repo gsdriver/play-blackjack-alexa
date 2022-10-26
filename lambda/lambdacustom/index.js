@@ -120,7 +120,6 @@ function initialize(event, attributes) {
   });
 }
 
-
 const requestInterceptor = {
   process(handlerInput) {
     const attributesManager = handlerInput.attributesManager;

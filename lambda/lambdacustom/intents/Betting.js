@@ -75,8 +75,8 @@ module.exports = {
     }
 
     // If the last hand was played wrong, upsell them on our book
-    if (attributes.temp.wrongPlay) {
-      attributes.temp.wrongPlay = undefined;
+    if (attributes.temp.wrongPlayLoser) {
+      attributes.temp.wrongPlayLoser = undefined;
       if (!attributes.temp.noUpsellBetting) {
         const good = upsell.getGood(handlerInput, 'badplay');
         if (good) {

@@ -117,8 +117,9 @@ module.exports = {
     const now = Date.now();
     let good;
 
-    // Goods are only available in the US
-    if (locale !== 'en-US') {
+    // Check env var to see which markets support goods
+    const locales = (process.env.GOODLOCALES || "").split(",");
+    if (locales.indexOf(locale) === -1) {
       return;
     }
 
@@ -235,7 +236,7 @@ function selectGoodsMessage(attributes, good, message) {
   // Store upsell messages locally
   // These aren't localized outside of en-US anyway
   const upsellMessages = {
-    'BADPLAY_UPSELL': 'Want a classic reference to learn how to play better blackjack? You can purchase {Product} from Amazon. {Disclaimer}. Want to learn more?|Improve your game by reading the classic book {Product}, available to purchase from Amazon! {Disclaimer}. Want to buy it?|If you\'re enjoying this game, try reading the book {Product} available from Amazon. {Disclaimer}. Would you like to buy this book?',
+    'BADPLAY_UPSELL': 'Tough break on that last hand. Want a classic reference to learn how to play better blackjack? You can purchase {Product} from Amazon. {Disclaimer}. Want to learn more?|I\'m sorry for that loss. Improve your game by reading the classic book {Product}, available to purchase from Amazon! {Disclaimer}. Want to buy it?|If you\'re enjoying this game, try reading the book {Product} available from Amazon. {Disclaimer}. Would you like to buy this book?',
   };
   const productName = {
     'beat_the_dealer': 'Beat The Dealer',

@@ -38,6 +38,18 @@ module.exports = {
     return new Promise((resolve, reject) => {
       attributes.temp.addingReminder = undefined;
       if (event.request.intent.name === 'ReminderIntent') {
+        // First things first - let's make sure they've granted permission to set reminders
+        if (!event.context.System.user.permissions
+          || !event.context.System.user.permissions.consentToken) {
+          // Get their permission to show a reminder
+          response = handlerInput.responseBuilder
+            .speak(res.strings.REMINDER_GRANT_PERMISSION)
+            .withAskForPermissionsConsentCard(['alexa::alerts:reminders:skill:readwrite'])
+            .getResponse();
+          resolve(response);
+          return;
+        }
+
         bjUtils.isReminderActive(handlerInput, (isActive) => {
           if (!isActive) {
             attributes.temp.addingReminder = 'explicit';
@@ -62,12 +74,16 @@ module.exports = {
           if (result && (typeof result !== 'string')) {
             attributes.setReminder = true;
             let speech;
+            const cardText = res.strings.REMINDER_SET_CARD
+              .replace('{Time}', result.time)
+              .replace('{Timezone}', result.timezone);
             if (endSession) {
               speech = res.strings.REMINDER_SET
                 .replace('{Time}', result.time)
                 .replace('{Timezone}', result.timezone);
               response = handlerInput.responseBuilder
                 .speak(speech)
+                .withSimpleCard(cardText)
                 .withShouldEndSession(true)
                 .getResponse();
             } else {
@@ -76,6 +92,7 @@ module.exports = {
                 .replace('{Timezone}', result.timezone);
               response = handlerInput.responseBuilder
                 .speak(speech)
+                .withSimpleCard(cardText)
                 .reprompt(res.strings.REMINDER_REPROMPT)
                 .getResponse();
             }
