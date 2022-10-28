@@ -224,6 +224,21 @@
           ]
         },
         {
+          "name": "RefundGoodIntent",
+          "slots": [],
+          "samples": [
+            "cancel that book",
+            "refund that book",
+            "return that book",
+            "cancel my purchase",
+            "refund my purchase",
+            "return my purchase",
+            "cancel my order",
+            "refund my order",
+            "return my order"
+          ]
+        },
+        {
           "name": "HighScoreIntent",
           "samples": [
             "read high scores",

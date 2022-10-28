@@ -25,7 +25,7 @@ const common = {
   'BUY_GOOD_DECLINE_REPROMPT': 'What else can I help you with?',
   'BUY_GOOD_SUCCESS': 'Thank you! ',
   'BUY_GOOD_FAILURE': 'I\'m sorry, there was an issue while performing your request. ',
-  'BUY_GOOD_CANCEL': 'Please go to the orders section of your Amazon account to review or cancel your order.',
+  'BUY_GOOD_CANCEL': 'Please go to the orders section of your Amazon account to review or cancel your order. What else can I help you with?',
   // From ChangeRules.js
   'CHANGERULES_NO_RULE': 'I\'m sorry, I didn\'t catch a rule to change. {2} What else can I help with?',
   'CHANGERULES_NO_RULE_VALUE': 'I\'m sorry, I don\'t understand how to change {0}. {2} What else can I help with?',

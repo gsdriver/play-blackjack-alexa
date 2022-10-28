@@ -12,7 +12,7 @@ module.exports = {
       'AMAZON.HelpIntent', 'AMAZON.YesIntent', 'AMAZON.NoIntent', 'AMAZON.StopIntent',
       'AMAZON.CancelIntent', 'SuggestIntent', 'ResetIntent', 'PlaceSideBetIntent',
       'RemoveSideBetIntent', 'RulesIntent', 'EnableTrainingIntent', 'DisableTrainingIntent',
-      'PurchaseIntent', 'RefundIntent'];
+      'PurchaseIntent', 'RefundIntent', 'RefundGoodIntent'];
 
     // Default to a negative response
     const response = {

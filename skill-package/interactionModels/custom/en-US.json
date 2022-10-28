@@ -306,8 +306,22 @@
           ],
           "samples": [
             "cancel {Product}",
-            "return {Product}",
-            "refund {Product}"
+            "return {Product}"
+          ]
+        },
+        {
+          "name": "RefundGoodIntent",
+          "slots": [],
+          "samples": [
+            "cancel that book",
+            "refund that book",
+            "return that book",
+            "cancel my purchase",
+            "refund my purchase",
+            "return my purchase",
+            "cancel my order",
+            "refund my order",
+            "return my order"
           ]
         },
         {

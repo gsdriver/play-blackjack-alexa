@@ -35,16 +35,6 @@ module.exports = {
     const game = attributes[attributes.currentGame];
     let exitSpeech = '';
 
-    // Special case - if they made a purchase and launched the skill a-new
-    // then we should direct them to Amazon to cancel the purchase
-    if (handlerInput.requestEnvelope.session.new &&
-      attributes.purchasedGoods && Object.keys(attributes.purchasedGoods).length) {
-      return handlerInput.responseBuilder
-        .speak(res.strings.BUY_GOOD_CANCEL)
-        .withShouldEndSession(true)
-        .getResponse();
-    }
-
     // Tell them how much money they are leaving with
     exitSpeech = res.strings.EXIT_BANKROLL.replace('{0}', game.bankroll) + ' ';
     if (attributes.bot || (attributes.platform === 'google')) {

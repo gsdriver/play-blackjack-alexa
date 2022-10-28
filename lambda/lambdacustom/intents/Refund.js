@@ -10,14 +10,15 @@ module.exports = {
   canHandle: function(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
 
-    return (request.type === 'IntentRequest') && (request.intent.name === 'RefundIntent');
+    return (request.type === 'IntentRequest') && 
+      ((request.intent.name === 'RefundIntent') || (request.intent.name === 'RefundGoodIntent'));
   },
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const res = require('../resources')(event.request.locale);
 
-    if (event.request.dialogState !== 'COMPLETED') {
+    if ((event.request.intent.name === 'RefundIntent') && (event.request.dialogState !== 'COMPLETED')) {
       return handlerInput.responseBuilder
         .addDelegateDirective(event.request.intent)
         .getResponse();
@@ -60,7 +61,7 @@ module.exports = {
     if (attributes.purchasedGoods && Object.keys(attributes.purchasedGoods).length) {
       return handlerInput.responseBuilder
         .speak(res.strings.BUY_GOOD_CANCEL)
-        .withShouldEndSession(true)
+        .reprompt(res.strings.BUY_GOOD_CANCEL)
         .getResponse();
     }
 
