@@ -48,6 +48,48 @@ module.exports = {
       }
       const game = attributes[attributes.currentGame];
 
+      // If they busted, let's look into resetting the bankroll
+      if (attributes.busted) {
+        if (attributes.paid && attributes.paid.bankrollreset && (attributes.paid.bankrollreset.state == 'PURCHASED')) {
+          game.bankroll = game.bankrollRefresh;
+          attributes.busted = undefined;
+          attributes.prependLaunch = (attributes.prependLaunch || "") +
+            res.strings.LAUNCH_RESET_BANKROLL_SUBSCRIPTION.replace('{Bankroll}', game.bankroll);
+        } else {
+          // Is it the next day or not?
+          bjUtils.isNextDay(handlerInput, (nextDay) => {
+            if (!nextDay) {
+              // Here's the place to do an upsell if we can!
+              const directive = upsell.getUpsell(attributes, 'busted');
+              if (directive) {
+                directive.token = 'game.' + directive.token + '.launch';
+                resolve(handlerInput.responseBuilder
+                  .addDirective(directive)
+                  .withShouldEndSession(true)
+                  .getResponse());
+              } else {
+                // Nope, you aren't allowed to play - get out of here
+                launchSpeech = res.strings.LAUNCH_BUSTED;
+                if (attributes.prependLaunch) {
+                  launchSpeech = attributes.prependLaunch + launchSpeech;
+                  attributes.prependLaunch = undefined;
+                }
+                resolve(handlerInput.responseBuilder
+                  .speak(res.strings.LAUNCH_BUSTED)
+                  .withShouldEndSession(true)
+                  .getResponse());
+                }
+              return;  
+            } else {
+              // OK, it's the following day, so we can update their bankroll
+              game.bankroll = game.bankrollRefresh;
+              attributes.busted = undefined;
+              attributes.prependLaunch = (attributes.prependLaunch || "") + res.strings.LAUNCH_RESET_BANKROLL;
+            }
+          });
+        }
+      }
+
       // Try to keep it simple
       const format = JSON.parse(res.strings.LAUNCH_WELCOME)[attributes.currentGame];
       bjUtils.getWelcome(handlerInput, format, (greeting) => {

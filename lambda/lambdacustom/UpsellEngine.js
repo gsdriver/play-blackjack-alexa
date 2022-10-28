@@ -214,10 +214,12 @@ function selectUpsellMessage(attributes, upsellProduct, message) {
     'PLAY_UPSELL': 'Did you know we have a {Product} expansion pack? Want to learn more?|I\'m glad to see you\'re enjoying Blackjack Game. Would you like to hear about the {Product} expansion pack I have available for purchase?|By the way, we also have a {Product} game available for purchase. Want to hear more?',
     'LISTPURCHASES_UPSELL': 'We have {Product} available. Want to learn more?|We have a {Product} expansion pack available for purchase. Would you like to hear more?|We have {Product} available for purchase. Want to hear more?',
     'HARDHAND_UPSELL': 'Most people play that previous hand improperly. We have a feature that lets you practice over 100 hands most people get wrong. Want to learn more?|That wasn\'t the best way to play that last hand. Most people play that one wrong. Would you like to hear about an advanced training mode I have that will help you perfect your game?|You know, most people play that last hand wrong. I have a list of hard hands that I can give you to help you train. Want to hear more?',
+    'BUSTED_UPSELL': 'You are out of money. Your bankroll will reset tomorrow or you can get the {Product} subscription which will automatically reset your bankroll. Would you like to hear more?',
   };
   const productName = {
     'spanish': 'Spanish 21',
     'training': 'Advanced Training',
+    'resetbankroll': 'Reset Bankroll',
   };
 
   const options = upsellMessages[message].split('|');
@@ -259,6 +261,13 @@ function shouldUpsell(attributes, availableProducts, trigger, now) {
 
   switch (trigger) {
     case 'launch':
+      break;
+
+    case 'busted':
+      // Reset bankroll is always triggered if available
+      if (availableProducts.indexOf('resetbankroll') > -1) {
+        upsell = 'resetbankroll';
+      }
       break;
 
     case 'long21':

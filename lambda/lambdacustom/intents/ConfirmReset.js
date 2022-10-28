@@ -43,11 +43,14 @@ module.exports = {
       reprompt = res.strings.RESET_REPROMPT;
     } else if (request.intent.name === 'AMAZON.YesIntent') {
       // Confirmed - let's reset but preserve the timestamp
+      // Note that we also will no longer reset the bankroll (sorry, gotta pay for that)
+      const bankroll = attributes[attributes.currentGame].bankroll;
       const timestamp = attributes[attributes.currentGame].timestamp;
       gameService.initializeGame(attributes, event.session.user.userId);
       attributes[attributes.currentGame].timestamp = timestamp;
+      attributes[attributes.currentGame].bankroll = bankroll;
       attributes.temp.confirmReset = undefined;
-      speech = res.strings.RESET_COMPLETED;
+      speech = res.strings.RESET_COMPLETED.replace('{Bankroll}', bankroll);
       reprompt = res.strings.RESET_REPROMPT;
     } else {
       // Repeat the request

@@ -59,6 +59,7 @@ function initialize(event, attributes) {
     attributes.userId = event.session.user.userId;
     bjUtils.readSuggestions(attributes, () => {
       // If they don't have a game, create one
+      gameService.updateGames(attributes);
       if (!attributes.currentGame) {
         gameService.initializeGame('standard', attributes, userId);
         attributes.newUser = true;

@@ -56,7 +56,7 @@ const common = {
   'LAUNCH_SELECT_GAME': ' or say select a different game to change between Spanish 21 and standard blackjack',
   'LAUNCH_START_REMOVE_SIDEBET': 'remove side bet to remove your side bet',
   'LAUNCH_START_HIGH_SCORES': 'read high scores to hear the leader board',
-  'LAUNCH_START_RESET': 'reset game to reset to the default rules and bankroll',
+  'LAUNCH_START_RESET': 'reset game to reset to the default rules',
   'LAUNCH_START_PROMPT': ' <break time=\'300ms\'/>Now, what can I help you with?',
   'LAUNCH_SPANISH_TRIAL': 'For a limited time, we have a free trial version of Spanish 21 to play. Say select a new game to play Spanish 21. ',
   'LAUNCH_SPANISH_TRIAL_OVER': 'The free trial of Spanish 21 is over. If you would like to continue to play Spanish 21, say buy Spanish 21. ',
@@ -83,7 +83,7 @@ const common = {
   // From Refund.js
   'REFUND_REPROMPT': 'What else can I help you with?',
   // From Reset.js
-  'RESET_CONFIRM': 'Would you like to reset the game? This will reset your bankroll and rules of the game.',
+  'RESET_CONFIRM': 'Would you like to reset the game? This will reset the rules of the game.',
   'RESET_REPROMPT': 'Say bet to start a new game.',
   'RESET_ABORTED': 'Game not reset. Say bet to start a new game.',
   // From Rules.js
@@ -137,6 +137,8 @@ const common = {
   'READHAND_PLAYER_BUSTED': 'You busted with {0} for a total of {1}.  ',
   'READHAND_PLAYER_TOTAL_ACTIVE': 'You have {0} for a total of {1}.  ',
   'READHAND_PLAYER_TOTAL_END': 'You had {0} for a total of {1}.  ',
+  'RESET_BANKROLL_AFTER_PLAY': 'Thanks to your Reset Bankroll subscription, we reset your bankroll. ',
+  'BUSTED_AFTER_PLAY': 'You lost all your money. Please come back later to play again. ',
   'RULES_SPANISH21': 'Spanish 21 has bonus payouts for a 21 with five or more cards and other special rules you can hear by saying Help. ',
   'RULES_DECKS': '{0} deck game. ',
   'RULES_HIT_SOFT17': 'Dealer hits on soft 17. ',
@@ -167,7 +169,7 @@ const common = {
   // From Tournament.js
   'TOURNAMENT_DEFAULT_TIMEZONE': 'Pacific time',
   'TOURNAMENT_NOCHANGERULES': 'Sorry, you can\'t change the rules on this game. ',
-  'TOURNAMENT_NORESET': 'Sorry, you can\'t reset your bankroll on this game. What else can I help you with?',
+  'TOURNAMENT_NORESET': 'Sorry, you can\'t reset the rules on this game. What else can I help you with?',
   'TOURNAMENT_HANDS_REMAINING': 'You have {0} hands remaining. ',
   'TOURNAMENT_BANKRUPT': 'You lost all your money and are out of the tournament. Thanks for playing! Check back tomorrow for the results. ',
   'TOURNAMENT_INVALIDACTION_REPROMPT': 'What else can I help you with?',
@@ -240,8 +242,10 @@ const dollar = {
   'HELP_CARD_PROGRESSIVE_TEXT': 'This game features a progressive triple seven jackpot. Place a side bet of $5 by saying PLACE SIDE BET which will stay in effect until you say REMOVE SIDE BET.\nThe side bet pays out $25 if your first card is a seven, $100 if your first two cards are both seven, and the progressive jackpot if your first three cards are seven. The progressive jackpot is based on aggregate play across all users of this skill.\n',
   // From Launch.js
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet $5 towards the jackpot',
+  'LAUNCH_RESET_BANKROLL_SUBSCRIPTION': 'Thanks to your Reset Bankroll subscription, your bankroll is reset to ${Bankroll}. ',
+  'LAUNCH_BUSTED': 'Your bankroll is $0. Come back to Blackjack Game tomorrow to play again. ',
   // From Reset.js
-  'RESET_COMPLETED': 'You have $5000. Say bet to start a new game.',
+  'RESET_COMPLETED': 'You have ${Bankroll}. Say bet to start a new game.',
   // From PlayGame.js
   'YOU_BET_TEXT': 'You bet ${0}. ',
   'YOUR_BANKROLL_TEXT': 'You have ${0}. ',
@@ -278,8 +282,10 @@ const pound = {
   'HELP_CARD_PROGRESSIVE_TEXT': 'This game features a progressive triple seven jackpot. Place a side bet of £5 by saying PLACE SIDE BET which will stay in effect until you say REMOVE SIDE BET.\nThe side bet pays out £25 if your first card is a seven, £100 if your first two cards are both seven, and the progressive jackpot if your first three cards are seven. The progressive jackpot is based on aggregate play across all users of this skill.\n',
   // From Launch.js
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet £5 towards the jackpot',
+  'LAUNCH_RESET_BANKROLL_SUBSCRIPTION': 'Thanks to your Reset Bankroll subscription, your bankroll is reset to £{Bankroll}. ',
+  'LAUNCH_BUSTED': 'Your bankroll is £0. Come back to Blackjack Game tomorrow to play again. ',
   // From Reset.js
-  'RESET_COMPLETED': 'You have £5000. Say bet to start a new game.',
+  'RESET_COMPLETED': 'You have {Bankroll}. Say bet to start a new game.',
   // From PlayGame.js
   'YOU_BET_TEXT': 'You bet £{0}. ',
   'YOUR_BANKROLL_TEXT': 'You have £{0}. ',

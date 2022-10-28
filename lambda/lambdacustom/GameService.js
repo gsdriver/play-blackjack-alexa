@@ -11,6 +11,7 @@ const seedrandom = require('seedrandom');
 const hardHands = require('./hardHands');
 
 const STARTING_BANKROLL = 5000;
+const REFRESH_BANKROLL = 500;
 
 availableGames = {
   'standard': {version: '1.0.0',
@@ -38,6 +39,7 @@ availableGames = {
      currentPlayerHand: 0,
      specialState: null,
      bankroll: STARTING_BANKROLL,
+     bankrollRefresh: REFRESH_BANKROLL,
      lastBet: 100,
      possibleActions: [],
      canReset: true,
@@ -63,6 +65,7 @@ availableGames = {
      currentPlayerHand: 0,
      specialState: null,
      bankroll: STARTING_BANKROLL,
+     bankrollRefresh: REFRESH_BANKROLL,
      lastBet: 100,
      possibleActions: [],
      canReset: true,
@@ -90,6 +93,7 @@ availableGames = {
      currentPlayerHand: 0,
      specialState: null,
      bankroll: 25000,
+     bankrollRefresh: 0,
      lastBet: 100,
      maxHands: 100,
      possibleActions: [],
@@ -139,7 +143,8 @@ availableGames = {
     activePlayer: 'none',
     currentPlayerHand: 0,
     specialState: null,
-    bankroll: 5000,
+    bankroll: STARTING_BANKROLL,
+    bankrollRefresh: REFRESH_BANKROLL,
     lastBet: 100,
     possibleActions: [],
     readSuit: true,
@@ -197,6 +202,14 @@ module.exports = {
     }
 
     return games;
+  },
+  // Updates the attributes structure with new values if necessary
+  updateGames: function(attributes) {
+    for (game in availableGames) {
+      if (attributes[game]) {
+        attributes[game].bankrollRefresh = availableGames[game].bankrollRefresh;
+      }
+    }
   },
   // Determines if this is the initial game state or not
   isDefaultGame: function(attributes) {

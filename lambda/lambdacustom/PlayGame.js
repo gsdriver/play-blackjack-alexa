@@ -143,6 +143,21 @@ module.exports = {
               }
             }
 
+            // If they ran out of money (non-tournament), then either reset
+            // it for them (if they have the subscription), or we'll end the game
+            let resetBankroll;
+            const handResult = (tellResult(attributes, locale, action.action, oldGame) + ' ');
+            if (game.possibleActions.indexOf('resetbankroll') > -1) {
+              if (attributes.paid && attributes.paid.bankrollreset && (attributes.paid.bankrollreset.state == 'PURCHASED')) {
+                game.bankroll = game.bankrollRefresh;
+                resetBankroll = true;
+              } else {
+                attributes.busted = true;
+                callback(error, handResult + resources.strings.BUSTED_AFTER_PLAY, null, null);
+                return;
+              }        
+            }
+
             // Make note if the hand is over, they lost, and they played it wrong
             attributes.temp.wrongPlayLoser = (suggestion !== 'notplayerturn')
               && (suggestion !== action.action)
@@ -151,8 +166,10 @@ module.exports = {
         
             // Pose this as a question whether it's the player or dealer's turn
             repromptQuestion = listValidActions(game, locale, 'full');
-            speechQuestion += (tellResult(attributes, locale, action.action, oldGame) + ' '
-              + listValidActions(game, locale, (playerBlackjack) ? 'full' : 'summary'));
+            speechQuestion += handResult;
+            speechQuestion += resetBankroll
+              ? resources.strings.RESET_BANKROLL_AFTER_PLAY
+              : listValidActions(game, locale, (playerBlackjack) ? 'full' : 'summary');
           }
 
           sendUserCallback(attributes, error, null, speechQuestion, repromptQuestion, callback);
@@ -252,21 +269,7 @@ function sendUserCallback(attributes, error, response, speech, reprompt, callbac
     if (game.possibleActions.indexOf('shuffle') > -1) {
       // Simplify things and just shuffle for them
       gameService.userAction(attributes, 'shuffle', 0, (err) => {
-        testReset();
       });
-    } else {
-      testReset();
-    }
-
-    function testReset() {
-      if (game.possibleActions.indexOf('resetbankroll') > -1) {
-        // Simplify things and just shuffle for them if this is resetbankroll
-        gameService.userAction(attributes, 'resetbankroll', 0, (err) => {
-          sendCallback();
-        });
-      } else {
-        sendCallback();
-      }
     }
   } else {
     sendCallback();
@@ -349,9 +352,6 @@ function tellResult(attributes, locale, action, oldGame) {
 
   // So what happened?
   switch (action) {
-    case 'resetbankroll':
-      result += resources.strings.RESULT_BANKROLL_RESET;
-      break;
     case 'shuffle':
       result += resources.strings.RESULT_DECK_SHUFFLED;
       break;
