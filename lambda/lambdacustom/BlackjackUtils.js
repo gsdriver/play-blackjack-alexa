@@ -158,9 +158,14 @@ module.exports = {
 
         // Post the reminder
         request(params, (err, response, body) => {
+          console.log('SetReminder Response: ', JSON.stringify(response), JSON.stringify(body));
           if (body && body.code && (body.code !== 'OK')) {
             console.log('SetReminder error ' + body.code);
             callback(body.code);
+          } else if (response && response.statusCode && response.statusCode !== 200) {
+            // Assume this means unauthorized
+            console.log('SetReminder error response ' + response.statusCode);
+            callback('UNAUTHORIZED');
           } else {
             // OK, return the time and timezone
             module.exports.getLocalTournamentTime(handlerInput, (time, timezone) => {

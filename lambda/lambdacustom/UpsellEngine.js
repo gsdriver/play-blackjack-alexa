@@ -40,19 +40,30 @@ module.exports = {
 
     // See what's available
     const availableProducts = getAvailableProducts(attributes);
-    if (!availableProducts.length) {
-      // Nothing is available to sell
-      return;
-    }
+    if (availableProducts.length) {
+      // Reserved for our usage
+      if (!attributes.upsell) {
+        attributes.upsell = {};
+        attributes.upsell.prompts = {};
+      }
+      attributes.upsell.version = 'v1.3';
 
-    // Reserved for our usage
-    if (!attributes.upsell) {
-      attributes.upsell = {};
-      attributes.upsell.prompts = {};
+      // Clear legacy prompts structure
+      if (attributes.prompts) {
+        attributes.prompts.spanish = undefined;
+        attributes.prompts.long21 = undefined;
+        attributes.prompts.sellSpanish = undefined;
+      }
+
+      // Capture start time so we can see full session length
+      if (!attributes.upsell.start) {
+        attributes.upsell.start = now;
+        attributes.upsell.sessions = (attributes.upsell.sessions + 1) || 1;
+      }
     }
-    attributes.upsell.version = 'v1.3';
 
     // We should init the goods structure as well
+    // We do this for all locales
     if (!attributes.goods) {
       attributes.goods = {};
       attributes.goods.prompts = {};
@@ -60,20 +71,14 @@ module.exports = {
     if (!attributes.purchasedGoods) {
       attributes.purchasedGoods = {};
     }
+
+    // HACK for testing
+    if (process.env.TEST_GOODSPURCHASE) {
+      attributes.goods.prompts = {};
+      attributes.purchasedGoods = {};
+    }
+
     attributes.goods.version = 'v1.0';
-
-    // Clear legacy prompts structure
-    if (attributes.prompts) {
-      attributes.prompts.spanish = undefined;
-      attributes.prompts.long21 = undefined;
-      attributes.prompts.sellSpanish = undefined;
-    }
-
-    // Capture start time so we can see full session length
-    if (!attributes.upsell.start) {
-      attributes.upsell.start = now;
-      attributes.upsell.sessions = (attributes.upsell.sessions + 1) || 1;
-    }
   },
   getUpsell: function(attributes, trigger) {
     let directive;

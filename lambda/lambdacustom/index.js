@@ -172,9 +172,10 @@ const requestInterceptor = {
               }
             });
             attributes.temp.inSkillProductInfo = undefined;
-            upsell.initUpsell(attributes);
           }
 
+          // We need to init upsell for all locales at it could also include goods
+          upsell.initUpsell(attributes);
           return tournament.getTournamentComplete(event.request.locale, attributes);
         }).then((result) => {
           attributes.prependLaunch = result;
