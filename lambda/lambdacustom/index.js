@@ -56,6 +56,12 @@ function initialize(event, attributes) {
     attributes.prompts = {};
   }
 
+  // Special case - the "see next day" flag persists
+  if (attributes.seeNextDay) {
+    attributes.temp.seeNextDay = true;
+    attributes.seeNextDay = undefined;
+  }
+
   return new Promise((resolve, reject) => {
     attributes.userId = event.session.user.userId;
     bjUtils.readSuggestions(attributes, () => {

@@ -27,7 +27,7 @@ availableGames = {
        blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
        numberOfDecks: 1,         // Number of decks in play
        minBet: 5,                // The minimum bet - not configurable
-       maxBet: 1000,             // The maximum bet - not configurable
+       maxBet: 5000,             // The maximum bet - not configurable
        maxSplitHands: 4,         // Maximum number of hands you can have due to splits
      },
      progressive: {
@@ -58,7 +58,7 @@ availableGames = {
        blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
        numberOfDecks: 1,         // Number of decks in play
        minBet: 5,                // The minimum bet - not configurable
-       maxBet: 1000,             // The maximum bet - not configurable
+       maxBet: 5000,             // The maximum bet - not configurable
        maxSplitHands: 4,         // Maximum number of hands you can have due to splits
      },
      activePlayer: 'none',
@@ -86,7 +86,7 @@ availableGames = {
        blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
        numberOfDecks: 4,         // Number of decks in play
        minBet: 5,                // The minimum bet - not configurable
-       maxBet: 1000,             // The maximum bet - not configurable
+       maxBet: 5000,             // The maximum bet - not configurable
        maxSplitHands: 4,         // Maximum number of hands you can have due to splits
      },
      activePlayer: 'none',
@@ -112,7 +112,7 @@ availableGames = {
       blackjackBonus: 0.5,        // Bonus for player blackjack, usually 0.5 or 0.2
       numberOfDecks: 6,           // Number of decks in play
       minBet: 5,                  // The minimum bet - not configurable
-      maxBet: 1000,               // The maximum bet - not configurable
+      maxBet: 5000,               // The maximum bet - not configurable
       maxSplitHands: 4,           // Maximum number of hands you can have due to splits
       surrenderAfterDouble: true, // Can you surrender after doubling?
       pay21: {
@@ -208,8 +208,18 @@ module.exports = {
     for (game in availableGames) {
       if (attributes[game]) {
         attributes[game].bankrollRefresh = availableGames[game].bankrollRefresh;
+
+        // Also reset the min and max bets
+        attributes[game].rules.minBet = availableGames[game].rules.minBet;
+        attributes[game].rules.maxBet = availableGames[game].rules.maxBet;
       }
     }
+  },
+  // Resets the list of actions after a bankroll reset
+  resetActions: function(attributes) {
+    const game = attributes[attributes.currentGame];
+
+    setNextActions(game);
   },
   // Determines if this is the initial game state or not
   isDefaultGame: function(attributes) {

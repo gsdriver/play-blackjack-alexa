@@ -53,6 +53,7 @@ module.exports = {
         if (attributes.busted) {
           if (attributes.paid && attributes.paid.bankrollreset && (attributes.paid.bankrollreset.state == 'PURCHASED')) {
             game.bankroll = game.bankrollRefresh;
+            gameService.resetActions(attributes);
             attributes.busted = undefined;
             attributes.prependLaunch = (attributes.prependLaunch || "") +
               res.strings.LAUNCH_RESET_BANKROLL_SUBSCRIPTION.replace('{Bankroll}', game.bankroll);
@@ -60,6 +61,11 @@ module.exports = {
           } else {
             // Is it the next day or not?
             bjUtils.isNextDay(handlerInput, (nextDay) => {
+              // If we are forcing ourselves to see next day, then set nextDay to true
+              if (attributes.temp.seeNextDay) {
+                nextDay = true;
+              }
+
               if (!nextDay) {
                 // Here's the place to do an upsell if we can!
                 const directive = attributes.temp.noUpsellLaunch ? undefined : upsell.getUpsell(attributes, 'busted');
@@ -84,22 +90,26 @@ module.exports = {
               } else {
                 // OK, it's the following day, so we can update their bankroll
                 game.bankroll = game.bankrollRefresh;
+                gameService.resetActions(attributes);
                 attributes.busted = undefined;
-                attributes.prependLaunch = (attributes.prependLaunch || "") + res.strings.LAUNCH_RESET_BANKROLL;
+                attributes.prependLaunch = (attributes.prependLaunch || "") + res.strings.LAUNCH_RESET_BANKROLL.replace('{Bankroll}', game.bankroll);
                 resolve2();
               }
             });
           }
+        } else {
+          resolve2();
         }
       }).then((directive) => {
         // If we already told them about being busted, just leave
         if (directive) {
-          return directive;
+          resolve(directive);
+          return;
         }
 
         // Try to keep it simple
         const format = JSON.parse(res.strings.LAUNCH_WELCOME)[attributes.currentGame];
-        bjUtils.getWelcome(handlerInput, format, (greeting) => {
+        return bjUtils.getWelcome(handlerInput, format, (greeting) => {
           // First let's eee if a free trial is underway - or has ended
           launchSpeech = greeting;
           let spanishState;

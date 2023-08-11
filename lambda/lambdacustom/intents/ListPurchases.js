@@ -26,6 +26,7 @@ module.exports = {
     const productMap = {
       'spanish': 'Spanish 21',
       'training': 'advanced training',
+      'bankrollreset': 'reset bankroll',
     };
 
     let product;

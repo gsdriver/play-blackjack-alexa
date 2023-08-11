@@ -23,9 +23,13 @@ module.exports = {
 
     // Test Cases
     // 6: Dealer always gets a blackjack
+    // 8: We will force it to be the "next day" the next time the user launches the skill
     if (testCase === 6) {
       attributes.temp.alwaysDealerBlackjack = enterTest;
       speechTemplate = enterTest ? 'ENABLE_DEALER_BLACKJACK' : 'DISABLE_DEALER_BLACKJACK';
+    } else if (testCase === 8) {
+      attributes.seeNextDay = enterTest? true : undefined;
+      speechTemplate = enterTest ? 'ENABLE_NEXT_DAY' : 'DISABLE_NEXT_DAY';
     }
 
     return handlerInput.responseBuilder

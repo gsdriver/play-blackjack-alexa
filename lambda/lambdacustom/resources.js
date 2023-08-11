@@ -91,6 +91,8 @@ const common = {
   // From TestCase.js
   'ENABLE_DEALER_BLACKJACK': 'Dealer will now always get a blackjack. What else can I help you with?',
   'DISABLE_DEALER_BLACKJACK': 'The dealer will no longer always get a blackjack. What else can I help you with?',
+  'ENABLE_NEXT_DAY': 'We will treat it as being tomorrow the next time you launch the skill. What else can I help you with?',
+  'DISABLE_NEXT_DAY': 'We will no longer treat it as being tomorrow the next time you launch the skill. What else can I help you with?',
   'UNKNOWN_TEST_CASE': 'Sorry, that is an unknown test case. What else can I help you with?',
   'TEST_CASE_REPROMPT': 'What else can I help you with?',
   // From Training.js
@@ -247,6 +249,7 @@ const dollar = {
   'HELP_CARD_PROGRESSIVE_TEXT': 'This game features a progressive triple seven jackpot. Place a side bet of $5 by saying PLACE SIDE BET which will stay in effect until you say REMOVE SIDE BET.\nThe side bet pays out $25 if your first card is a seven, $100 if your first two cards are both seven, and the progressive jackpot if your first three cards are seven. The progressive jackpot is based on aggregate play across all users of this skill.\n',
   // From Launch.js
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet $5 towards the jackpot',
+  'LAUNCH_RESET_BANKROLL': 'Welcome back. We have reset your bankroll to ${Bankroll}. ',
   'LAUNCH_RESET_BANKROLL_SUBSCRIPTION': 'Thanks to your Reset Bankroll subscription, your bankroll is reset to ${Bankroll}. ',
   'LAUNCH_BUSTED': 'Your bankroll is $0. Come back to Blackjack Game tomorrow to play again. ',
   // From Reset.js
@@ -272,7 +275,7 @@ const dollar = {
   'TOURNAMENT_STANDING_TOGO': '<say-as interpret-as="ordinal">1</say-as> place has ${0}. ',
   // This file
   'MAP_ERROR_TOOSMALL': 'Your bet is below the minimum of $5',
-  'MAP_ERROR_TOOLARGE': 'Your bet is above the maximum of $1000',
+  'MAP_ERROR_TOOLARGE': 'Your bet is above the maximum of $5000',
 };
 
 const pound = {
@@ -287,6 +290,7 @@ const pound = {
   'HELP_CARD_PROGRESSIVE_TEXT': 'This game features a progressive triple seven jackpot. Place a side bet of £5 by saying PLACE SIDE BET which will stay in effect until you say REMOVE SIDE BET.\nThe side bet pays out £25 if your first card is a seven, £100 if your first two cards are both seven, and the progressive jackpot if your first three cards are seven. The progressive jackpot is based on aggregate play across all users of this skill.\n',
   // From Launch.js
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet £5 towards the jackpot',
+  'LAUNCH_BANKROLL': 'Welcome back. We have reset your bankroll to £{Bankroll}. ',
   'LAUNCH_RESET_BANKROLL_SUBSCRIPTION': 'Thanks to your Reset Bankroll subscription, your bankroll is reset to £{Bankroll}. ',
   'LAUNCH_BUSTED': 'Your bankroll is £0. Come back to Blackjack Game tomorrow to play again. ',
   // From Reset.js
@@ -312,7 +316,7 @@ const pound = {
   'TOURNAMENT_STANDING_TOGO': '<say-as interpret-as="ordinal">1</say-as> place has £{0}. ',
   // This file
   'MAP_ERROR_TOOSMALL': 'Your bet is below the minimum of £5',
-  'MAP_ERROR_TOOLARGE': 'Your bet is above the maximum of £1000',
+  'MAP_ERROR_TOOLARGE': 'Your bet is above the maximum of £5000',
 };
 
 const resources = {
