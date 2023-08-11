@@ -31,6 +31,7 @@ const Purchase = require('./intents/Purchase');
 const Refund = require('./intents/Refund');
 const ProductResponse = require('./intents/ProductResponse');
 const SessionResumed = require('./intents/SessionResumed');
+const TestCase = require('./intents/TestCase');
 const gameService = require('./GameService');
 const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
@@ -294,6 +295,7 @@ function runGame(event, context, callback) {
       Blackjack,
       Repeat,
       HighScore,
+      TestCase,
       SessionEnd,
       Unhandled
     )

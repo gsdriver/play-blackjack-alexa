@@ -152,7 +152,7 @@ module.exports = {
                 game.bankroll = game.bankrollRefresh;
                 resetBankroll = true;
               } else {
-                attributes.busted = true;
+                attributes.busted = Date.now();
                 callback(error, handResult + resources.strings.BUSTED_AFTER_PLAY, null, null);
                 return;
               }        
@@ -265,12 +265,11 @@ function sendUserCallback(attributes, error, response, speech, reprompt, callbac
   const game = attributes[attributes.currentGame];
 
   // If this is shuffle, we'll do the shuffle for them
-  if (game && game.possibleActions) {
-    if (game.possibleActions.indexOf('shuffle') > -1) {
-      // Simplify things and just shuffle for them
-      gameService.userAction(attributes, 'shuffle', 0, (err) => {
-      });
-    }
+  if (game && game.possibleActions && game.possibleActions.indexOf('shuffle') > -1) {
+    // Simplify things and just shuffle for them
+    gameService.userAction(attributes, 'shuffle', 0, (err) => {
+      sendCallback();
+    });
   } else {
     sendCallback();
   }

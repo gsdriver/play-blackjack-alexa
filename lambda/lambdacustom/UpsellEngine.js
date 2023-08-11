@@ -219,7 +219,7 @@ function selectUpsellMessage(attributes, upsellProduct, message) {
   const productName = {
     'spanish': 'Spanish 21',
     'training': 'Advanced Training',
-    'resetbankroll': 'Reset Bankroll',
+    'bankrollreset': 'Reset Bankroll',
   };
 
   const options = upsellMessages[message].split('|');
@@ -265,8 +265,8 @@ function shouldUpsell(attributes, availableProducts, trigger, now) {
 
     case 'busted':
       // Reset bankroll is always triggered if available
-      if (availableProducts.indexOf('resetbankroll') > -1) {
-        upsell = 'resetbankroll';
+      if (availableProducts.indexOf('bankrollreset') > -1) {
+        upsell = 'bankrollreset';
       }
       break;
 

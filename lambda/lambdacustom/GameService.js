@@ -508,10 +508,19 @@ function deal(attributes, betAmount) {
   game.sideBetWin = undefined;
 
   // Now deal the cards
-  newHand.cards.push(game.deck.cards.shift());
-  game.dealerHand.cards.push(game.deck.cards.shift());
-  newHand.cards.push(game.deck.cards.shift());
-  game.dealerHand.cards.push(game.deck.cards.shift());
+  if (attributes.temp.alwaysDealerBlackjack) {
+    // Let's try to force a loss by giving the dealer a blackjack
+    newHand.cards.push(game.deck.cards.shift());
+    game.dealerHand.cards.push({'rank': 1, 'suit': 'S'});
+    newHand.cards.push(game.deck.cards.shift());
+    game.dealerHand.cards.push({'rank': 11, 'suit': 'C'});
+  } else {
+    newHand.cards.push(game.deck.cards.shift());
+    game.dealerHand.cards.push(game.deck.cards.shift());
+    newHand.cards.push(game.deck.cards.shift());
+    game.dealerHand.cards.push(game.deck.cards.shift());
+  }
+  
   game.playerHands.push(newHand);
 
   // Count the sevens!

@@ -247,6 +247,32 @@
           ]
         },
         {
+          "name": "EnterTestIntent",
+          "slots": [
+            {
+              "name": "TestCase",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "enter test case {TestCase}",
+            "turn on test case {TestCase}"
+          ]
+        },
+        {
+          "name": "ExitTestIntent",
+          "slots": [
+            {
+              "name": "TestCase",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "exit test case {TestCase}",
+            "turn off test case {TestCase}"
+          ]
+        },
+        {
           "name": "AMAZON.HelpIntent",
           "samples": []
         },

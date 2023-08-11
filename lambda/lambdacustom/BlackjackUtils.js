@@ -84,14 +84,16 @@ module.exports = {
       return (err.statusCode === 403) ? false : undefined;
     });
   },
-  isNextDay: function(handlerInput) {
-    return getUserTimezone(handlerInput).then((timezone) => {
+  isNextDay: function(handlerInput, callback) {
+    const event = handlerInput.requestEnvelope;
+
+    getUserTimezone(event, (timezone) => {
       const attributes = handlerInput.attributesManager.getSessionAttributes();
       const tz = (timezone) ? timezone : 'America/Los_Angeles';
       const busted = moment.tz(attributes.busted, tz).format('YYYY-MM-DD');
       const now = moment.tz(Date.now(), tz).format('YYYY-MM-DD');
 
-      return (busted !== now);
+      callback(busted !== now);
     });
   },
   getLocalTournamentTime: function(handlerInput, callback) {

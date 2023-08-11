@@ -88,6 +88,11 @@ const common = {
   'RESET_ABORTED': 'Game not reset. Say bet to start a new game.',
   // From Rules.js
   'RULES_CARD_TITLE': 'Blackjack Rules',
+  // From TestCase.js
+  'ENABLE_DEALER_BLACKJACK': 'Dealer will now always get a blackjack. What else can I help you with?',
+  'DISABLE_DEALER_BLACKJACK': 'The dealer will no longer always get a blackjack. What else can I help you with?',
+  'UNKNOWN_TEST_CASE': 'Sorry, that is an unknown test case. What else can I help you with?',
+  'TEST_CASE_REPROMPT': 'What else can I help you with?',
   // From Training.js
   'TRAINING_ON': 'Training mode turned on. I will let you know when your play differs from Basic Strategy. ',
   'TRAINING_OFF': 'Training mode turned off. ',
