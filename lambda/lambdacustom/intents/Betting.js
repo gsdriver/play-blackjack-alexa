@@ -51,7 +51,7 @@ module.exports = {
       if (!attributes.temp.noUpsellBetting) {
         const directive = upsell.getUpsell(attributes, 'long21');
         if (directive) {
-          directive.token = 'game.' + directive.token + '.betting';
+          directive.token = directive.token + '.betting';
           return handlerInput.responseBuilder
             .addDirective(directive)
             .withShouldEndSession(true)
@@ -65,7 +65,7 @@ module.exports = {
       if (!attributes.temp.noUpsellBetting) {
         const directive = upsell.getUpsell(attributes, 'hardhand');
         if (directive) {
-          directive.token = 'game.' + directive.token + '.betting';
+          directive.token = directive.token + '.betting';
           return handlerInput.responseBuilder
             .addDirective(directive)
             .withShouldEndSession(true)
@@ -93,7 +93,7 @@ module.exports = {
     if (!attributes.temp.noUpsellBetting) {
       const directive = upsell.getUpsell(attributes, 'play');
       if (directive) {
-        directive.token = 'game.' + directive.token + '.betting';
+        directive.token = directive.token + '.betting';
         return handlerInput.responseBuilder
           .addDirective(directive)
           .withShouldEndSession(true)

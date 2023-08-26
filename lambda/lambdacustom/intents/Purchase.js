@@ -5,6 +5,7 @@
 'use strict';
 
 const bjUtils = require('../BlackjackUtils');
+const upsell = require('../UpsellEngine');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -45,7 +46,7 @@ module.exports = {
             'productId': attributes.paid[product].productId,
           },
         },
-        'token': 'game.' + product + '.launch',
+        'token': upsell.upsellToken(product) + '.launch',
       };
 
       return handlerInput.responseBuilder

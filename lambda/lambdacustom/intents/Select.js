@@ -33,7 +33,7 @@ module.exports = {
         || (availableGames.indexOf('training') === -1))) {
       const directive = upsell.getUpsell(attributes, 'select');
       if (directive) {
-        directive.token = 'game.' + directive.token + '.select';
+        directive.token = directive.token + '.select';
         return handlerInput.responseBuilder
           .addDirective(directive)
           .withShouldEndSession(true)

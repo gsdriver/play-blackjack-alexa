@@ -105,11 +105,21 @@ module.exports = {
           },
           'upsellMessage': selectUpsellMessage(attributes, upsellProduct, trigger.toUpperCase() + '_UPSELL'),
         },
-        'token': upsellProduct,
+        'token': module.exports.upsellToken(upsellProduct),
       };
     }
 
     return directive;
+  },
+  // Token can be postpended with additional directive (e.g. launch or betting)
+  upsellToken: function(upsellProduct) {
+    const tokenPrefix = {
+      'spanish': 'game',
+      'training': 'game',
+      'bankrollreset': 'subscribe',
+    };
+  
+    return tokenPrefix[upsellProduct] ? `${tokenPrefix[upsellProduct]}.${upsellProduct}` : undefined;
   },
   getGood: function(handlerInput, trigger) {
     const attributes = handlerInput.attributesManager.getSessionAttributes();

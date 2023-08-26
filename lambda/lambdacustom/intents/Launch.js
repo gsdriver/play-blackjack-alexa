@@ -70,7 +70,7 @@ module.exports = {
                 // Here's the place to do an upsell if we can!
                 const directive = attributes.temp.noUpsellLaunch ? undefined : upsell.getUpsell(attributes, 'busted');
                 if (directive) {
-                  directive.token = 'subscribe.' + directive.token + '.launch';
+                  directive.token = directive.token + '.launch';
                   resolve2(handlerInput.responseBuilder
                     .addDirective(directive)
                     .withShouldEndSession(true)
@@ -135,7 +135,7 @@ module.exports = {
           } else if (!attributes.temp.noUpsellLaunch) {
             const directive = upsell.getUpsell(attributes, 'launch');
             if (directive) {
-              directive.token = 'game.' + directive.token + '.launch';
+              directive.token = directive.token + '.launch';
               resolve(handlerInput.responseBuilder
                 .addDirective(directive)
                 .withShouldEndSession(true)

@@ -51,7 +51,7 @@ module.exports = {
     if (availableProducts.length) {
       const directive = upsell.getUpsell(attributes, 'listpurchases');
       if (directive) {
-        directive.token = 'game.' + directive.token + '.launch';
+        directive.token = directive.token + '.launch';
         return handlerInput.responseBuilder
           .addDirective(directive)
           .withShouldEndSession(true)

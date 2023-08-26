@@ -144,7 +144,7 @@ const common = {
   'READHAND_PLAYER_BUSTED': 'You busted with {0} for a total of {1}.  ',
   'READHAND_PLAYER_TOTAL_ACTIVE': 'You have {0} for a total of {1}.  ',
   'READHAND_PLAYER_TOTAL_END': 'You had {0} for a total of {1}.  ',
-  'RESET_BANKROLL_AFTER_PLAY': 'Thanks to your Reset Bankroll subscription, we reset your bankroll. ',
+  'RESET_BANKROLL_AFTER_PLAY': 'Thanks to your Reset Bankroll subscription, we reset your bankroll. What would you like to do?',
   'BUSTED_AFTER_PLAY': 'You lost all your money. Please come back later to play again. ',
   'RULES_SPANISH21': 'Spanish 21 has bonus payouts for a 21 with five or more cards and other special rules you can hear by saying Help. ',
   'RULES_DECKS': '{0} deck game. ',
