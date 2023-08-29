@@ -11,6 +11,7 @@ const seedrandom = require('seedrandom');
 const hardHands = require('./hardHands');
 
 const STARTING_BANKROLL = 5000;
+const REFRESH_BANKROLL = 500;
 
 availableGames = {
   'standard': {version: '1.0.0',
@@ -26,7 +27,7 @@ availableGames = {
        blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
        numberOfDecks: 1,         // Number of decks in play
        minBet: 5,                // The minimum bet - not configurable
-       maxBet: 1000,             // The maximum bet - not configurable
+       maxBet: 5000,             // The maximum bet - not configurable
        maxSplitHands: 4,         // Maximum number of hands you can have due to splits
      },
      progressive: {
@@ -38,6 +39,7 @@ availableGames = {
      currentPlayerHand: 0,
      specialState: null,
      bankroll: STARTING_BANKROLL,
+     bankrollRefresh: REFRESH_BANKROLL,
      lastBet: 100,
      possibleActions: [],
      canReset: true,
@@ -56,13 +58,14 @@ availableGames = {
        blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
        numberOfDecks: 1,         // Number of decks in play
        minBet: 5,                // The minimum bet - not configurable
-       maxBet: 1000,             // The maximum bet - not configurable
+       maxBet: 5000,             // The maximum bet - not configurable
        maxSplitHands: 4,         // Maximum number of hands you can have due to splits
      },
      activePlayer: 'none',
      currentPlayerHand: 0,
      specialState: null,
      bankroll: STARTING_BANKROLL,
+     bankrollRefresh: REFRESH_BANKROLL,
      lastBet: 100,
      possibleActions: [],
      canReset: true,
@@ -83,13 +86,14 @@ availableGames = {
        blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
        numberOfDecks: 4,         // Number of decks in play
        minBet: 5,                // The minimum bet - not configurable
-       maxBet: 1000,             // The maximum bet - not configurable
+       maxBet: 5000,             // The maximum bet - not configurable
        maxSplitHands: 4,         // Maximum number of hands you can have due to splits
      },
      activePlayer: 'none',
      currentPlayerHand: 0,
      specialState: null,
      bankroll: 25000,
+     bankrollRefresh: 0,
      lastBet: 100,
      maxHands: 100,
      possibleActions: [],
@@ -108,7 +112,7 @@ availableGames = {
       blackjackBonus: 0.5,        // Bonus for player blackjack, usually 0.5 or 0.2
       numberOfDecks: 6,           // Number of decks in play
       minBet: 5,                  // The minimum bet - not configurable
-      maxBet: 1000,               // The maximum bet - not configurable
+      maxBet: 5000,               // The maximum bet - not configurable
       maxSplitHands: 4,           // Maximum number of hands you can have due to splits
       surrenderAfterDouble: true, // Can you surrender after doubling?
       pay21: {
@@ -139,7 +143,8 @@ availableGames = {
     activePlayer: 'none',
     currentPlayerHand: 0,
     specialState: null,
-    bankroll: 5000,
+    bankroll: STARTING_BANKROLL,
+    bankrollRefresh: REFRESH_BANKROLL,
     lastBet: 100,
     possibleActions: [],
     readSuit: true,
@@ -197,6 +202,24 @@ module.exports = {
     }
 
     return games;
+  },
+  // Updates the attributes structure with new values if necessary
+  updateGames: function(attributes) {
+    for (game in availableGames) {
+      if (attributes[game]) {
+        attributes[game].bankrollRefresh = availableGames[game].bankrollRefresh;
+
+        // Also reset the min and max bets
+        attributes[game].rules.minBet = availableGames[game].rules.minBet;
+        attributes[game].rules.maxBet = availableGames[game].rules.maxBet;
+      }
+    }
+  },
+  // Resets the list of actions after a bankroll reset
+  resetActions: function(attributes) {
+    const game = attributes[attributes.currentGame];
+
+    setNextActions(game);
   },
   // Determines if this is the initial game state or not
   isDefaultGame: function(attributes) {
@@ -495,10 +518,19 @@ function deal(attributes, betAmount) {
   game.sideBetWin = undefined;
 
   // Now deal the cards
-  newHand.cards.push(game.deck.cards.shift());
-  game.dealerHand.cards.push(game.deck.cards.shift());
-  newHand.cards.push(game.deck.cards.shift());
-  game.dealerHand.cards.push(game.deck.cards.shift());
+  if (attributes.temp.alwaysDealerBlackjack) {
+    // Let's try to force a loss by giving the dealer a blackjack
+    newHand.cards.push(game.deck.cards.shift());
+    game.dealerHand.cards.push({'rank': 1, 'suit': 'S'});
+    newHand.cards.push(game.deck.cards.shift());
+    game.dealerHand.cards.push({'rank': 11, 'suit': 'C'});
+  } else {
+    newHand.cards.push(game.deck.cards.shift());
+    game.dealerHand.cards.push(game.deck.cards.shift());
+    newHand.cards.push(game.deck.cards.shift());
+    game.dealerHand.cards.push(game.deck.cards.shift());
+  }
+  
   game.playerHands.push(newHand);
 
   // Count the sevens!

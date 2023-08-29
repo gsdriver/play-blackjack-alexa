@@ -142,7 +142,7 @@
   "LONG21_SELL_SPANISH": "Du hast 21 Punkte mit fünf oder mehr als fünf Karten. Im bei uns angebotenen Spiel Spanish 21 gäbe es dafür Extrageld. Sage Spanish 21 kaufen, wenn du mehr darüber erfahren willst. <break time=\"500ms\"/>  ",
   "LOST_MULTIPLEHANDS_AND_SIDEBET": "Alle deine Hände sowie deine Zusatzwette haben verloren. ",
   "LOST_SINGLEHAND_AND_SIDEBET": "Du hast sowohl bei deiner Hand als auch bei deiner Zusatzwette verloren. ",
-  "MAP_ERROR_TOOLARGE": "Dein Einsatz liegt über dem Maximum von 1000$. ",
+  "MAP_ERROR_TOOLARGE": "Dein Einsatz liegt über dem Maximum von 5000$. ",
   "MAP_ERROR_TOOSMALL": "Dein Einsatz ist unter dem Minimum von 5$. ",
   "MORE_THAN_PLAYERS": "über {PlayerCount}",
   "NATURAL_BLACKJACK": "5 Punkte für einen Blackjack ",

@@ -20,11 +20,13 @@ module.exports = {
     const res = require('../resources')(event.request.locale);
     const output = playgame.readCurrentHand(attributes, event.request.locale);
     const game = attributes[attributes.currentGame];
-    const speech = res.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll) + output.speech;
+    const speech = attributes.temp.lastResponse
+      ? attributes.temp.lastResponse
+      : res.strings.YOUR_BANKROLL_TEXT.replace('{0}', game.bankroll) + output.speech;
 
     return handlerInput.responseBuilder
       .speak(speech)
-      .reprompt(output.reprompt)
+      .reprompt(attributes.temp.lastReprompt ? attributes.temp.lastReprompt : output.reprompt)
       .getResponse();
   },
 };

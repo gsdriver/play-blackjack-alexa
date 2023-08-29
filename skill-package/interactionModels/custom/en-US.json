@@ -141,11 +141,9 @@
           "slots": [],
           "samples": [
             "reset game",
-            "reset bankroll",
             "reset the game",
             "reset rules",
             "reset my game",
-            "reset my bankroll",
             "reset rules",
             "reset the rules",
             "reset my rules"
@@ -324,6 +322,32 @@
           ]
         },
         {
+          "name": "EnterTestIntent",
+          "slots": [
+            {
+              "name": "TestCase",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "enter test case {TestCase}",
+            "turn on test case {TestCase}"
+          ]
+        },
+        {
+          "name": "ExitTestIntent",
+          "slots": [
+            {
+              "name": "TestCase",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "samples": [
+            "exit test case {TestCase}",
+            "turn off test case {TestCase}"
+          ]
+        },
+        {
           "name": "AMAZON.FallbackIntent",
           "samples": []
         },
@@ -490,6 +514,20 @@
                   "list of advanced hands",
                   "advanced training",
                   "advanced training hands"
+                ]
+              }
+            },
+            {
+              "id": "bankrollreset",
+              "name": {
+                "value": "bankroll reset",
+                "synonyms": [
+                  "reset bankroll",
+                  "reset my bankroll",
+                  "reset bankroll feature",
+                  "feature to reset bankroll",
+                  "feature to reset my bankroll",
+                  "the reset bankroll feature"
                 ]
               }
             }
@@ -776,15 +814,15 @@
         "variations": [
           {
             "type": "PlainText",
-            "value": "Would you like to buy Spanish twenty-one or an advanced training mode?"
+            "value": "Would you like to buy Spanish twenty-one, an advanced training mode, or a feature to automatically reset your bankroll?"
           },
           {
             "type": "PlainText",
-            "value": "We have Spanish twenty-one and an advanced training mode available for purchase. Which are you interested in?"
+            "value": "We have Spanish twenty-one, an advanced training mode, and a feature to reset your bankroll available for purchase. Which are you interested in?"
           },
           {
             "type": "PlainText",
-            "value": "We have the popular Spanish twenty-one game and and advanced training mode available for purchase. Which would you like?"
+            "value": "We have the popular Spanish twenty-one game, an advanced training mode, and a reset bankroll feature available for purchase. Which would you like?"
           }
         ]
       },
@@ -793,7 +831,7 @@
         "variations": [
           {
             "type": "PlainText",
-            "value": "Would you like to refund Spanish twenty-one or advanced training?"
+            "value": "Would you like to refund Spanish twenty-one, advanced training mode, or the reset bankroll feature?"
           },
           {
             "type": "PlainText",

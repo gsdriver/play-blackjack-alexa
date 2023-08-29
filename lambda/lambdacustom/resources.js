@@ -20,6 +20,12 @@ const common = {
   // From Blackjack.js
   'BLACKJACKINTENT_NO_ACTION': 'I\'m sorry, I didn\'t catch that action. Please say what you want to do on this hand like hit or stand. What else can I help with?',
   'BLACKJACKINTENT_UNKNOWN_ACTION': 'I\'m sorry, I don\'t understand how to {0}. Please provide an action like hit or stand. What else can I help with?',
+  // From BuyGood.js
+  'BUY_GOOD_DECLINE': 'What else can I help you with?',
+  'BUY_GOOD_DECLINE_REPROMPT': 'What else can I help you with?',
+  'BUY_GOOD_SUCCESS': 'Thank you! ',
+  'BUY_GOOD_FAILURE': 'I\'m sorry, there was an issue while performing your request. ',
+  'BUY_GOOD_CANCEL': 'Please go to the orders section of your Amazon account to review or cancel your order.',
   // From ChangeRules.js
   'CHANGERULES_NO_RULE': 'I\'m sorry, I didn\'t catch a rule to change. {2} What else can I help with?',
   'CHANGERULES_NO_RULE_VALUE': 'I\'m sorry, I don\'t understand how to change {0}. {2} What else can I help with?',
@@ -50,7 +56,7 @@ const common = {
   'LAUNCH_SELECT_GAME': ' or say select a different game to change between Spanish 21 and standard blackjack',
   'LAUNCH_START_REMOVE_SIDEBET': 'remove side bet to remove your side bet',
   'LAUNCH_START_HIGH_SCORES': 'read high scores to hear the leader board',
-  'LAUNCH_START_RESET': 'reset game to reset to the default rules and bankroll',
+  'LAUNCH_START_RESET': 'reset game to reset to the default rules',
   'LAUNCH_START_PROMPT': ' <break time=\'300ms\'/>Now, what can I help you with?',
   'LAUNCH_SPANISH_TRIAL': 'For a limited time, we have a free trial version of Spanish 21 to play. Say select a new game to play Spanish 21. ',
   'LAUNCH_SPANISH_TRIAL_OVER': 'The free trial of Spanish 21 is over. If you would like to continue to play Spanish 21, say buy Spanish 21. ',
@@ -73,14 +79,22 @@ const common = {
   'REMINDER_ERROR_EXPLICIT': 'Sorry, there was a problem setting your reminder. What else can I help you with?',
   'REMINDER_SET': 'Great. I set a weekly reminder for the tournament round every {Time} {Timezone} <break time=\'200ms\'/> See you then!',
   'REMINDER_SET_EXPLICIT': 'Great. I set a weekly reminder for the tournament round every {Time} {Timezone} <break time=\'200ms\'/> What else can I help you with?',
+  'REMINDER_SET_CARD': 'Blackjack Game set a weekly reminder for the tournament round every {Time} {Timezone}.',
   // From Refund.js
   'REFUND_REPROMPT': 'What else can I help you with?',
   // From Reset.js
-  'RESET_CONFIRM': 'Would you like to reset the game? This will reset your bankroll and rules of the game.',
+  'RESET_CONFIRM': 'Would you like to reset the game? This will reset the rules of the game.',
   'RESET_REPROMPT': 'Say bet to start a new game.',
   'RESET_ABORTED': 'Game not reset. Say bet to start a new game.',
   // From Rules.js
   'RULES_CARD_TITLE': 'Blackjack Rules',
+  // From TestCase.js
+  'ENABLE_DEALER_BLACKJACK': 'Dealer will now always get a blackjack. What else can I help you with?',
+  'DISABLE_DEALER_BLACKJACK': 'The dealer will no longer always get a blackjack. What else can I help you with?',
+  'ENABLE_NEXT_DAY': 'We will treat it as being tomorrow the next time you launch the skill. What else can I help you with?',
+  'DISABLE_NEXT_DAY': 'We will no longer treat it as being tomorrow the next time you launch the skill. What else can I help you with?',
+  'UNKNOWN_TEST_CASE': 'Sorry, that is an unknown test case. What else can I help you with?',
+  'TEST_CASE_REPROMPT': 'What else can I help you with?',
   // From Training.js
   'TRAINING_ON': 'Training mode turned on. I will let you know when your play differs from Basic Strategy. ',
   'TRAINING_OFF': 'Training mode turned off. ',
@@ -130,6 +144,8 @@ const common = {
   'READHAND_PLAYER_BUSTED': 'You busted with {0} for a total of {1}.  ',
   'READHAND_PLAYER_TOTAL_ACTIVE': 'You have {0} for a total of {1}.  ',
   'READHAND_PLAYER_TOTAL_END': 'You had {0} for a total of {1}.  ',
+  'RESET_BANKROLL_AFTER_PLAY': 'Thanks to your Reset Bankroll subscription, we reset your bankroll. What would you like to do?',
+  'BUSTED_AFTER_PLAY': 'You lost all your money. Please come back later to play again. ',
   'RULES_SPANISH21': 'Spanish 21 has bonus payouts for a 21 with five or more cards and other special rules you can hear by saying Help. ',
   'RULES_DECKS': '{0} deck game. ',
   'RULES_HIT_SOFT17': 'Dealer hits on soft 17. ',
@@ -160,7 +176,7 @@ const common = {
   // From Tournament.js
   'TOURNAMENT_DEFAULT_TIMEZONE': 'Pacific time',
   'TOURNAMENT_NOCHANGERULES': 'Sorry, you can\'t change the rules on this game. ',
-  'TOURNAMENT_NORESET': 'Sorry, you can\'t reset your bankroll on this game. What else can I help you with?',
+  'TOURNAMENT_NORESET': 'Sorry, you can\'t reset the rules on this game. What else can I help you with?',
   'TOURNAMENT_HANDS_REMAINING': 'You have {0} hands remaining. ',
   'TOURNAMENT_BANKRUPT': 'You lost all your money and are out of the tournament. Thanks for playing! Check back tomorrow for the results. ',
   'TOURNAMENT_INVALIDACTION_REPROMPT': 'What else can I help you with?',
@@ -233,8 +249,11 @@ const dollar = {
   'HELP_CARD_PROGRESSIVE_TEXT': 'This game features a progressive triple seven jackpot. Place a side bet of $5 by saying PLACE SIDE BET which will stay in effect until you say REMOVE SIDE BET.\nThe side bet pays out $25 if your first card is a seven, $100 if your first two cards are both seven, and the progressive jackpot if your first three cards are seven. The progressive jackpot is based on aggregate play across all users of this skill.\n',
   // From Launch.js
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet $5 towards the jackpot',
+  'LAUNCH_RESET_BANKROLL': 'Welcome back. We have reset your bankroll to ${Bankroll}. ',
+  'LAUNCH_RESET_BANKROLL_SUBSCRIPTION': 'Thanks to your Reset Bankroll subscription, your bankroll is reset to ${Bankroll}. ',
+  'LAUNCH_BUSTED': 'Your bankroll is $0. Come back to Blackjack Game tomorrow to play again. ',
   // From Reset.js
-  'RESET_COMPLETED': 'You have $5000. Say bet to start a new game.',
+  'RESET_COMPLETED': 'You have ${Bankroll}. Say bet to start a new game.',
   // From PlayGame.js
   'YOU_BET_TEXT': 'You bet ${0}. ',
   'YOUR_BANKROLL_TEXT': 'You have ${0}. ',
@@ -256,7 +275,7 @@ const dollar = {
   'TOURNAMENT_STANDING_TOGO': '<say-as interpret-as="ordinal">1</say-as> place has ${0}. ',
   // This file
   'MAP_ERROR_TOOSMALL': 'Your bet is below the minimum of $5',
-  'MAP_ERROR_TOOLARGE': 'Your bet is above the maximum of $1000',
+  'MAP_ERROR_TOOLARGE': 'Your bet is above the maximum of $5000',
 };
 
 const pound = {
@@ -271,8 +290,11 @@ const pound = {
   'HELP_CARD_PROGRESSIVE_TEXT': 'This game features a progressive triple seven jackpot. Place a side bet of £5 by saying PLACE SIDE BET which will stay in effect until you say REMOVE SIDE BET.\nThe side bet pays out £25 if your first card is a seven, £100 if your first two cards are both seven, and the progressive jackpot if your first three cards are seven. The progressive jackpot is based on aggregate play across all users of this skill.\n',
   // From Launch.js
   'LAUNCH_START_PLACE_SIDEBET': 'place side bet to bet £5 towards the jackpot',
+  'LAUNCH_BANKROLL': 'Welcome back. We have reset your bankroll to £{Bankroll}. ',
+  'LAUNCH_RESET_BANKROLL_SUBSCRIPTION': 'Thanks to your Reset Bankroll subscription, your bankroll is reset to £{Bankroll}. ',
+  'LAUNCH_BUSTED': 'Your bankroll is £0. Come back to Blackjack Game tomorrow to play again. ',
   // From Reset.js
-  'RESET_COMPLETED': 'You have £5000. Say bet to start a new game.',
+  'RESET_COMPLETED': 'You have {Bankroll}. Say bet to start a new game.',
   // From PlayGame.js
   'YOU_BET_TEXT': 'You bet £{0}. ',
   'YOUR_BANKROLL_TEXT': 'You have £{0}. ',
@@ -294,7 +316,7 @@ const pound = {
   'TOURNAMENT_STANDING_TOGO': '<say-as interpret-as="ordinal">1</say-as> place has £{0}. ',
   // This file
   'MAP_ERROR_TOOSMALL': 'Your bet is below the minimum of £5',
-  'MAP_ERROR_TOOLARGE': 'Your bet is above the maximum of £1000',
+  'MAP_ERROR_TOOLARGE': 'Your bet is above the maximum of £5000',
 };
 
 const resources = {

@@ -5,6 +5,7 @@
 'use strict';
 
 const bjUtils = require('../BlackjackUtils');
+const upsell = require('../UpsellEngine');
 
 module.exports = {
   canHandle: function(handlerInput) {
@@ -27,8 +28,8 @@ module.exports = {
 
     const product = bjUtils.mapProduct(handlerInput);
     if (product) {
-    console.log(product);
-    console.log(attributes.paid);
+      console.log(product);
+      console.log(attributes.paid);
       if (!attributes.paid || !attributes.paid[product]) {
         // That really shouldn't happen
         return handlerInput.responseBuilder
@@ -45,7 +46,7 @@ module.exports = {
             'productId': attributes.paid[product].productId,
           },
         },
-        'token': 'game.' + product + '.launch',
+        'token': upsell.upsellToken(product) + '.launch',
       };
 
       return handlerInput.responseBuilder

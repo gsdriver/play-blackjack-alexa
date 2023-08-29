@@ -41,6 +41,9 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     let amount = 0;
     const game = attributes[attributes.currentGame];
+    let goodResponse = attributes.temp.goodResponse ? attributes.temp.goodResponse.slice() : undefined;
+
+    attributes.temp.goodResponse = undefined;
 
     // If the last hand was a 5 card 21, upsell them to Spanish 21
     if (attributes.temp.long21) {
@@ -48,7 +51,7 @@ module.exports = {
       if (!attributes.temp.noUpsellBetting) {
         const directive = upsell.getUpsell(attributes, 'long21');
         if (directive) {
-          directive.token = 'game.' + directive.token + '.betting';
+          directive.token = directive.token + '.betting';
           return handlerInput.responseBuilder
             .addDirective(directive)
             .withShouldEndSession(true)
@@ -62,10 +65,25 @@ module.exports = {
       if (!attributes.temp.noUpsellBetting) {
         const directive = upsell.getUpsell(attributes, 'hardhand');
         if (directive) {
-          directive.token = 'game.' + directive.token + '.betting';
+          directive.token = directive.token + '.betting';
           return handlerInput.responseBuilder
             .addDirective(directive)
             .withShouldEndSession(true)
+            .getResponse();
+        }
+      }
+    }
+
+    // If the last hand was played wrong, upsell them on our book
+    if (attributes.temp.wrongPlayLoser) {
+      attributes.temp.wrongPlayLoser = undefined;
+      if (!attributes.temp.noUpsellBetting) {
+        const good = upsell.getGood(handlerInput, 'badplay');
+        if (good) {
+          attributes.suggestGood = { good: good.good, asin: good.asin };
+          return handlerInput.responseBuilder
+            .speak(good.message)
+            .reprompt(good.message)
             .getResponse();
         }
       }
@@ -75,7 +93,7 @@ module.exports = {
     if (!attributes.temp.noUpsellBetting) {
       const directive = upsell.getUpsell(attributes, 'play');
       if (directive) {
-        directive.token = 'game.' + directive.token + '.betting';
+        directive.token = directive.token + '.betting';
         return handlerInput.responseBuilder
           .addDirective(directive)
           .withShouldEndSession(true)
@@ -102,6 +120,18 @@ module.exports = {
           }
           game.timestamp = Date.now();
           game.hands = (game.hands) ? (game.hands + 1) : 1;
+        }
+
+        if (goodResponse) {
+          if (error) {
+            error = `${goodResponse} ${error}`;
+          }
+          if (response) {
+            response = `${goodResponse} ${response}`;
+          }
+          if (speech) {
+            speech = `${goodResponse} ${speech}`;
+          }
         }
 
         resolve(bjUtils.getResponse(handlerInput, error, response, speech, reprompt));

@@ -24,11 +24,14 @@ const ConfirmReset = require('./intents/ConfirmReset');
 const ConfirmSelect = require('./intents/ConfirmSelect');
 const Select = require('./intents/Select');
 const Training = require('./intents/Training');
+const BuyGood = require('./intents/BuyGood');
 const Unhandled = require('./intents/Unhandled');
 const ListPurchases = require('./intents/ListPurchases');
 const Purchase = require('./intents/Purchase');
 const Refund = require('./intents/Refund');
 const ProductResponse = require('./intents/ProductResponse');
+const SessionResumed = require('./intents/SessionResumed');
+const TestCase = require('./intents/TestCase');
 const gameService = require('./GameService');
 const bjUtils = require('./BlackjackUtils');
 const tournament = require('./tournament');
@@ -53,10 +56,17 @@ function initialize(event, attributes) {
     attributes.prompts = {};
   }
 
+  // Special case - the "see next day" flag persists
+  if (attributes.seeNextDay) {
+    attributes.temp.seeNextDay = true;
+    attributes.seeNextDay = undefined;
+  }
+
   return new Promise((resolve, reject) => {
     attributes.userId = event.session.user.userId;
     bjUtils.readSuggestions(attributes, () => {
       // If they don't have a game, create one
+      gameService.updateGames(attributes);
       if (!attributes.currentGame) {
         gameService.initializeGame('standard', attributes, userId);
         attributes.newUser = true;
@@ -117,7 +127,6 @@ function initialize(event, attributes) {
     });
   });
 }
-
 
 const requestInterceptor = {
   process(handlerInput) {
@@ -266,6 +275,8 @@ function runGame(event, context, callback) {
   });
   const skillFunction = skillBuilder.addRequestHandlers(
       ProductResponse,
+      SessionResumed,
+      BuyGood,
       OfferTournament,
       TournamentJoin,
       Launch,
@@ -290,6 +301,7 @@ function runGame(event, context, callback) {
       Blackjack,
       Repeat,
       HighScore,
+      TestCase,
       SessionEnd,
       Unhandled
     )

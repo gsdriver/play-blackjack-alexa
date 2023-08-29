@@ -16,7 +16,7 @@
             "game"
           ],
           "name": "Blackjack Game",
-          "description": "Play rounds of blackjack, tracking your bankroll as you play.  You start with 5,000 dollars in credit and can vary your bet from 5 to 1,000 dollars.  Improve your blackjack skills by asking for a suggestion on any hand (\"what should I do\") or use training mode (\"enter training mode\"), where Alexa will prompt you with the recommended play on every hand, based on the game options currently being used!  This full-featured game has it all - hit, stand, split, double down, and even surrender.  You can also \"change\" options such as the number of decks (1, 2, 4, 6, or 8) or whether surrender is allowed or not.\n\nNEW: We have two premium experiences available for purchase!  Spanish 21 is an exciting blackjack variant that gives you bonus payouts for certain hands.  We also have analyzed half a millions hands of play, and have an Advanced Training mode that allows you to improve your game by focusing on those hands that stumped the most players of this skill. \n\nThere is also a triple seven progressive side bet.  For a 5 dollar side bet, you win if your first, first two, or first three cards are sevens.  Got three sevens?  Then you win the progressive jackpot, which increases based on aggregate play of this skill!  Play with your friends and really watch that jackpot grow!\n\nAt any time, you can ask to \"read the rules\" or \"repeat\" to hear the current rules in play or to repeat your hand and bankroll.  If you need to reset the game to its original state and rules of play, say \"reset game.\"\n\nJoin us each Tuesday to play in an exciting tournament round! See if you can get the highest bankroll with a fixed number of hands.  You can ask Alexa \"set a reminder for the tournament\" and you'll be notified when the tournament is underway.  Compare your bankroll with other players by saying \"read high scores\" to hear the leader board. Keep playing and you can move to the top!\n\nHave feedback or features you'd like to see?  Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
+          "description": "Play rounds of blackjack, tracking your bankroll as you play.  You start with 5,000 dollars in credit and can vary your bet from 5 to 5,000 dollars.  Improve your blackjack skills by asking for a suggestion on any hand (\"what should I do\") or use training mode (\"enter training mode\"), where Alexa will prompt you with the recommended play on every hand, based on the game options currently being used!  This full-featured game has it all - hit, stand, split, double down, and even surrender.  You can also \"change\" options such as the number of decks (1, 2, 4, 6, or 8) or whether surrender is allowed or not.\n\nWe have two premium experiences available for purchase!  Spanish 21 is an exciting blackjack variant that gives you bonus payouts for certain hands.  We also have analyzed half a millions hands of play, and have an Advanced Training mode that allows you to improve your game by focusing on those hands that stumped the most players of this skill. \n\nThere is also a triple seven progressive side bet.  For a 5 dollar side bet, you win if your first, first two, or first three cards are sevens.  Got three sevens?  Then you win the progressive jackpot, which increases based on aggregate play of this skill!  Play with your friends and really watch that jackpot grow!\n\nAt any time, you can ask to \"read the rules\" or \"repeat\" to hear the current rules in play or to repeat your hand and bankroll.  If you need to reset the game to its original state and rules of play, say \"reset game.\"\n\nJoin us each Tuesday to play in an exciting tournament round! See if you can get the highest bankroll with a fixed number of hands.  You can ask Alexa \"set a reminder for the tournament\" and you'll be notified when the tournament is underway.  Compare your bankroll with other players by saying \"read high scores\" to hear the leader board. Keep playing and you can move to the top!\n\nHave feedback or features you'd like to see?  Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
           "smallIconUri": "https://garrett-alexa-images.s3.amazonaws.com/skill-assets/blackjack/en-US_smallIconUri.png",
           "largeIconUri": "https://garrett-alexa-images.s3.amazonaws.com/skill-assets/blackjack/en-US_largeIconUri.png"
         },
@@ -34,7 +34,7 @@
             "game"
           ],
           "name": "Blackjack Game",
-          "description": "Play rounds of blackjack, tracking your bankroll as you play.  You start with 5,000 dollars in credit and can vary your bet from 5 to 1,000 dollars.  Improve your blackjack skills by asking for a suggestion on any hand (\"what should I do\") or use training mode (\"enter training mode\"), where Alexa will prompt you with the recommended play on every hand, based on the game options currently being used!  This full-featured game has it all - hit, stand, split, double down, and even surrender.  You can also \"change\" options such as the number of decks (1, 2, 4, 6, or 8) or whether surrender is allowed or not.\n\nThere is also a triple seven progressive side bet.  For a 5 dollar side bet, you win if your first, first two, or first three cards are sevens.  Got three sevens?  Then you win the progressive jackpot, which increases based on aggregate play of this skill!  Play with your friends and really watch that jackpot grow!\n\nAt any time, you can ask to \"read the rules\" or \"repeat\" to hear the current rules in play or to repeat your hand and bankroll.  If you need to reset the game to its original state and rules of play, say \"reset game.\"\n\nJoin us each Tuesday to play in an exciting tournament round! See if you can get the highest bankroll with a fixed number of hands.  You can ask Alexa \"set a reminder for the tournament\" and you'll be notified when the tournament is underway.  Compare your bankroll with other players by saying \"read high scores\" to hear the leader board. Keep playing and you can move to the top!\n\nHave feedback or features you'd like to see?  Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
+          "description": "Play rounds of blackjack, tracking your bankroll as you play.  You start with 5,000 dollars in credit and can vary your bet from 5 to 5,000 dollars.  Improve your blackjack skills by asking for a suggestion on any hand (\"what should I do\") or use training mode (\"enter training mode\"), where Alexa will prompt you with the recommended play on every hand, based on the game options currently being used!  This full-featured game has it all - hit, stand, split, double down, and even surrender.  You can also \"change\" options such as the number of decks (1, 2, 4, 6, or 8) or whether surrender is allowed or not.\n\nWe have two premium experiences available for purchase!  Spanish 21 is an exciting blackjack variant that gives you bonus payouts for certain hands.  We also have analyzed half a millions hands of play, and have an Advanced Training mode that allows you to improve your game by focusing on those hands that stumped the most players of this skill.\n\nThere is also a triple seven progressive side bet.  For a 5 dollar side bet, you win if your first, first two, or first three cards are sevens.  Got three sevens?  Then you win the progressive jackpot, which increases based on aggregate play of this skill!  Play with your friends and really watch that jackpot grow!\n\nAt any time, you can ask to \"read the rules\" or \"repeat\" to hear the current rules in play or to repeat your hand and bankroll.  If you need to reset the game to its original state and rules of play, say \"reset game.\"\n\nJoin us each Tuesday to play in an exciting tournament round! See if you can get the highest bankroll with a fixed number of hands.  You can ask Alexa \"set a reminder for the tournament\" and you'll be notified when the tournament is underway.  Compare your bankroll with other players by saying \"read high scores\" to hear the leader board. Keep playing and you can move to the top!\n\nHave feedback or features you'd like to see?  Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
           "smallIconUri": "https://garrett-alexa-images.s3.amazonaws.com/skill-assets/blackjack/en-CA_smallIconUri.png",
           "largeIconUri": "https://garrett-alexa-images.s3.amazonaws.com/skill-assets/blackjack/en-CA_largeIconUri.png"
         },
@@ -52,7 +52,7 @@
             "game"
           ],
           "name": "Blackjack Game",
-          "description": "Play rounds of blackjack, tracking your bankroll as you play.  You start with 5,000 dollars in credit and can vary your bet from 5 to 1,000 dollars.  Improve your blackjack skills by asking for a suggestion on any hand (\"what should I do\") or use training mode (\"enter training mode\"), where Alexa will prompt you with the recommended play on every hand, based on the game options currently being used!  This full-featured game has it all - hit, stand, split, double down, and even surrender.  You can also \"change\" options such as the number of decks (1, 2, 4, 6, or 8) or whether surrender is allowed or not.\n\nThere is also a triple seven progressive side bet.  For a 5 dollar side bet, you win if your first, first two, or first three cards are sevens.  Got three sevens?  Then you win the progressive jackpot, which increases based on aggregate play of this skill!  Play with your friends and really watch that jackpot grow!\n\nAt any time, you can ask to \"read the rules\" or \"repeat\" to hear the current rules in play or to repeat your hand and bankroll.  If you need to reset the game to its original state and rules of play, say \"reset game.\"\n\nJoin us each Tuesday to play in an exciting tournament round! See if you can get the highest bankroll with a fixed number of hands.  You can ask Alexa \"set a reminder for the tournament\" and you'll be notified when the tournament is underway.  Compare your bankroll with other players by saying \"read high scores\" to hear the leader board. Keep playing and you can move to the top!\n\nHave feedback or features you'd like to see?  Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
+          "description": "Play rounds of blackjack, tracking your bankroll as you play.  You start with 5,000 dollars in credit and can vary your bet from 5 to 5,000 dollars.  Improve your blackjack skills by asking for a suggestion on any hand (\"what should I do\") or use training mode (\"enter training mode\"), where Alexa will prompt you with the recommended play on every hand, based on the game options currently being used!  This full-featured game has it all - hit, stand, split, double down, and even surrender.  You can also \"change\" options such as the number of decks (1, 2, 4, 6, or 8) or whether surrender is allowed or not.\n\nThere is also a triple seven progressive side bet.  For a 5 dollar side bet, you win if your first, first two, or first three cards are sevens.  Got three sevens?  Then you win the progressive jackpot, which increases based on aggregate play of this skill!  Play with your friends and really watch that jackpot grow!\n\nAt any time, you can ask to \"read the rules\" or \"repeat\" to hear the current rules in play or to repeat your hand and bankroll.  If you need to reset the game to its original state and rules of play, say \"reset game.\"\n\nJoin us each Tuesday to play in an exciting tournament round! See if you can get the highest bankroll with a fixed number of hands.  You can ask Alexa \"set a reminder for the tournament\" and you'll be notified when the tournament is underway.  Compare your bankroll with other players by saying \"read high scores\" to hear the leader board. Keep playing and you can move to the top!\n\nHave feedback or features you'd like to see?  Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
           "smallIconUri": "https://garrett-alexa-images.s3.amazonaws.com/skill-assets/blackjack/en-IN_smallIconUri.png",
           "largeIconUri": "https://garrett-alexa-images.s3.amazonaws.com/skill-assets/blackjack/en-IN_largeIconUri.png"
         },
@@ -70,7 +70,7 @@
             "game"
           ],
           "name": "Blackjack Game",
-          "description": "Play rounds of blackjack, tracking your bankroll as you play.  You start with 5,000 dollars in credit and can vary your bet from 5 to 1,000 dollars.  Improve your blackjack skills by asking for a suggestion on any hand (\"what should I do\") or use training mode (\"enter training mode\"), where Alexa will prompt you with the recommended play on every hand, based on the game options currently being used!  This full-featured game has it all - hit, stand, split, double down, and even surrender.  You can also \"change\" options such as the number of decks (1, 2, 4, 6, or 8) or whether surrender is allowed or not.\n\nThere is also a triple seven progressive side bet.  For a 5 dollar side bet, you win if your first, first two, or first three cards are sevens.  Got three sevens?  Then you win the progressive jackpot, which increases based on aggregate play of this skill!  Play with your friends and really watch that jackpot grow!\n\nAt any time, you can ask to \"read the rules\" or \"repeat\" to hear the current rules in play or to repeat your hand and bankroll.  If you need to reset the game to its original state and rules of play, say \"reset game.\"\n\nJoin us each Tuesday to play in an exciting tournament round! See if you can get the highest bankroll with a fixed number of hands.  You can ask Alexa \"set a reminder for the tournament\" and you'll be notified when the tournament is underway.  Compare your bankroll with other players by saying \"read high scores\" to hear the leader board. Keep playing and you can move to the top!\n\nHave feedback or features you'd like to see?  Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
+          "description": "Play rounds of blackjack, tracking your bankroll as you play.  You start with 5,000 dollars in credit and can vary your bet from 5 to 5,000 dollars.  Improve your blackjack skills by asking for a suggestion on any hand (\"what should I do\") or use training mode (\"enter training mode\"), where Alexa will prompt you with the recommended play on every hand, based on the game options currently being used!  This full-featured game has it all - hit, stand, split, double down, and even surrender.  You can also \"change\" options such as the number of decks (1, 2, 4, 6, or 8) or whether surrender is allowed or not.\n\nThere is also a triple seven progressive side bet.  For a 5 dollar side bet, you win if your first, first two, or first three cards are sevens.  Got three sevens?  Then you win the progressive jackpot, which increases based on aggregate play of this skill!  Play with your friends and really watch that jackpot grow!\n\nAt any time, you can ask to \"read the rules\" or \"repeat\" to hear the current rules in play or to repeat your hand and bankroll.  If you need to reset the game to its original state and rules of play, say \"reset game.\"\n\nJoin us each Tuesday to play in an exciting tournament round! See if you can get the highest bankroll with a fixed number of hands.  You can ask Alexa \"set a reminder for the tournament\" and you'll be notified when the tournament is underway.  Compare your bankroll with other players by saying \"read high scores\" to hear the leader board. Keep playing and you can move to the top!\n\nHave feedback or features you'd like to see?  Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
           "smallIconUri": "https://garrett-alexa-images.s3.amazonaws.com/skill-assets/blackjack/en-AU_smallIconUri.png",
           "largeIconUri": "https://garrett-alexa-images.s3.amazonaws.com/skill-assets/blackjack/en-AU_largeIconUri.png"
         },
@@ -88,24 +88,98 @@
             "game"
           ],
           "name": "Blackjack Game",
-          "description": "Play rounds of blackjack, tracking your bankroll as you play.  You start with 5,000 pounds in credit and can vary your bet from 5 to 1,000 pounds.  Improve your blackjack skills by asking for a suggestion on any hand (\"what should I do\") or use training mode (\"enter training mode\"), where Alexa will prompt you with the recommended play on every hand, based on the game options currently being used!  This full-featured game has it all - hit, stand, split, double down, and even surrender.  You can also \"change\" options such as the number of decks (1, 2, 4, 6, or 8) or whether surrender is allowed or not.\n\nNEW: We have two premium experiences available for purchase!  Spanish 21 is an exciting blackjack variant that gives you bonus payouts for certain hands.  We also have analyzed half a millions hands of play, and have an Advanced Training mode that allows you to improve your game by focusing on those hands that stumped the most players of this skill.\n\nThere is also a triple seven progressive side bet.  For a 5 pound side bet, you win if your first, first two, or first three cards are sevens.  Got three sevens?  Then you win the progressive jackpot, which increases based on aggregate play of this skill!  Play with your friends and really watch that jackpot grow!\n\nAt any time, you can ask to \"read the rules\" or \"repeat\" to hear the current rules in play or to repeat your hand and bankroll.  If you need to reset the game to its original state and rules of play, say \"reset game.\"\n\nJoin us each Tuesday to play in an exciting tournament round! See if you can get the highest bankroll with a fixed number of hands.  You can ask Alexa \"set a reminder for the tournament\" and you'll be notified when the tournament is underway.  Compare your bankroll with other players by saying \"read high scores\" to hear the leader board. Keep playing and you can move to the top!\n\nHave feedback or features you'd like to see?  Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
+          "description": "Play rounds of blackjack, tracking your bankroll as you play.  You start with 5,000 pounds in credit and can vary your bet from 5 to 5,000 pounds.  Improve your blackjack skills by asking for a suggestion on any hand (\"what should I do\") or use training mode (\"enter training mode\"), where Alexa will prompt you with the recommended play on every hand, based on the game options currently being used!  This full-featured game has it all - hit, stand, split, double down, and even surrender.  You can also \"change\" options such as the number of decks (1, 2, 4, 6, or 8) or whether surrender is allowed or not.\n\nWe have two premium experiences available for purchase!  Spanish 21 is an exciting blackjack variant that gives you bonus payouts for certain hands.  We also have analyzed half a millions hands of play, and have an Advanced Training mode that allows you to improve your game by focusing on those hands that stumped the most players of this skill.\n\nThere is also a triple seven progressive side bet.  For a 5 pound side bet, you win if your first, first two, or first three cards are sevens.  Got three sevens?  Then you win the progressive jackpot, which increases based on aggregate play of this skill!  Play with your friends and really watch that jackpot grow!\n\nAt any time, you can ask to \"read the rules\" or \"repeat\" to hear the current rules in play or to repeat your hand and bankroll.  If you need to reset the game to its original state and rules of play, say \"reset game.\"\n\nJoin us each Tuesday to play in an exciting tournament round! See if you can get the highest bankroll with a fixed number of hands.  You can ask Alexa \"set a reminder for the tournament\" and you'll be notified when the tournament is underway.  Compare your bankroll with other players by saying \"read high scores\" to hear the leader board. Keep playing and you can move to the top!\n\nHave feedback or features you'd like to see?  Connect with us on Facebook at https://www.facebook.com/alexacasinogames!",
           "smallIconUri": "https://garrett-alexa-images.s3.amazonaws.com/skill-assets/blackjack/en-GB_smallIconUri.png",
           "largeIconUri": "https://garrett-alexa-images.s3.amazonaws.com/skill-assets/blackjack/en-GB_largeIconUri.png"
         }
       },
       "isAvailableWorldwide": true,
-      "testingInstructions": "Allows you to play a game of blackjack with varying options. The game keeps the player's state so they can track their progress as they play.  Linking the skill is optional but if done will read the player's first name when they start the skill or if they are on the leader board.",
+      "testingInstructions": "Allows you to play a game of blackjack with varying options. The game keeps the player's state so they can track their progress as they play.  Linking the skill is optional but if done will read the player's first name when they start the skill or if they are on the leader board. To test the reset bankroll subscription, you can say \"enter test case six\" which will rig the game so the dealer always gets a blackjack, making it easier for you to lose all your money and get prompts for the reset bankroll feature.",
       "category": "GAMES",
       "distributionCountries": []
     },
     "apis": {
       "custom": {
         "endpoint": {
-          "uri": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v13"
+          "uri": "arn:aws:lambda:us-east-1:129065607926:function:Play_Blackjack_v14"
         },
         "interfaces": [
           {
-            "type": "RENDER_TEMPLATE"
+            "type": "ALEXA_PRESENTATION_APL",
+            "supportedViewports": [
+              {
+                "mode": "HUB",
+                "shape": "ROUND",
+                "minWidth": 100,
+                "maxWidth": 599,
+                "minHeight": 100,
+                "maxHeight": 599
+              },
+              {
+                "mode": "HUB",
+                "shape": "RECTANGLE",
+                "minHeight": 100,
+                "maxHeight": 599,
+                "minWidth": 960,
+                "maxWidth": 1279
+              },
+              {
+                "mode": "HUB",
+                "shape": "RECTANGLE",
+                "minHeight": 600,
+                "maxHeight": 959,
+                "minWidth": 960,
+                "maxWidth": 1279
+              },
+              {
+                "mode": "HUB",
+                "shape": "RECTANGLE",
+                "minHeight": 600,
+                "maxHeight": 1279,
+                "minWidth": 1280,
+                "maxWidth": 1920
+              },
+              {
+                "mode": "HUB",
+                "shape": "RECTANGLE",
+                "minHeight": 960,
+                "maxHeight": 1279,
+                "minWidth": 1920,
+                "maxWidth": 2560
+              },
+              {
+                "mode": "HUB",
+                "shape": "RECTANGLE",
+                "minHeight": 1920,
+                "maxHeight": 2560,
+                "minWidth": 960,
+                "maxWidth": 1279
+              },
+              {
+                "mode": "TV",
+                "shape": "RECTANGLE",
+                "minHeight": 540,
+                "maxHeight": 540,
+                "minWidth": 960,
+                "maxWidth": 960
+              },
+              {
+                "mode": "MOBILE",
+                "shape": "RECTANGLE",
+                "minHeight": 320,
+                "maxHeight": 1920,
+                "minWidth": 960,
+                "maxWidth": 1279
+              },
+              {
+                "mode": "MOBILE",
+                "shape": "RECTANGLE",
+                "minHeight": 320,
+                "maxHeight": 1920,
+                "minWidth": 1280,
+                "maxWidth": 1920
+              }
+            ]
           },
           {
             "type": "CAN_FULFILL_INTENT_REQUEST"

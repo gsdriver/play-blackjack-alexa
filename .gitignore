@@ -9,6 +9,7 @@ src/test.json
 .ask
 .idea
 .legacy
+rollback.sh
 summary.csv
 attributes.txt
 seed.txt

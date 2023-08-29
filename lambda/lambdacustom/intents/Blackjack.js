@@ -26,7 +26,7 @@ module.exports = {
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const res = require('../resources')(event.request.locale);
     const game = attributes[attributes.currentGame];
-    const actionSlot = event.request.intent.slots.Action;
+    const actionSlot = event.request.intent.slots ? event.request.intent.slots.Action : undefined;
     let actionObj;
     let response;
 

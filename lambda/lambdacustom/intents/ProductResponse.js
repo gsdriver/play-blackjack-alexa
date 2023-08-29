@@ -81,7 +81,7 @@ module.exports = {
       switch (event.request.name) {
         case 'Buy':
         case 'Upsell':
-          if (event.request.payload &&
+          if (options[0] === 'game' && event.request.payload &&
             ((event.request.payload.purchaseResult == 'ACCEPTED') ||
              (event.request.payload.purchaseResult == 'ALREADY_PURCHASED'))) {
             // OK, flip them to this game
@@ -89,7 +89,7 @@ module.exports = {
           }
           break;
         case 'Cancel':
-          if (event.request.payload &&
+          if (options[0] === 'game' && event.request.payload &&
               (event.request.payload.purchaseResult == 'ACCEPTED')) {
             attributes[game] = undefined;
             return selectedGame(handlerInput, 'standard');
