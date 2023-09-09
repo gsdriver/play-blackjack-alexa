@@ -117,6 +117,7 @@ module.exports = {
       'spanish': 'game',
       'training': 'game',
       'bankrollreset': 'subscribe',
+      'changerules': 'option',
     };
   
     return tokenPrefix[upsellProduct] ? `${tokenPrefix[upsellProduct]}.${upsellProduct}` : undefined;
@@ -225,14 +226,19 @@ function selectUpsellMessage(attributes, upsellProduct, message) {
     'LISTPURCHASES_UPSELL': 'We have {Product} available. Want to learn more?|We have a {Product} expansion pack available for purchase. Would you like to hear more?|We have {Product} available for purchase. Want to hear more?',
     'HARDHAND_UPSELL': 'Most people play that previous hand improperly. We have a feature that lets you practice over 100 hands most people get wrong. Want to learn more?|That wasn\'t the best way to play that last hand. Most people play that one wrong. Would you like to hear about an advanced training mode I have that will help you perfect your game?|You know, most people play that last hand wrong. I have a list of hard hands that I can give you to help you train. Want to hear more?',
     'BUSTED_UPSELL': 'You are out of money. Your bankroll will reset tomorrow or you can get the {Product} subscription which will automatically reset your bankroll. Would you like to hear more?',
+    'CHANGERULES_UPSELL': 'Want to be able to change the rules of play? You can with {Product}. Want to hear more?|To change the rules of play, you\'ll need {Product}. Want to hear more?|You can change the rules of play with {Product}. Want to hear more?',
   };
   const productName = {
     'spanish': 'Spanish 21',
     'training': 'Advanced Training',
     'bankrollreset': 'Reset Bankroll',
+    'changerules': 'Change Rules',
   };
 
-  const options = upsellMessages[message].split('|');
+  // We should be more robust for this in the future
+  // Really the message should be a combination of the trigger and the product selected
+  // For now though, play is the only trigger that has multiple products
+  const options = upsellMessages[((message === 'PLAY_UPSELL') && (upsellProduct === 'changerules')) ? 'CHANGERULES_UPSELL' : message].split('|');
   selection = Math.floor(Math.random() * options.length);
   if (selection === options.length) {
     selection--;
@@ -280,6 +286,13 @@ function shouldUpsell(attributes, availableProducts, trigger, now) {
       }
       break;
 
+    case 'changerules':
+      // Change rules is always triggered if available
+      if (availableProducts.indexOf('changerules') > -1) {
+        upsell = 'changerules';
+      }
+      break;
+
     case 'long21':
       if (availableProducts.indexOf('spanish') > -1) {
         if (!attributes.upsell.prompts.long21 ||
@@ -297,12 +310,21 @@ function shouldUpsell(attributes, availableProducts, trigger, now) {
       break;
 
     case 'play':
-      // Trigger if once they hit 6 hands - once every 2 days and not for the first session
+      // Trigger Spanish every fifth hand - once every 2 days and not for the first session
       if (availableProducts.indexOf('spanish') > -1) {
-        if ((attributes.upsell.play.count === 6) &&
+        if ((attributes.upsell.play.count % 5 === 0) &&
           (!attributes.upsell.prompts.play ||
             ((now - attributes.upsell.prompts.play) > 2*24*60*60*1000))) {
           upsell = 'spanish';
+        }
+      }
+
+      // If not triggering a Spanish suggestion, promote change rules instead
+      if (!upsell && (availableProducts.indexOf('changerules') > -1)) {
+        // Prompt every 4 days
+        if (!attributes.upsell.prompts.play ||
+          ((now - attributes.upsell.prompts.play) > 4*24*60*60*1000)) {
+          upsell = 'changerules';
         }
       }
       break;

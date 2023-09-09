@@ -27,9 +27,7 @@ const common = {
   'BUY_GOOD_FAILURE': 'I\'m sorry, there was an issue while performing your request. ',
   'BUY_GOOD_CANCEL': 'Please go to the orders section of your Amazon account to review or cancel your order.',
   // From ChangeRules.js
-  'CHANGERULES_NO_RULE': 'I\'m sorry, I didn\'t catch a rule to change. {2} What else can I help with?',
-  'CHANGERULES_NO_RULE_VALUE': 'I\'m sorry, I don\'t understand how to change {0}. {2} What else can I help with?',
-  'CHANGERULES_NO_RULE_OPTION': 'I\'m sorry, I didn\'t catch how to change {0}. {2} What else can I help with?',
+  'CHANGERULES_NO_RULE': 'To change a rule, say change followed by the rule you want to change. For example, say change number of decks to two. What else can I help with?',
   'CHANGERULES_CANT_CHANGE_RULE': 'I\'m sorry, I was unable to change {0} to {1}. {2} What else can I help with?',
   'CHANGERULES_CARD_TITLE': 'Blackjack Game',
   'CHANGERULES_ERR_CHECKAPP': 'Check the Alexa companion app for rules you can change.',
@@ -369,6 +367,11 @@ const utils = (locale) => {
         'one deck': 1, 'two decks': 2, 'four decks': 4, 'six decks': 6, 'eight decks': 8,
         'two deck': 2, 'four deck': 4, 'six deck': 6, 'eight deck': 8,
         'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'eight': 8,
+        'ten or eleven': 10, 'ten or eleven only': 10, 'only on ten or eleven': 10,
+        '10 or 11': 10, '10 or 11 only': 10, 'only on 10 or 11': 10,
+        'nine or ten or eleven': 9, 'only on nine or ten or eleven': 9, 'only nine thru eleven': 9, 'nine thru eleven': 9,
+        '9 or 10 or 11': 9, 'only on 9 or 10 or 11': 0, 'only 9 thru 11': 9, '9 thru 11': 9,
+        'any cards': 1, 'any card': 1, 'first two cards': 1, 'not allowed': 0, 'two cards': 1, '2 cards': 1, '2 card': 1, 'two card': 1,
         '1': 1, '2': 2, '3': 3, '4': 4, '6': 6, '8': 8};
       return valueMapping[value];
     },
@@ -516,7 +519,7 @@ const utils = (locale) => {
         case 'ResetIntent':
           response += 'reset the game ';
           break;
-        case 'ChangeRulesIntent':
+        case 'ChangeOptionIntent':
           response += 'change the rules ';
           break;
         case 'AMAZON.YesIntent':

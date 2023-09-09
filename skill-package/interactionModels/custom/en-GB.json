@@ -150,11 +150,11 @@
           ]
         },
         {
-          "name": "ChangeRulesIntent",
+          "name": "ChangeOptionIntent",
           "slots": [
             {
               "name": "Change",
-              "type": "LIST_OF_RULES_OPTIONS"
+              "type": "LIST_OF_RULE_OPTIONS"
             },
             {
               "name": "ChangeOption",
@@ -169,7 +169,19 @@
             "make {Change} {ChangeOption}",
             "turn {Change} {ChangeOption}",
             "turn {ChangeOption} {Change}",
+            "allow {Change} on {ChangeOption}",
+            "turn on {Change} on {ChangeOption}",
             "{ChangeOption} {Change}"
+          ]
+        },
+        {
+          "name": "ChangeRulesIntent",
+          "slots": [],
+          "samples": [
+            "change the rules",
+            "update the rules",
+            "change the game options",
+            "make the game more interesting"
           ]
         },
         {
@@ -525,6 +537,21 @@
                   "the reset bankroll feature"
                 ]
               }
+            },
+            {
+              "id": "changerules",
+              "name": {
+                "value": "change rules",
+                "synonyms": [
+                  "change rules",
+                  "ability to change rules",
+                  "change the rules",
+                  "change the game rules",
+                  "allow rule changes",
+                  "change game options",
+                  "update game options"
+                ]
+              }
             }
           ],
           "name": "LIST_OF_PRODUCTS"
@@ -635,9 +662,64 @@
               "name": {
                 "value": "split hands"
               }
+            },
+            {
+              "name": {
+                "value": "ten or eleven"
+              }
+            },
+            {
+              "name": {
+                "value": "ten or eleven only"
+              }
+            },
+            {
+              "name": {
+                "value": "only on ten or eleven"
+              }
+            },
+            {
+              "name": {
+                "value": "nine or ten or eleven"
+              }
+            },
+            {
+              "name": {
+                "value": "only on nine or ten or eleven"
+              }
+            },
+            {
+              "name": {
+                "value": "nine thru eleven"
+              }
+            },
+            {
+              "name": {
+                "value": "only nine thru eleven"
+              }
+            },
+            {
+              "name": {
+                "value": "any cards"
+              }
+            },
+            {
+              "name": {
+                "value": "any card"
+              }
+            },
+            {
+              "name": {
+                "value": "first two cards"
+              }
+            },
+            {
+              "name": {
+                "value": "not allowed"
+              }
             }
           ],
-          "name": "LIST_OF_RULES_OPTIONS"
+          "name": "LIST_OF_RULE_OPTIONS"
         },
         {
           "values": [

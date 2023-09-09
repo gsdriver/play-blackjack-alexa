@@ -27,6 +27,7 @@ module.exports = {
       'spanish': 'Spanish 21',
       'training': 'advanced training',
       'bankrollreset': 'reset bankroll',
+      'changerules': 'change rules',
     };
 
     let product;

@@ -14,7 +14,7 @@ module.exports = {
     // Intents that will drop to Launch
     const request = handlerInput.requestEnvelope.request;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const intents = ['SuggestIntent', 'ChangeRulesIntent', 'AMAZON.YesIntent', 'AMAZON.NoIntent'];
+    const intents = ['SuggestIntent', 'ChangeOptionIntent', 'ChangeRulesIntent', 'AMAZON.YesIntent', 'AMAZON.NoIntent'];
 
     if ((request.type === 'LaunchRequest')
       || (handlerInput.requestEnvelope.session.new

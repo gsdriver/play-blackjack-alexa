@@ -12,7 +12,7 @@ module.exports = {
       'AMAZON.HelpIntent', 'AMAZON.YesIntent', 'AMAZON.NoIntent', 'AMAZON.StopIntent',
       'AMAZON.CancelIntent', 'SuggestIntent', 'ResetIntent', 'PlaceSideBetIntent',
       'RemoveSideBetIntent', 'RulesIntent', 'EnableTrainingIntent', 'DisableTrainingIntent',
-      'PurchaseIntent', 'RefundIntent'];
+      'PurchaseIntent', 'RefundIntent', 'ChangeRulesIntent'];
 
     // Default to a negative response
     const response = {
@@ -51,7 +51,7 @@ module.exports = {
           && event.request.intent.slots.Action.value) {
           valid = res.getBlackjackAction(event.request.intent.slots.Action);
         }
-      } else if (event.request.intent.name == 'ChangeRulesIntent') {
+      } else if (event.request.intent.name == 'ChangeOptionIntent') {
         // Need change slot and change option slot
         const changeSlot = event.request.intent.slots.Change;
         const optionSlot = event.request.intent.slots.ChangeOption;

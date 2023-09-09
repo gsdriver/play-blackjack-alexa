@@ -21,11 +21,11 @@ availableGames = {
      rules: {
        hitSoft17: false,         // Does dealer hit soft 17
        surrender: 'late',        // Surrender offered - none, late, or early
-       double: 'any',            // Double rules - none, 10or11, 9or10or11, any
-       doubleaftersplit: true,   // Can double after split - none, 10or11, 9or10or11, any
+       double: '10or11',         // Double rules - none, 10or11, 9or10or11, any
+       doubleaftersplit: false,  // Can double after split - none, 10or11, 9or10or11, any
        resplitAces: false,       // Can you resplit aces
        blackjackBonus: 0.5,      // Bonus for player blackjack, usually 0.5 or 0.2
-       numberOfDecks: 1,         // Number of decks in play
+       numberOfDecks: 4,         // Number of decks in play
        minBet: 5,                // The minimum bet - not configurable
        maxBet: 5000,             // The maximum bet - not configurable
        maxSplitHands: 4,         // Maximum number of hands you can have due to splits
