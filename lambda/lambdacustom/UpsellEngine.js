@@ -117,7 +117,7 @@ module.exports = {
       'spanish': 'game',
       'training': 'game',
       'bankrollreset': 'subscribe',
-      'changerules': 'option',
+      'changerules': 'changerules',
     };
   
     return tokenPrefix[upsellProduct] ? `${tokenPrefix[upsellProduct]}.${upsellProduct}` : undefined;

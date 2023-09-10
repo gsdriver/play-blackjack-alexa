@@ -10,6 +10,7 @@ const bjUtils = require('../BlackjackUtils');
 const Launch = require('./Launch');
 const Select = require('./Select');
 const Betting = require('./Betting');
+const ChangeRules = require('./ChangeRules');
 const AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
 const SNS = new AWS.SNS();
@@ -86,6 +87,12 @@ module.exports = {
              (event.request.payload.purchaseResult == 'ALREADY_PURCHASED'))) {
             // OK, flip them to this game
             return selectedGame(handlerInput, game);
+          } else if (options[0] === 'changerules' && event.request.payload &&
+          ((event.request.payload.purchaseResult == 'ACCEPTED') ||
+           (event.request.payload.purchaseResult == 'ALREADY_PURCHASED'))) {
+            // In this case, drop them in change rules. There are no slots so it should
+            // prompt them telling them how to change the rules
+            return ChangeRules.handle(handlerInput);
           }
           break;
         case 'Cancel':

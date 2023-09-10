@@ -22,8 +22,8 @@ module.exports = {
   handle: function(handlerInput) {
     const event = handlerInput.requestEnvelope;
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const changeSlotValue = (event.request.intent.slots && event.request.intent.slots.Change) ? (event.request.intent.slots.Change.value || '') : '';
-    const optionSlotValue = (event.request.intent.slots && event.request.intent.slots.ChangeOption) ? (event.request.intent.slots.ChangeOption.value || '') : '';
+    const changeSlotValue = (event.request.intent && event.request.intent.slots && event.request.intent.slots.Change) ? (event.request.intent.slots.Change.value || '') : '';
+    const optionSlotValue = (event.request.intent && event.request.intent.slots && event.request.intent.slots.ChangeOption) ? (event.request.intent.slots.ChangeOption.value || '') : '';
     const res = require('../resources')(event.request.locale);
     let ruleError;
 
