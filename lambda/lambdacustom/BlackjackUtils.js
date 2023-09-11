@@ -170,9 +170,10 @@ module.exports = {
 
         // Post the reminder
         request(params, (err, response, body) => {
+          console.log('set reminder result', err, body)
           if (body && body.code && (body.code !== 'OK')) {
             console.log('SetReminder error ' + body.code);
-            callback(body.code);
+            callback({errorCode: body.code});
           } else {
             // OK, return the time and timezone
             module.exports.getLocalTournamentTime(handlerInput, (time, timezone) => {
@@ -181,7 +182,7 @@ module.exports = {
           }
         });
       } else {
-        callback();
+        callback({errorCode: 'NO_TOURNEY_TIME'});
       }
     });
   },

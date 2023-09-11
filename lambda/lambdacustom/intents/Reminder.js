@@ -71,7 +71,8 @@ module.exports = {
       } else if (event.request.intent.name === 'AMAZON.YesIntent') {
         // Let's see if we can add a reminder
         bjUtils.setTournamentReminder(handlerInput, (result) => {
-          if (result && (typeof result !== 'string')) {
+          console.log('reminder', result);
+          if (!result.errorCode) {
             attributes.setReminder = true;
             let speech;
             const cardText = res.strings.REMINDER_SET_CARD
@@ -96,26 +97,14 @@ module.exports = {
                 .reprompt(res.strings.REMINDER_REPROMPT)
                 .getResponse();
             }
-          } else if (result === 'UNAUTHORIZED') {
+          // We're going to assume all errors mean that we are unauthorized
+          } else {
             // Get their permission to show a reminder
             response = handlerInput.responseBuilder
               .speak(res.strings.REMINDER_GRANT_PERMISSION)
               .withAskForPermissionsConsentCard(['alexa::alerts:reminders:skill:readwrite'])
               .withShouldEndSession(true)
               .getResponse();
-          } else {
-            // Some other problem not auth-related
-            if (endSession) {
-              response = handlerInput.responseBuilder
-                .speak(res.strings.REMINDER_ERROR)
-                .withShouldEndSession(true)
-                .getResponse();
-            } else {
-              response = handlerInput.responseBuilder
-                .speak(res.strings.REMINDER_ERROR_EXPLICIT)
-                .reprompt(res.strings.REMINDER_REPROMPT)
-                .getResponse();
-            }
           }
           resolve(response);
         });
